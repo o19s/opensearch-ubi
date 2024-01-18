@@ -17,7 +17,7 @@ public class BackendController {
     @ResponseBody
     public String log(@RequestBody String body) throws IOException {
 
-        final File file = new File("/tmp/opensearch.log");
+        final File file = new File("opensearch.log");
         FileUtils.writeStringToFile(file, body, Charset.defaultCharset(), true);
 
         System.out.println(body);
