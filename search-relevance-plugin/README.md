@@ -1,8 +1,17 @@
 # search-relevance-plugin
 
-./gradlew build
+Build the plugin:
 
-docker-compose build
-docker-compose up
+`./gradlew build`
 
-curl localhost:9200/_plugins/
+Build the OpenSearch docker image and add the plugin:
+
+`docker-compose build`
+
+Start the containers:
+
+`docker-compose up`
+
+Send an event:
+
+`./test.sh`
