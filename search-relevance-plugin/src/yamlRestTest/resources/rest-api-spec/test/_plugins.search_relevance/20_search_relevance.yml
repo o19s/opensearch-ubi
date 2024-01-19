@@ -1,0 +1,15 @@
+---
+"Default with invalid event":
+  - do:
+      _plugins.search_relevance: {}
+
+  - match: {$body: "Invalid event received" }
+
+---
+"With event":
+  - do:
+      _plugins.search_relevance:
+        body:
+          event: some json event
+
+  - match: {$body: "Event received" }

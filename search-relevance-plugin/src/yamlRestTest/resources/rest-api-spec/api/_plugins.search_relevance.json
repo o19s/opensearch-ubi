@@ -1,0 +1,19 @@
+{
+  "_plugins.search_relevance": {
+    "stability" : "stable",
+    "url": {
+      "paths": [
+        {
+          "path": "/_plugins/search_relevance",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        }
+      ]
+    },
+    "body": {
+      "description": "The JSON event"
+    }
+  }
+}

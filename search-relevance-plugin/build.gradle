@@ -1,0 +1,40 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'opensearch.opensearchplugin'
+apply plugin: 'opensearch.yaml-rest-test'
+
+opensearchplugin {
+    name 'opensearch-search-relevance-plugin'
+    description 'OpenSearch Search Relevance Plugin'
+    classname 'org.opensearch.rest.action.SearchRelevancePlugin'
+    licenseFile rootProject.file('LICENSE.txt')
+    noticeFile rootProject.file('NOTICE.txt')
+}
+
+// disabling some unnecessary validations for this plugin
+testingConventions.enabled = false
+loggerUsageCheck.enabled = false
+validateNebulaPom.enabled = false
+
+buildscript {
+    repositories {
+        mavenLocal()
+        maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+
+    dependencies {
+        classpath "org.opensearch.gradle:build-tools:2.11.1"
+    }
+}
+
+repositories {
+    mavenLocal()
+}
+
+dependencies {
+    // required for the yaml test to run
+    yamlRestTestImplementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+    runtimeOnly 'org.apache.logging.log4j:log4j-core:2.20.0'
+}
