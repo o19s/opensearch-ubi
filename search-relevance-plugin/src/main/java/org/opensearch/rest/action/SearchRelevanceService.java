@@ -14,13 +14,10 @@ import org.opensearch.rest.RestResponse;
 
 public class SearchRelevanceService {
 
-    public static RestResponse buildResponse(final boolean valid) {
+    public static RestResponse buildResponse() {
 
-        if(valid) {
-            return new BytesRestResponse(RestStatus.OK, "Event received");
-        } else {
-            return new BytesRestResponse(RestStatus.OK, "Invalid event received");
-        }
+        return new BytesRestResponse(RestStatus.OK, "Event received");
 
     }
+
 }

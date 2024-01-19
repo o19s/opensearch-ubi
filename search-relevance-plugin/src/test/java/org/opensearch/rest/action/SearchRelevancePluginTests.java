@@ -14,12 +14,8 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class SearchRelevancePluginTests extends OpenSearchTestCase {
 
-    public void testBuildValidSearchRelevanceResponse() {
-        assertThat(SearchRelevanceService.buildResponse(true).content().utf8ToString(), equalTo("Event received"));
-    }
-
-    public void testBuildInvalidSearchRelevanceResponse() {
-        assertThat(SearchRelevanceService.buildResponse(false).content().utf8ToString(), equalTo("Invalid event received"));
+    public void testBuildSearchRelevanceResponse() {
+        assertThat(SearchRelevanceService.buildResponse().content().utf8ToString(), equalTo("Event received"));
     }
 
 }
