@@ -11,87 +11,83 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.admin.indices.create.CreateIndexRequest;
+import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.client.node.NodeClient;
-import org.opensearch.common.xcontent.XContentFactory;
 import org.opensearch.common.xcontent.XContentType;
-import org.opensearch.core.xcontent.ToXContent;
-import org.opensearch.core.xcontent.XContentBuilder;
+import org.opensearch.core.rest.RestStatus;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
+import org.opensearch.rest.RestResponse;
 
-import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-import static org.opensearch.rest.RestRequest.Method.GET;
-import static org.opensearch.rest.RestRequest.Method.POST;
+import static org.opensearch.rest.RestRequest.Method.*;
 
 public class SearchRelevanceAction extends BaseRestHandler {
-
-    public static final String INDEX_NAME = "searchrelevance";
 
     private static final Logger LOGGER = LogManager.getLogger(SearchRelevanceAction.class);
 
     @Override
     public String getName() {
-        return "rest_handler_search_relevance";
+        return "Search Relevance";
     }
 
     @Override
     public List<Route> routes() {
         return List.of(
-                new Route(GET, "/_plugins/search_relevance"),
-                new Route(POST, "/_plugins/search_relevance"));
+                new Route(PUT, "/_plugins/search_relevance/{store}"), // Initializes the store.
+                new Route(DELETE, "/_plugins/search_relevance/{store}"), // Deletes a store.
+                new Route(GET, "/_plugins/search_relevance"), // Lists all stores
+                new Route(POST, "/_plugins/search_relevance/{store}")); // Indexes events into the store.
     }
 
     @Override
     protected RestChannelConsumer prepareRequest(RestRequest request, NodeClient client) {
 
-        if(!request.hasContent()) {
-            throw new IllegalArgumentException("Missing event content");
-        }
-
         LOGGER.log(Level.INFO, "received event");
 
-        if (request.method() == POST) {
+        if (request.method() == PUT) {
+
+            final String indexName = request.param("store");
+
+            LOGGER.log(Level.INFO, "Creating search relevance index {}", indexName);
+            final CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName);
+            return (channel) -> client.admin().indices().create(createIndexRequest, new RestToXContentListener<>(channel));
+
+        } else if (request.method() == DELETE) {
+
+            final String indexName = request.param("store");
+
+            LOGGER.log(Level.INFO, "Deleting search relevance index {}", indexName);
+            final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
+            return (channel) -> client.admin().indices().delete(deleteIndexRequest, new RestToXContentListener<>(channel));
+
+        } else if (request.method() == POST) {
 
             if (request.hasContent()) {
 
-                // Create the index.
-                // TODO: Only need to do this once on init.
-                LOGGER.log(Level.INFO, "Creating index");
-                final CreateIndexRequest createIndexRequest = new CreateIndexRequest();
-                createIndexRequest.index(INDEX_NAME);
-                client.admin().indices().create(createIndexRequest);
+                final String indexName = request.param("store");
 
                 // Index the event.
-                LOGGER.log(Level.INFO, "Indexing the event");
-                final IndexRequest indexRequest = new IndexRequest();
-                indexRequest.index(INDEX_NAME);
+                LOGGER.log(Level.INFO, "Indexing event into {}", indexName);
+                final IndexRequest indexRequest = new IndexRequest(indexName);
                 indexRequest.source(request.content().utf8ToString(), XContentType.JSON);
-                client.index(indexRequest);
+                return (channel) -> client.index(indexRequest, new RestToXContentListener<>(channel));
 
-                return channel -> {
-                    try {
-                        channel.sendResponse(SearchRelevanceService.buildResponse());
-                    } catch (final Exception e) {
-                        channel.sendResponse(new BytesRestResponse(channel, e));
-                    }
-                };
-
+            } else {
+                throw new IllegalArgumentException("Missing event content");
             }
 
         }
 
-        // TODO: Do something else.
+        // TODO: List all search_relevance stores.
 
         return channel -> {
             try {
-                channel.sendResponse(SearchRelevanceService.buildResponse());
+                final RestResponse restResponse = new BytesRestResponse(RestStatus.OK, "Event received");
+                channel.sendResponse(restResponse);
             } catch (final Exception e) {
                 channel.sendResponse(new BytesRestResponse(channel, e));
             }

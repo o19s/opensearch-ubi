@@ -6,8 +6,10 @@
         {
           "path": "/_plugins/search_relevance",
           "methods": [
+            "DELETE",
             "GET",
-            "POST"
+            "POST",
+            "PUT"
           ]
         }
       ]
