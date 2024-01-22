@@ -23,3 +23,9 @@ Send an event to the `awesome` store:
 ```
 curl -X POST http://localhost:9200/_plugins/search_relevance/awesome -H "Content-Type: application/json" -d @instant-search.json
 ```
+
+Get events:
+
+```
+curl http://localhost:9200/awesome/_search
+```
