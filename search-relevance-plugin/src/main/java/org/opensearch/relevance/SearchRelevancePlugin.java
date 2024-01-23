@@ -9,6 +9,7 @@ package org.opensearch.relevance;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.opensearch.action.support.ActionFilter;
 import org.opensearch.client.Client;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.cluster.node.DiscoveryNodes;
@@ -23,7 +24,8 @@ import org.opensearch.env.Environment;
 import org.opensearch.env.NodeEnvironment;
 import org.opensearch.plugins.ActionPlugin;
 import org.opensearch.plugins.Plugin;
-import org.opensearch.relevance.action.SearchRelevanceAction;
+import org.opensearch.relevance.action.SearchRelevanceRestHandler;
+import org.opensearch.relevance.action.SearchRelevanceSearchFilter;
 import org.opensearch.relevance.events.EventManager;
 import org.opensearch.repositories.RepositoriesService;
 import org.opensearch.rest.RestController;
@@ -53,8 +55,13 @@ public class SearchRelevancePlugin extends Plugin implements ActionPlugin {
                                              final IndexNameExpressionResolver indexNameExpressionResolver,
                                              final Supplier<DiscoveryNodes> nodesInCluster) {
 
-        return singletonList(new SearchRelevanceAction());
+        return singletonList(new SearchRelevanceRestHandler());
 
+    }
+
+    @Override
+    public List<ActionFilter> getActionFilters() {
+        return singletonList(new SearchRelevanceSearchFilter());
     }
 
     @Override

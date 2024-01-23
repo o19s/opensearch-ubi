@@ -5,6 +5,7 @@
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
  */
+
 package org.opensearch.relevance.action;
 
 import org.apache.logging.log4j.Level;
@@ -26,9 +27,9 @@ import java.util.List;
 
 import static org.opensearch.rest.RestRequest.Method.*;
 
-public class SearchRelevanceAction extends BaseRestHandler {
+public class SearchRelevanceRestHandler extends BaseRestHandler {
 
-    private static final Logger LOGGER = LogManager.getLogger(SearchRelevanceAction.class);
+    private static final Logger LOGGER = LogManager.getLogger(SearchRelevanceRestHandler.class);
 
     @Override
     public String getName() {
