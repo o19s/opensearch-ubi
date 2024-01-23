@@ -1,6 +1,6 @@
 # search-relevance-plugin
 
-Build the plugin:
+Build the plugin.  Note that you will have to match up the JDK 11 on your system to java home in the `gradle.properties` file:
 
 `./gradlew build`
 
