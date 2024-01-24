@@ -8,6 +8,7 @@ services:
       discovery.type: single-node
       node.name: opensearch
       plugins.security.disabled: "true"
+      plugins.relevance.index: "awesome"
     volumes:
       - opensearch-data:/usr/share/opensearch/data
     ports:

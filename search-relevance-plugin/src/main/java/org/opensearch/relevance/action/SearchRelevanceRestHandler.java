@@ -54,7 +54,7 @@ public class SearchRelevanceRestHandler extends BaseRestHandler {
 
             final String indexName = request.param("store");
 
-            LOGGER.log(Level.INFO, "Creating search relevance index {}", indexName);
+            LOGGER.info("Creating search relevance index {}", indexName);
             final CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName);
             return (channel) -> nodeClient.admin().indices().create(createIndexRequest, new RestToXContentListener<>(channel));
 
@@ -62,7 +62,7 @@ public class SearchRelevanceRestHandler extends BaseRestHandler {
 
             final String indexName = request.param("store");
 
-            LOGGER.log(Level.INFO, "Deleting search relevance index {}", indexName);
+            LOGGER.info("Deleting search relevance index {}", indexName);
             final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
             return (channel) -> nodeClient.admin().indices().delete(deleteIndexRequest, new RestToXContentListener<>(channel));
 
@@ -73,7 +73,7 @@ public class SearchRelevanceRestHandler extends BaseRestHandler {
                 final String indexName = request.param("store");
 
                 // Add the event for indexing.
-                LOGGER.log(Level.INFO, "Indexing event into {}", indexName);
+                LOGGER.info("Indexing event into {}", indexName);
                 final IndexRequest indexRequest = new IndexRequest(indexName);
                 indexRequest.source(request.content().utf8ToString(), XContentType.JSON);
 
