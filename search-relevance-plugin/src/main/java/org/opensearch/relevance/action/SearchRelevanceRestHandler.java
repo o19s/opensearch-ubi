@@ -5,7 +5,8 @@
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
  */
-package org.opensearch.rest.action;
+
+package org.opensearch.relevance.action;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -16,18 +17,19 @@ import org.opensearch.action.index.IndexRequest;
 import org.opensearch.client.node.NodeClient;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.core.rest.RestStatus;
+import org.opensearch.relevance.events.EventManager;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
-import org.opensearch.rest.RestResponse;
+import org.opensearch.rest.action.RestToXContentListener;
 
 import java.util.List;
 
 import static org.opensearch.rest.RestRequest.Method.*;
 
-public class SearchRelevanceAction extends BaseRestHandler {
+public class SearchRelevanceRestHandler extends BaseRestHandler {
 
-    private static final Logger LOGGER = LogManager.getLogger(SearchRelevanceAction.class);
+    private static final Logger LOGGER = LogManager.getLogger(SearchRelevanceRestHandler.class);
 
     @Override
     public String getName() {
@@ -44,7 +46,7 @@ public class SearchRelevanceAction extends BaseRestHandler {
     }
 
     @Override
-    protected RestChannelConsumer prepareRequest(RestRequest request, NodeClient client) {
+    protected RestChannelConsumer prepareRequest(RestRequest request, NodeClient nodeClient) {
 
         LOGGER.log(Level.INFO, "received event");
 
@@ -54,7 +56,7 @@ public class SearchRelevanceAction extends BaseRestHandler {
 
             LOGGER.log(Level.INFO, "Creating search relevance index {}", indexName);
             final CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName);
-            return (channel) -> client.admin().indices().create(createIndexRequest, new RestToXContentListener<>(channel));
+            return (channel) -> nodeClient.admin().indices().create(createIndexRequest, new RestToXContentListener<>(channel));
 
         } else if (request.method() == DELETE) {
 
@@ -62,7 +64,7 @@ public class SearchRelevanceAction extends BaseRestHandler {
 
             LOGGER.log(Level.INFO, "Deleting search relevance index {}", indexName);
             final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
-            return (channel) -> client.admin().indices().delete(deleteIndexRequest, new RestToXContentListener<>(channel));
+            return (channel) -> nodeClient.admin().indices().delete(deleteIndexRequest, new RestToXContentListener<>(channel));
 
         } else if (request.method() == POST) {
 
@@ -70,11 +72,15 @@ public class SearchRelevanceAction extends BaseRestHandler {
 
                 final String indexName = request.param("store");
 
-                // Index the event.
+                // Add the event for indexing.
                 LOGGER.log(Level.INFO, "Indexing event into {}", indexName);
                 final IndexRequest indexRequest = new IndexRequest(indexName);
                 indexRequest.source(request.content().utf8ToString(), XContentType.JSON);
-                return (channel) -> client.index(indexRequest, new RestToXContentListener<>(channel));
+
+                //return (channel) -> client.index(indexRequest, new RestToXContentListener<>(channel));
+                EventManager.getInstance(nodeClient).addIndexRequest(indexRequest);
+
+                return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "Event received"));
 
             } else {
                 throw new IllegalArgumentException("Missing event content");
@@ -82,16 +88,8 @@ public class SearchRelevanceAction extends BaseRestHandler {
 
         }
 
-        // TODO: List all search_relevance stores.
-
-        return channel -> {
-            try {
-                final RestResponse restResponse = new BytesRestResponse(RestStatus.OK, "Event received");
-                channel.sendResponse(restResponse);
-            } catch (final Exception e) {
-                channel.sendResponse(new BytesRestResponse(channel, e));
-            }
-        };
+        // TODO: List names of all search_relevance stores.
+        return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "ok"));
 
     }
 
