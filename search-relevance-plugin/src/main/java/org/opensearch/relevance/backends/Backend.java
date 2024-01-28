@@ -11,6 +11,8 @@ package org.opensearch.relevance.backends;
 import org.opensearch.client.node.NodeClient;
 import org.opensearch.rest.RestChannel;
 
+import java.util.List;
+
 public interface Backend {
 
     void initialize(final String indexName, final NodeClient nodeClient, RestChannel channel);
@@ -18,5 +20,7 @@ public interface Backend {
     void delete(final String indexName, final NodeClient nodeClient, RestChannel channel);
 
     void persist(final String indexName, String event, final NodeClient nodeClient);
+
+    List<String> get();
 
 }

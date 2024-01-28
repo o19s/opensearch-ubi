@@ -19,6 +19,10 @@ import org.opensearch.relevance.events.EventManager;
 import org.opensearch.rest.RestChannel;
 import org.opensearch.rest.action.RestToXContentListener;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class OpenSearchBackend implements Backend {
 
     private static final Logger LOGGER = LogManager.getLogger(OpenSearchBackend.class);
@@ -54,6 +58,12 @@ public class OpenSearchBackend implements Backend {
         //return (channel) -> client.index(indexRequest, new RestToXContentListener<>(channel));
         EventManager.getInstance(nodeClient).addIndexRequest(indexRequest);
 
+    }
+
+    @Override
+    public List<String> get() {
+        // TODO: Get the list of stores for the plugin.
+        return new ArrayList<>();
     }
 
 }
