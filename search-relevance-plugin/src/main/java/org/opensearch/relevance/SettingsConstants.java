@@ -8,7 +8,7 @@
 
 package org.opensearch.relevance;
 
-public class ConfigConstants {
+public class SettingsConstants {
 
     public static final String INDEX_NAME = "plugins.relevance.index";
 

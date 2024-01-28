@@ -15,7 +15,6 @@ import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.support.ActionFilter;
 import org.opensearch.action.support.ActionFilterChain;
-import org.opensearch.common.settings.Setting;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
 import org.opensearch.tasks.Task;
@@ -59,7 +58,7 @@ public class SearchRelevanceSearchFilter implements ActionFilter {
 
                 // TODO: We need to restrict this to only searches of certain indices.
                 // TODO: Look up which indices to log from the plugin settings.
-                if(indices.contains("awesome")) {
+                //if(indices.contains("awesome")) {
 
                     // Create a UUID for this search request.
                     final String searchId = UUID.randomUUID().toString();
@@ -87,7 +86,7 @@ public class SearchRelevanceSearchFilter implements ActionFilter {
 
                     }
 
-                }
+                //}
 
                 listener.onResponse(response);
 

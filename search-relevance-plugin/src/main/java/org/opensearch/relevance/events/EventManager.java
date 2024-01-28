@@ -13,12 +13,12 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.action.bulk.BulkRequest;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.client.Client;
-import org.opensearch.relevance.queues.EventQueue;
-import org.opensearch.relevance.queues.InternalQueue;
+import org.opensearch.relevance.events.queues.EventQueue;
+import org.opensearch.relevance.events.queues.InternalQueue;
 
 import java.util.TimerTask;
 
-public class EventManager extends TimerTask {
+public class EventManager {
 
     private static final Logger LOGGER = LogManager.getLogger(EventManager.class);
 
@@ -31,8 +31,7 @@ public class EventManager extends TimerTask {
         this.eventQueue = new InternalQueue();
     }
 
-    @Override
-    public void run() {
+    public void process() {
 
         if(eventQueue.size() > 0) {
 

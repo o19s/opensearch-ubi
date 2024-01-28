@@ -11,17 +11,14 @@ package org.opensearch.relevance.action;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.action.admin.indices.create.CreateIndexRequest;
-import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.opensearch.action.index.IndexRequest;
 import org.opensearch.client.node.NodeClient;
-import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.core.rest.RestStatus;
+import org.opensearch.relevance.backends.Backend;
+import org.opensearch.relevance.backends.OpenSearchBackend;
 import org.opensearch.relevance.events.EventManager;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
-import org.opensearch.rest.action.RestToXContentListener;
 
 import java.util.List;
 
@@ -30,6 +27,12 @@ import static org.opensearch.rest.RestRequest.Method.*;
 public class SearchRelevanceRestHandler extends BaseRestHandler {
 
     private static final Logger LOGGER = LogManager.getLogger(SearchRelevanceRestHandler.class);
+
+    private final Backend backend;
+
+    public SearchRelevanceRestHandler() {
+        this.backend = new OpenSearchBackend();
+    }
 
     @Override
     public String getName() {
@@ -55,16 +58,14 @@ public class SearchRelevanceRestHandler extends BaseRestHandler {
             final String indexName = request.param("store");
 
             LOGGER.info("Creating search relevance index {}", indexName);
-            final CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName);
-            return (channel) -> nodeClient.admin().indices().create(createIndexRequest, new RestToXContentListener<>(channel));
+            return (channel) -> backend.initialize(indexName, nodeClient, channel);
 
         } else if (request.method() == DELETE) {
 
             final String indexName = request.param("store");
 
             LOGGER.info("Deleting search relevance index {}", indexName);
-            final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
-            return (channel) -> nodeClient.admin().indices().delete(deleteIndexRequest, new RestToXContentListener<>(channel));
+            return (channel) -> backend.delete(indexName, nodeClient, channel);
 
         } else if (request.method() == POST) {
 
@@ -72,13 +73,9 @@ public class SearchRelevanceRestHandler extends BaseRestHandler {
 
                 final String indexName = request.param("store");
 
-                // Add the event for indexing.
-                LOGGER.info("Indexing event into {}", indexName);
-                final IndexRequest indexRequest = new IndexRequest(indexName);
-                indexRequest.source(request.content().utf8ToString(), XContentType.JSON);
-
-                //return (channel) -> client.index(indexRequest, new RestToXContentListener<>(channel));
-                EventManager.getInstance(nodeClient).addIndexRequest(indexRequest);
+                LOGGER.info("Persisting event into {}", indexName);
+                final String event = request.content().utf8ToString();
+                backend.persist(indexName, event, nodeClient);
 
                 return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "Event received"));
 
