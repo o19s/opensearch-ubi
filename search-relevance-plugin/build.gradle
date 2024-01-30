@@ -4,7 +4,7 @@ apply plugin: 'opensearch.opensearchplugin'
 apply plugin: 'opensearch.yaml-rest-test'
 
 opensearchplugin {
-    name 'opensearch-search-relevance-plugin'
+    name 'opensearch-search-relevance'
     description 'OpenSearch Search Relevance Plugin'
     classname 'org.opensearch.relevance.SearchRelevancePlugin'
     licenseFile rootProject.file('LICENSE.txt')
