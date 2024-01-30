@@ -2,7 +2,7 @@ version: '3'
 
 services:
   opensearch:
-    build: .
+    build: ./search-relevance-plugin/
     container_name: opensearch
     environment:
       discovery.type: single-node
@@ -17,27 +17,37 @@ services:
       http.cors.allow-credentials: true
       http.cors.allow-headers: X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
       plugins.relevance.index: "awesome"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536      
     volumes:
       - opensearch-data:/usr/share/opensearch/data
     ports:
       - 9200:9200
       - 9600:9600
+    expose:
+      - 9200
+      - 9600
     networks:
       - opensearch-net
 
-#  opensearch-dashboards:
-#    image: opensearchproject/opensearch-dashboards:2.11.1
-#    container_name: opensearch-dashboards
-#    ports:
-#      - 5601:5601
-#    expose:
-#      - "5601"
-#    environment:
-#      OPENSEARCH_HOSTS: '["https://opensearch:9200"]'
-#    networks:
-#      - opensearch-net
-#    depends_on:
-#      - opensearch
+  opensearch-dashboards:
+    build: ./dashboard-plugin/
+    container_name: opensearch-dashboards
+    ports:
+      - 5601:5601
+    expose:
+      - 5601
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+    networks:
+      - opensearch-net
+    depends_on:
+      - opensearch
 
 volumes:
   opensearch-data:
