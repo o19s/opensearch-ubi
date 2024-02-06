@@ -17,10 +17,10 @@ import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.client.node.NodeClient;
 import org.opensearch.cluster.metadata.IndexMetadata;
-import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.io.Streams;
 import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.relevance.SettingsConstants;
 import org.opensearch.relevance.events.EventManager;
 import org.opensearch.rest.RestChannel;
 import org.opensearch.rest.action.RestToXContentListener;
@@ -38,8 +38,6 @@ public class OpenSearchBackend implements Backend {
     private static final String MAPPING_FILE = "index-mapping.json";
 
     public static final int VERSION = 1;
-    public static final Setting<Integer> STORE_VERSION_PROP = Setting.intSetting("index.ublstore_version",
-            VERSION, -1, Integer.MAX_VALUE, Setting.Property.IndexScope);
 
     @Override
     public void initialize(final String indexName, final NodeClient nodeClient, final RestChannel channel) {
@@ -102,12 +100,9 @@ public class OpenSearchBackend implements Backend {
         return Settings.builder()
                 .put(IndexMetadata.INDEX_NUMBER_OF_SHARDS_SETTING.getKey(), 1)
                 .put(IndexMetadata.INDEX_AUTO_EXPAND_REPLICAS_SETTING.getKey(), "0-2")
-                //.put(STORE_VERSION_PROP.getKey(), VERSION)
+                .put(SettingsConstants.VERSION_SETTING, VERSION)
                 .put(IndexMetadata.SETTING_PRIORITY, Integer.MAX_VALUE)
                 .put(IndexMetadata.SETTING_INDEX_HIDDEN, true)
-                /*.put(Settings.builder()
-                        .loadFromSource(readResourceFile(indexName, ANALYSIS_FILE), XContentType.JSON)
-                        .build())*/
                 .build();
     }
 

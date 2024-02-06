@@ -63,7 +63,9 @@ public class SearchRelevancePlugin extends Plugin implements ActionPlugin {
 
         final List<Setting<?>> settings = new ArrayList<>();
         settings.add(Setting.simpleString(SettingsConstants.INDEX_NAME, "None", Setting.Property.NodeScope));
-        //settings.add(Setting.simpleString("index.ublstore_version", "None", Setting.Property.NodeScope));
+
+        // The version of the index mapping.
+        settings.add(Setting.intSetting(SettingsConstants.VERSION_SETTING, 1, -1, Integer.MAX_VALUE, Setting.Property.IndexScope));
 
         return settings;
 
