@@ -63,6 +63,7 @@ public class SearchRelevancePlugin extends Plugin implements ActionPlugin {
 
         final List<Setting<?>> settings = new ArrayList<>();
         settings.add(Setting.simpleString(SettingsConstants.INDEX_NAME, "None", Setting.Property.NodeScope));
+        //settings.add(Setting.simpleString("index.ublstore_version", "None", Setting.Property.NodeScope));
 
         return settings;
 
@@ -93,7 +94,6 @@ public class SearchRelevancePlugin extends Plugin implements ActionPlugin {
 
         // TODO: Only start this if already initialized.
         threadPool.scheduler().scheduleAtFixedRate(() -> {
-            LOGGER.info("Bulk indexing search relevance events.");
             EventManager.getInstance(client).process();
         }, 0, 2000, TimeUnit.MILLISECONDS);
 

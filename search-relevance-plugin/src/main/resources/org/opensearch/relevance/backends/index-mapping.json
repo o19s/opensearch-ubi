@@ -1,0 +1,95 @@
+{
+  "dynamic": "strict",
+  "properties": {
+    "action_name": { "type" : "keyword" },
+    "user_id":     { "type" : "keyword" },
+    "session_id":  { "type" : "keyword" },
+    "time":  { "type" : "text" },
+    "data": {
+      "properties": {
+        "info": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "warn": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "error": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "debug": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "data":  { "type" : "object" },
+        "user_name":  {"type": "keyword"},
+        "user_id":  {"type": "keyword"},
+        "to_user_id":  {"type": "keyword"},
+        "transaction_id":  {"type": "keyword"},
+        "transaction_type":  {"type": "keyword"},
+        "query_session":  {"type": "keyword"},
+        "searched_for": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "product_id":  {"type": "keyword"},
+        "product_type":  { "type": "text"},
+        "product_description": { "type": "text"},
+        "content":  { "type": "text"},
+        "price":  { "type": "float"},
+        "browser": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "ip": {"type":"ip","ignore_malformed": true},
+        "datetime": {"type": "date", "doc_values": true},
+        "dob": {"type": "date", "doc_values": true},
+        "address": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "city":  {"type": "keyword"},
+        "state":  {"type": "keyword"},
+        "zip":  {"type": "keyword"},
+        "email":  {"type": "keyword"}
+      }
+    }
+  }
+}
