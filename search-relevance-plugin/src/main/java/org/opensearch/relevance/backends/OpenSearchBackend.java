@@ -54,6 +54,7 @@ public class OpenSearchBackend implements Backend {
     public void initialize(final String storeName, final RestChannel channel) {
 
         // TODO: Determine if already initialized with this index name first.
+        // TODO: Also need some error handling around this in case one or both of these index creations fail.
 
         LOGGER.info("Creating search relevance store {}", storeName);
 
@@ -105,8 +106,19 @@ public class OpenSearchBackend implements Backend {
 
     @Override
     public void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) {
-        // TODO: Implement this.
+
         LOGGER.info("Writing query ID {} with response ID {}", queryRequest.getQueryId(), queryResponse.getQueryResponseId());
+
+        // TODO: Format what to index as JSON.
+        final String json = "";
+
+        final String queriesIndexName = getQueriesIndexName(storeName);
+        final IndexRequest indexRequest = new IndexRequest(queriesIndexName)
+                .source(json, XContentType.JSON);
+
+        //return (channel) -> client.index(indexRequest, new RestToXContentListener<>(channel));
+        EventManager.getInstance(client).addIndexRequest(indexRequest);
+
     }
 
     @Override
