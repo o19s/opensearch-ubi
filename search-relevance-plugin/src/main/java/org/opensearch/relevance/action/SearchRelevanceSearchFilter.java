@@ -17,18 +17,21 @@ import org.opensearch.action.support.ActionFilter;
 import org.opensearch.action.support.ActionFilterChain;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
+import org.opensearch.relevance.backends.Backend;
+import org.opensearch.relevance.model.QueryRequest;
+import org.opensearch.relevance.model.QueryResponse;
 import org.opensearch.tasks.Task;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class SearchRelevanceSearchFilter implements ActionFilter {
 
     private static final Logger LOGGER = LogManager.getLogger(SearchRelevanceSearchFilter.class);
 
-    public SearchRelevanceSearchFilter() {
+    private final Backend backend;
 
+    public SearchRelevanceSearchFilter(final Backend backend) {
+        this.backend = backend;
     }
 
     @Override
@@ -61,28 +64,32 @@ public class SearchRelevanceSearchFilter implements ActionFilter {
                 //if(indices.contains("awesome")) {
 
                     // Create a UUID for this search request.
-                    final String searchId = UUID.randomUUID().toString();
+                    final String queryId = UUID.randomUUID().toString();
                     final String query = searchRequest.source().toString();
 
                     LOGGER.info("Query: {}", query);
-                    LOGGER.info("Query ID: {}", searchId);
+                    LOGGER.info("Query ID: {}", queryId);
 
                     // Create a UUID for this search response.
-                    final String responseId = UUID.randomUUID().toString();
+                    final String queryResponseId = UUID.randomUUID().toString();
+
+                    final List<Integer> queryResponseHitIds = new LinkedList<>();
 
                     // Get all search hits from the response.
                     if (response instanceof SearchResponse) {
 
                         final SearchResponse sr = (SearchResponse) response;
 
-                        // TODO: Log this search request with this list of hits.
-
                         sr.getHits().forEach(hit -> {
 
-                            // Put the hitId in the hit so the frontend can access it.
-                            LOGGER.info("Search hit id: {}", hit.docId());
+                            // TODO: Put the hitId in the hit so the frontend can access it to know what was interacted with.
+                            queryResponseHitIds.add(hit.docId());
 
                         });
+
+                        backend.persistQuery("storeName",
+                                new QueryRequest(queryId, query),
+                                new QueryResponse(queryResponseId, queryResponseHitIds));
 
                     }
 

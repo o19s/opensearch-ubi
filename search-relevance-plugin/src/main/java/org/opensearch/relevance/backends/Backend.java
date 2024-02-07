@@ -9,17 +9,21 @@
 package org.opensearch.relevance.backends;
 
 import org.opensearch.client.node.NodeClient;
+import org.opensearch.relevance.model.QueryRequest;
+import org.opensearch.relevance.model.QueryResponse;
 import org.opensearch.rest.RestChannel;
 
 import java.util.List;
 
 public interface Backend {
 
-    void initialize(final String indexName, final NodeClient nodeClient, RestChannel channel);
+    void initialize(final String storeName, RestChannel channel);
 
-    void delete(final String indexName, final NodeClient nodeClient, RestChannel channel);
+    void delete(final String storeName, RestChannel channel);
 
-    void persist(final String indexName, String event, final NodeClient nodeClient);
+    void persistEvent(final String storeName, String event);
+
+    void persistQuery(final String storeName, QueryRequest queryRequest, QueryResponse queryResponse);
 
     List<String> get();
 

@@ -14,8 +14,6 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.client.node.NodeClient;
 import org.opensearch.core.rest.RestStatus;
 import org.opensearch.relevance.backends.Backend;
-import org.opensearch.relevance.backends.OpenSearchBackend;
-import org.opensearch.relevance.events.EventManager;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
@@ -30,8 +28,8 @@ public class SearchRelevanceRestHandler extends BaseRestHandler {
 
     private final Backend backend;
 
-    public SearchRelevanceRestHandler() {
-        this.backend = new OpenSearchBackend();
+    public SearchRelevanceRestHandler(final Backend backend) {
+        this.backend = backend;
     }
 
     @Override
@@ -55,27 +53,27 @@ public class SearchRelevanceRestHandler extends BaseRestHandler {
 
         if (request.method() == PUT) {
 
-            final String indexName = request.param("store");
+            final String storeName = request.param("store");
 
-            LOGGER.info("Creating search relevance index {}", indexName);
-            return (channel) -> backend.initialize(indexName, nodeClient, channel);
+            LOGGER.info("Creating search relevance index {}", storeName);
+            return (channel) -> backend.initialize(storeName, channel);
 
         } else if (request.method() == DELETE) {
 
-            final String indexName = request.param("store");
+            final String storeName = request.param("store");
 
-            LOGGER.info("Deleting search relevance index {}", indexName);
-            return (channel) -> backend.delete(indexName, nodeClient, channel);
+            LOGGER.info("Deleting search relevance index {}", storeName);
+            return (channel) -> backend.delete(storeName, channel);
 
         } else if (request.method() == POST) {
 
             if (request.hasContent()) {
 
-                final String indexName = request.param("store");
+                final String storeName = request.param("store");
 
-                LOGGER.info("Persisting event into {}", indexName);
+                LOGGER.info("Persisting event into {}", storeName);
                 final String event = request.content().utf8ToString();
-                backend.persist(indexName, event, nodeClient);
+                backend.persistEvent(storeName, event);
 
                 return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "Event received"));
 

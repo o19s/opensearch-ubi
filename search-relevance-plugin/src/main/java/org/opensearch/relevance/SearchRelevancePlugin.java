@@ -24,6 +24,8 @@ import org.opensearch.plugins.ActionPlugin;
 import org.opensearch.plugins.Plugin;
 import org.opensearch.relevance.action.SearchRelevanceRestHandler;
 import org.opensearch.relevance.action.SearchRelevanceSearchFilter;
+import org.opensearch.relevance.backends.Backend;
+import org.opensearch.relevance.backends.OpenSearchBackend;
 import org.opensearch.relevance.events.EventManager;
 import org.opensearch.repositories.RepositoriesService;
 import org.opensearch.rest.RestController;
@@ -45,6 +47,8 @@ public class SearchRelevancePlugin extends Plugin implements ActionPlugin {
 
     private static final Logger LOGGER = LogManager.getLogger(SearchRelevancePlugin.class);
 
+    private Backend backend;
+
     @Override
     public List<RestHandler> getRestHandlers(final Settings settings,
                                              final RestController restController,
@@ -54,7 +58,7 @@ public class SearchRelevancePlugin extends Plugin implements ActionPlugin {
                                              final IndexNameExpressionResolver indexNameExpressionResolver,
                                              final Supplier<DiscoveryNodes> nodesInCluster) {
 
-        return singletonList(new SearchRelevanceRestHandler());
+        return singletonList(new SearchRelevanceRestHandler(backend));
 
     }
 
@@ -74,7 +78,7 @@ public class SearchRelevancePlugin extends Plugin implements ActionPlugin {
     @Override
     public List<ActionFilter> getActionFilters() {
         // LOGGER.info("Index name: {}", settings.get(ConfigConstants.INDEX_NAME));
-        return singletonList(new SearchRelevanceSearchFilter());
+        return singletonList(new SearchRelevanceSearchFilter(backend));
     }
 
     @Override
@@ -91,6 +95,8 @@ public class SearchRelevancePlugin extends Plugin implements ActionPlugin {
             IndexNameExpressionResolver indexNameExpressionResolver,
             Supplier<RepositoriesService> repositoriesServiceSupplier
     ) {
+
+        this.backend = new OpenSearchBackend(client);
 
         LOGGER.info("Creating scheduled task");
 

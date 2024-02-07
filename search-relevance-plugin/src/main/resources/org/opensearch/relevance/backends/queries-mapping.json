@@ -1,0 +1,8 @@
+{
+  "dynamic": "strict",
+  "properties": {
+    "query": {
+      "type": "keyword"
+    }
+  }
+}

@@ -15,6 +15,7 @@ import org.apache.logging.log4j.util.Supplier;
 import org.opensearch.action.admin.indices.create.CreateIndexRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.opensearch.action.index.IndexRequest;
+import org.opensearch.client.Client;
 import org.opensearch.client.node.NodeClient;
 import org.opensearch.cluster.metadata.IndexMetadata;
 import org.opensearch.common.settings.Settings;
@@ -22,10 +23,13 @@ import org.opensearch.common.util.io.Streams;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.relevance.SettingsConstants;
 import org.opensearch.relevance.events.EventManager;
+import org.opensearch.relevance.model.QueryRequest;
+import org.opensearch.relevance.model.QueryResponse;
 import org.opensearch.rest.RestChannel;
 import org.opensearch.rest.action.RestToXContentListener;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -35,68 +39,101 @@ public class OpenSearchBackend implements Backend {
 
     private static final Logger LOGGER = LogManager.getLogger(OpenSearchBackend.class);
 
-    private static final String MAPPING_FILE = "index-mapping.json";
+    private static final String EVENTS_MAPPING_FILE = "events-mapping.json";
+    private static final String QUERIES_MAPPING_FILE = "queries-mapping.json";
 
     public static final int VERSION = 1;
 
+    private final Client client;
+
+    public OpenSearchBackend(final Client client) {
+        this.client = client;
+    }
+
     @Override
-    public void initialize(final String indexName, final NodeClient nodeClient, final RestChannel channel) {
+    public void initialize(final String storeName, final RestChannel channel) {
 
         // TODO: Determine if already initialized with this index name first.
 
-        LOGGER.info("Creating search relevance index {}", indexName);
+        LOGGER.info("Creating search relevance store {}", storeName);
 
-        final CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName)
-                .mapping(getResourceFile(indexName))
+        // Create the events index.
+        final String eventsIndexName = getEventsIndexName(storeName);
+
+        final CreateIndexRequest createEventsIndexRequest = new CreateIndexRequest(eventsIndexName)
+                .mapping(getResourceFile(EVENTS_MAPPING_FILE))
                 .settings(getIndexSettings());
 
-        nodeClient.admin().indices().create(createIndexRequest, new RestToXContentListener<>(channel));
+        client.admin().indices().create(createEventsIndexRequest, new RestToXContentListener<>(channel));
 
+        // Create the queries index.
+        final String queriesIndexName = getQueriesIndexName(storeName);
+
+        final CreateIndexRequest createQueryIndexRequest = new CreateIndexRequest(queriesIndexName)
+                .mapping(getResourceFile(QUERIES_MAPPING_FILE))
+                .settings(getIndexSettings());
+
+        client.admin().indices().create(createQueryIndexRequest, new RestToXContentListener<>(channel));
 
     }
 
     @Override
-    public void delete(String indexName, NodeClient nodeClient, RestChannel channel) {
+    public void delete(String storeName, RestChannel channel) {
 
-        LOGGER.info("Deleting search relevance index {}", indexName);
-        final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
-        nodeClient.admin().indices().delete(deleteIndexRequest, new RestToXContentListener<>(channel));
+        LOGGER.info("Deleting search relevance store {}", storeName);
+
+        final String eventsIndexName = getEventsIndexName(storeName);
+        final String queriesIndexName = getQueriesIndexName(storeName);
+        final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(eventsIndexName, queriesIndexName);
+        client.admin().indices().delete(deleteIndexRequest, new RestToXContentListener<>(channel));
 
     }
 
     @Override
-    public void persist(String indexName, String event, NodeClient nodeClient) {
+    public void persistEvent(String storeName, String event) {
 
         // Add the event for indexing.
-        LOGGER.info("Indexing event into {}", indexName);
-        final IndexRequest indexRequest = new IndexRequest(indexName);
-        indexRequest.source(event, XContentType.JSON);
+        LOGGER.info("Indexing event into {}", storeName);
+        final String eventsIndexName = getEventsIndexName(storeName);
+        final IndexRequest indexRequest = new IndexRequest(eventsIndexName)
+                .source(event, XContentType.JSON);
 
         //return (channel) -> client.index(indexRequest, new RestToXContentListener<>(channel));
-        EventManager.getInstance(nodeClient).addIndexRequest(indexRequest);
+        EventManager.getInstance(client).addIndexRequest(indexRequest);
 
+    }
+
+    @Override
+    public void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) {
+        // TODO: Implement this.
+        LOGGER.info("Writing query ID {} with response ID {}", queryRequest.getQueryId(), queryResponse.getQueryResponseId());
     }
 
     @Override
     public List<String> get() {
-        // TODO: Get the list of stores for the plugin.
+        // TODO: Get the list of initialized stores for the plugin.
         return new ArrayList<>();
     }
 
-    private String getResourceFile(String indexName) {
-        try (InputStream is = OpenSearchBackend.class.getResourceAsStream(OpenSearchBackend.MAPPING_FILE)) {
+    private String getEventsIndexName(final String storeName) {
+        return "." + storeName + "_events";
+    }
+
+    private String getQueriesIndexName(final String storeName) {
+        return "." + storeName + "_queries";
+    }
+
+    private String getResourceFile(final String fileName) {
+        try (InputStream is = OpenSearchBackend.class.getResourceAsStream(fileName)) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             Streams.copy(is, out);
             return out.toString(StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            LOGGER.error((Supplier<?>) () -> new ParameterizedMessage(
-                            "failed to create index [{}] with resource [{}]",
-                            indexName, OpenSearchBackend.MAPPING_FILE), e);
-            throw new IllegalStateException("failed to create index with resource [" + OpenSearchBackend.MAPPING_FILE + "]", e);
+        } catch (IOException e) {
+            throw new IllegalStateException("failed to create index with resource [" + OpenSearchBackend.EVENTS_MAPPING_FILE + "]", e);
         }
     }
 
-    private static Settings getIndexSettings() {
+    private Settings getIndexSettings() {
         return Settings.builder()
                 .put(IndexMetadata.INDEX_NUMBER_OF_SHARDS_SETTING.getKey(), 1)
                 .put(IndexMetadata.INDEX_AUTO_EXPAND_REPLICAS_SETTING.getKey(), "0-2")
