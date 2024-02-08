@@ -16,7 +16,8 @@ services:
       http.cors.allow-methods: OPTIONS,HEAD,GET,POST,PUT,DELETE
       http.cors.allow-credentials: true
       http.cors.allow-headers: X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
-      plugins.relevance.index: "awesome"
+      plugins.ubl.indices: "awesome"
+      logger.level: debug
     ulimits:
       memlock:
         soft: -1
@@ -35,19 +36,19 @@ services:
     networks:
       - opensearch-net
 
-  opensearch-dashboards:
-    build: ./dashboard-plugin/
-    container_name: opensearch-dashboards
-    ports:
-      - 5601:5601
-    expose:
-      - 5601
-    environment:
-      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
-    networks:
-      - opensearch-net
-    depends_on:
-      - opensearch
+  # opensearch-dashboards:
+  #   build: ./dashboard-plugin/
+  #   container_name: opensearch-dashboards
+  #   ports:
+  #     - 5601:5601
+  #   expose:
+  #     - 5601
+  #   environment:
+  #     OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+  #   networks:
+  #     - opensearch-net
+  #   depends_on:
+  #     - opensearch
 
 volumes:
   opensearch-data:

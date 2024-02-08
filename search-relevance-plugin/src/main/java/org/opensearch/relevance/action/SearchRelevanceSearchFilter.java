@@ -15,8 +15,10 @@ import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.support.ActionFilter;
 import org.opensearch.action.support.ActionFilterChain;
+import org.opensearch.common.settings.Settings;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
+import org.opensearch.relevance.SettingsConstants;
 import org.opensearch.relevance.backends.Backend;
 import org.opensearch.relevance.model.QueryRequest;
 import org.opensearch.relevance.model.QueryResponse;
@@ -29,9 +31,11 @@ public class SearchRelevanceSearchFilter implements ActionFilter {
     private static final Logger LOGGER = LogManager.getLogger(SearchRelevanceSearchFilter.class);
 
     private final Backend backend;
+    private final Settings settings;
 
-    public SearchRelevanceSearchFilter(final Backend backend) {
+    public SearchRelevanceSearchFilter(final Backend backend, final Settings settings) {
         this.backend = backend;
+        this.settings = settings;
     }
 
     @Override
@@ -57,11 +61,10 @@ public class SearchRelevanceSearchFilter implements ActionFilter {
                 // Get the search itself.
                 final SearchRequest searchRequest = (SearchRequest) request;
 
-                final List<String> indices = Arrays.asList(searchRequest.indices());
-
-                // TODO: We need to restrict this to only searches of certain indices.
-                // TODO: Look up which indices to log from the plugin settings.
-                //if(indices.contains("awesome")) {
+                // Restrict this to only searches of certain indices specified in the settings.
+                //final List<String> indices = Arrays.asList(searchRequest.indices());
+                //final Set<String> indicesToLog = new HashSet<>(Arrays.asList(settings.get(SettingsConstants.INDEX_NAMES).split(",")));
+                //if(indicesToLog.containsAll(indices)) {
 
                     // Create a UUID for this search request.
                     final String queryId = UUID.randomUUID().toString();
@@ -100,8 +103,8 @@ public class SearchRelevanceSearchFilter implements ActionFilter {
             }
 
             @Override
-            public void onFailure(Exception e) {
-                listener.onFailure(e);
+            public void onFailure(Exception ex) {
+                listener.onFailure(ex);
             }
 
         });

@@ -36,3 +36,10 @@ git clone https://github.com/opensearch-project/OpenSearch-Dashboards.git
 cd OpenSearch-Dashboards
 
 node scripts/generate_plugin.js my_plugin_name
+
+
+```
+nvm use 18.19.0
+
+yarn start
+```

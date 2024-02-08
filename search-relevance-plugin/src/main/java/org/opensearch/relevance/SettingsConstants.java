@@ -10,7 +10,7 @@ package org.opensearch.relevance;
 
 public class SettingsConstants {
 
-    public static final String INDEX_NAME = "plugins.relevance.index";
+    public static final String INDEX_NAMES = "plugins.ubl.indices";
     public static final String VERSION_SETTING = "index.ublstore.version";
 
 }

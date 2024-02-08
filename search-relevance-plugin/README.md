@@ -27,5 +27,5 @@ curl -X POST http://localhost:9200/_plugins/search_relevance/awesome -H "Content
 Get events:
 
 ```
-curl http://localhost:9200/awesome/_search
+curl http://localhost:9200/.awesome_events/_search
 ```

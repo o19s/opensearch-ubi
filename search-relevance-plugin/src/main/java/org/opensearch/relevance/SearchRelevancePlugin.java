@@ -48,6 +48,7 @@ public class SearchRelevancePlugin extends Plugin implements ActionPlugin {
     private static final Logger LOGGER = LogManager.getLogger(SearchRelevancePlugin.class);
 
     private Backend backend;
+    private ActionFilter searchRelevanceFilter;
 
     @Override
     public List<RestHandler> getRestHandlers(final Settings settings,
@@ -66,7 +67,7 @@ public class SearchRelevancePlugin extends Plugin implements ActionPlugin {
     public List<Setting<?>> getSettings() {
 
         final List<Setting<?>> settings = new ArrayList<>();
-        settings.add(Setting.simpleString(SettingsConstants.INDEX_NAME, "None", Setting.Property.NodeScope));
+        settings.add(Setting.simpleString(SettingsConstants.INDEX_NAMES, "", Setting.Property.NodeScope));
 
         // The version of the index mapping.
         settings.add(Setting.intSetting(SettingsConstants.VERSION_SETTING, 1, -1, Integer.MAX_VALUE, Setting.Property.IndexScope));
@@ -78,7 +79,7 @@ public class SearchRelevancePlugin extends Plugin implements ActionPlugin {
     @Override
     public List<ActionFilter> getActionFilters() {
         // LOGGER.info("Index name: {}", settings.get(ConfigConstants.INDEX_NAME));
-        return singletonList(new SearchRelevanceSearchFilter(backend));
+        return singletonList(searchRelevanceFilter);
     }
 
     @Override
@@ -97,6 +98,7 @@ public class SearchRelevancePlugin extends Plugin implements ActionPlugin {
     ) {
 
         this.backend = new OpenSearchBackend(client);
+        this.searchRelevanceFilter =  new SearchRelevanceSearchFilter(backend, environment.settings());
 
         LOGGER.info("Creating scheduled task");
 
