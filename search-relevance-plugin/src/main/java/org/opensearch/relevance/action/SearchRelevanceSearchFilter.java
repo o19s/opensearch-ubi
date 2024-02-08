@@ -58,6 +58,8 @@ public class SearchRelevanceSearchFilter implements ActionFilter {
             @Override
             public void onResponse(Response response) {
 
+                final long startTime = System.currentTimeMillis();
+
                 // Get the search itself.
                 final SearchRequest searchRequest = (SearchRequest) request;
 
@@ -97,6 +99,9 @@ public class SearchRelevanceSearchFilter implements ActionFilter {
                     }
 
                 //}
+
+                final long elapsedTime = System.currentTimeMillis() - startTime;
+                LOGGER.info("UBL search request filter took {} ms", elapsedTime);
 
                 listener.onResponse(response);
 
