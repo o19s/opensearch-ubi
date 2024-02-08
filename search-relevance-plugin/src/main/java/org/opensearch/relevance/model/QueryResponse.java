@@ -12,28 +12,26 @@ import java.util.List;
 
 public class QueryResponse {
 
-    private String queryResponseId;
-    private List<Integer> queryResponseHitIds;
+    private final String queryId;
+    private final String queryResponseId;
+    private final List<Integer> queryResponseHitIds;
 
-    public QueryResponse(final String queryResponseId, final List<Integer> queryResponseHitIds) {
+    public QueryResponse(final String queryId, final String queryResponseId, final List<Integer> queryResponseHitIds) {
+        this.queryId = queryId;
         this.queryResponseId = queryResponseId;
         this.queryResponseHitIds = queryResponseHitIds;
+    }
+
+    public String getQueryId() {
+        return queryId;
     }
 
     public String getQueryResponseId() {
         return queryResponseId;
     }
 
-    public void setQueryResponseId(String queryResponseId) {
-        this.queryResponseId = queryResponseId;
-    }
-
     public List<Integer> getQueryResponseHitIds() {
         return queryResponseHitIds;
-    }
-
-    public void setQueryResponseHitIds(List<Integer> queryResponseHitIds) {
-        this.queryResponseHitIds = queryResponseHitIds;
     }
 
 }

@@ -81,18 +81,18 @@ public class SearchRelevanceSearchFilter implements ActionFilter {
                     // Get all search hits from the response.
                     if (response instanceof SearchResponse) {
 
-                        final SearchResponse sr = (SearchResponse) response;
+                        final SearchResponse searchResponse = (SearchResponse) response;
 
-                        sr.getHits().forEach(hit -> {
-
-                            // TODO: Put the hitId in the hit so the frontend can access it to know what was interacted with.
+                        // Add each hit to the list of query responses.
+                        searchResponse.getHits().forEach(hit -> {
                             queryResponseHitIds.add(hit.docId());
-
                         });
 
+                        // Persist the query to the backend.
+                        // TODO: How do we know which storeName?
                         backend.persistQuery("storeName",
                                 new QueryRequest(queryId, query),
-                                new QueryResponse(queryResponseId, queryResponseHitIds));
+                                new QueryResponse(queryId, queryResponseId, queryResponseHitIds));
 
                     }
 
