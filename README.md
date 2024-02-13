@@ -1,4 +1,10 @@
-# search-relevance-plugin
+# OpenSearch User Behavior Logging
+
+This project is getting a new name! See the voting - https://forum.opensearch.org/t/vote-user-behavior-logging-and-insights/17838
+
+OpenSearch RFC - https://github.com/opensearch-project/OpenSearch/issues/12084
+
+## Building and Usage
 
 Build the plugin.  Note that you will have to match up the JDK 11 on your system to java home in the `gradle.properties` file:
 
