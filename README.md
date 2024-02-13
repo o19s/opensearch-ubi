@@ -4,6 +4,8 @@ This project is getting a new name! See the voting - https://forum.opensearch.or
 
 OpenSearch RFC - https://github.com/opensearch-project/OpenSearch/issues/12084
 
+This project is the OpenSearch plugin for storing and managing search requests and responses along with events produced client-side.
+
 ## Building and Usage
 
 Build the plugin.  Note that you will have to match up the JDK 11 on your system to java home in the `gradle.properties` file:
