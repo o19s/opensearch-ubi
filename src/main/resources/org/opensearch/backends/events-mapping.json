@@ -1,5 +1,5 @@
 {
-  "dynamic": "strict",
+  "dynamic": false,
   "properties": {
     "action_name": { "type" : "keyword" },
     "user_id":     { "type" : "keyword" },

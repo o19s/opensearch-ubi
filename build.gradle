@@ -4,9 +4,9 @@ apply plugin: 'opensearch.opensearchplugin'
 apply plugin: 'opensearch.yaml-rest-test'
 
 opensearchplugin {
-    name 'opensearch-search-relevance'
-    description 'OpenSearch Search Relevance Plugin'
-    classname 'org.opensearch.relevance.SearchRelevancePlugin'
+    name 'opensearch-ubl'
+    description 'OpenSearch User Behavior Logging Plugin'
+    classname 'org.opensearch.UserBehaviorLoggingPlugin'
     licenseFile rootProject.file('LICENSE.txt')
     noticeFile rootProject.file('NOTICE.txt')
 }

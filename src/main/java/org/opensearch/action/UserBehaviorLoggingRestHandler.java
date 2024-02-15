@@ -6,14 +6,14 @@
  * compatible open source license.
  */
 
-package org.opensearch.relevance.action;
+package org.opensearch.action;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.client.node.NodeClient;
 import org.opensearch.core.rest.RestStatus;
-import org.opensearch.relevance.backends.Backend;
+import org.opensearch.backends.Backend;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
@@ -22,13 +22,13 @@ import java.util.List;
 
 import static org.opensearch.rest.RestRequest.Method.*;
 
-public class SearchRelevanceRestHandler extends BaseRestHandler {
+public class UserBehaviorLoggingRestHandler extends BaseRestHandler {
 
-    private static final Logger LOGGER = LogManager.getLogger(SearchRelevanceRestHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(UserBehaviorLoggingRestHandler.class);
 
     private final Backend backend;
 
-    public SearchRelevanceRestHandler(final Backend backend) {
+    public UserBehaviorLoggingRestHandler(final Backend backend) {
         this.backend = backend;
     }
 
@@ -40,10 +40,10 @@ public class SearchRelevanceRestHandler extends BaseRestHandler {
     @Override
     public List<Route> routes() {
         return List.of(
-                new Route(PUT, "/_plugins/search_relevance/{store}"), // Initializes the store.
-                new Route(DELETE, "/_plugins/search_relevance/{store}"), // Deletes a store.
-                new Route(GET, "/_plugins/search_relevance"), // Lists all stores
-                new Route(POST, "/_plugins/search_relevance/{store}")); // Indexes events into the store.
+                new Route(PUT, "/_plugins/ubl/{store}"), // Initializes the store.
+                new Route(DELETE, "/_plugins/ubl/{store}"), // Deletes a store.
+                new Route(GET, "/_plugins/ubl"), // Lists all stores
+                new Route(POST, "/_plugins/ubl/{store}")); // Indexes events into the store.
     }
 
     @Override

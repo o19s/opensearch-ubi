@@ -4,7 +4,7 @@
     "url": {
       "paths": [
         {
-          "path": "/_plugins/search_relevance",
+          "path": "/_plugins/ubl",
           "methods": [
             "DELETE",
             "GET",

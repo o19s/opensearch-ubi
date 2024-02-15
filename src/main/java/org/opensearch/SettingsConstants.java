@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.relevance;
+package org.opensearch;
 
 public class SettingsConstants {
 

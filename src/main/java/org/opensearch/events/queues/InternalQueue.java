@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.relevance.events.queues;
+package org.opensearch.events.queues;
 
 import org.opensearch.action.index.IndexRequest;
 

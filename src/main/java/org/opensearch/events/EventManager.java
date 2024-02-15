@@ -6,17 +6,15 @@
  * compatible open source license.
  */
 
-package org.opensearch.relevance.events;
+package org.opensearch.events;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.bulk.BulkRequest;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.client.Client;
-import org.opensearch.relevance.events.queues.EventQueue;
-import org.opensearch.relevance.events.queues.InternalQueue;
-
-import java.util.TimerTask;
+import org.opensearch.events.queues.EventQueue;
+import org.opensearch.events.queues.InternalQueue;
 
 public class EventManager {
 

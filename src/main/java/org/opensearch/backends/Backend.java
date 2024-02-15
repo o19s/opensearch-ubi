@@ -6,11 +6,10 @@
  * compatible open source license.
  */
 
-package org.opensearch.relevance.backends;
+package org.opensearch.backends;
 
-import org.opensearch.client.node.NodeClient;
-import org.opensearch.relevance.model.QueryRequest;
-import org.opensearch.relevance.model.QueryResponse;
+import org.opensearch.model.QueryResponse;
+import org.opensearch.model.QueryRequest;
 import org.opensearch.rest.RestChannel;
 
 import java.util.List;

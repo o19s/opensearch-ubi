@@ -6,11 +6,10 @@
  * compatible open source license.
  */
 
-package org.opensearch.relevance.action;
+package org.opensearch.action;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.action.ActionRequest;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.support.ActionFilter;
@@ -18,22 +17,21 @@ import org.opensearch.action.support.ActionFilterChain;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
-import org.opensearch.relevance.SettingsConstants;
-import org.opensearch.relevance.backends.Backend;
-import org.opensearch.relevance.model.QueryRequest;
-import org.opensearch.relevance.model.QueryResponse;
+import org.opensearch.model.QueryResponse;
+import org.opensearch.backends.Backend;
+import org.opensearch.model.QueryRequest;
 import org.opensearch.tasks.Task;
 
 import java.util.*;
 
-public class SearchRelevanceSearchFilter implements ActionFilter {
+public class UserBehaviorLoggingSearchFilter implements ActionFilter {
 
-    private static final Logger LOGGER = LogManager.getLogger(SearchRelevanceSearchFilter.class);
+    private static final Logger LOGGER = LogManager.getLogger(UserBehaviorLoggingSearchFilter.class);
 
     private final Backend backend;
     private final Settings settings;
 
-    public SearchRelevanceSearchFilter(final Backend backend, final Settings settings) {
+    public UserBehaviorLoggingSearchFilter(final Backend backend, final Settings settings) {
         this.backend = backend;
         this.settings = settings;
     }

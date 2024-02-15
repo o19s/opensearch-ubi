@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.relevance.model;
+package org.opensearch.model;
 
 import java.util.List;
 
