@@ -6,15 +6,15 @@
  * compatible open source license.
  */
 
-package org.opensearch;
+package org.opensearch.ubl;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.action.UserBehaviorLoggingRestHandler;
-import org.opensearch.action.UserBehaviorLoggingSearchFilter;
+import org.opensearch.ubl.action.UserBehaviorLoggingRestHandler;
+import org.opensearch.ubl.action.UserBehaviorLoggingSearchFilter;
 import org.opensearch.action.support.ActionFilter;
-import org.opensearch.backends.Backend;
-import org.opensearch.backends.OpenSearchBackend;
+import org.opensearch.ubl.backends.Backend;
+import org.opensearch.ubl.backends.OpenSearchBackend;
 import org.opensearch.client.Client;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.cluster.node.DiscoveryNodes;
@@ -24,7 +24,7 @@ import org.opensearch.core.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.env.Environment;
 import org.opensearch.env.NodeEnvironment;
-import org.opensearch.events.EventManager;
+import org.opensearch.ubl.events.EventManager;
 import org.opensearch.plugins.ActionPlugin;
 import org.opensearch.plugins.Plugin;
 import org.opensearch.repositories.RepositoriesService;

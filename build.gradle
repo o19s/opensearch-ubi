@@ -6,7 +6,7 @@ apply plugin: 'opensearch.yaml-rest-test'
 opensearchplugin {
     name 'opensearch-ubl'
     description 'OpenSearch User Behavior Logging Plugin'
-    classname 'org.opensearch.UserBehaviorLoggingPlugin'
+    classname 'org.opensearch.ubl.UserBehaviorLoggingPlugin'
     licenseFile rootProject.file('LICENSE.txt')
     noticeFile rootProject.file('NOTICE.txt')
 }

@@ -6,15 +6,15 @@
  * compatible open source license.
  */
 
-package org.opensearch.events;
+package org.opensearch.ubl.events;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.bulk.BulkRequest;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.client.Client;
-import org.opensearch.events.queues.EventQueue;
-import org.opensearch.events.queues.InternalQueue;
+import org.opensearch.ubl.events.queues.EventQueue;
+import org.opensearch.ubl.events.queues.InternalQueue;
 
 public class EventManager {
 

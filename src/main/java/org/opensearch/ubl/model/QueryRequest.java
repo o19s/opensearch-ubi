@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.model;
+package org.opensearch.ubl.model;
 
 public class QueryRequest {
 

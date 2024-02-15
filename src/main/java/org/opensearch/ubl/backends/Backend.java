@@ -6,10 +6,10 @@
  * compatible open source license.
  */
 
-package org.opensearch.backends;
+package org.opensearch.ubl.backends;
 
-import org.opensearch.model.QueryResponse;
-import org.opensearch.model.QueryRequest;
+import org.opensearch.ubl.model.QueryResponse;
+import org.opensearch.ubl.model.QueryRequest;
 import org.opensearch.rest.RestChannel;
 
 import java.util.List;

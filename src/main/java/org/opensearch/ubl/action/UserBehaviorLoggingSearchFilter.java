@@ -6,10 +6,11 @@
  * compatible open source license.
  */
 
-package org.opensearch.action;
+package org.opensearch.ubl.action;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.opensearch.action.ActionRequest;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.support.ActionFilter;
@@ -17,9 +18,9 @@ import org.opensearch.action.support.ActionFilterChain;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
-import org.opensearch.model.QueryResponse;
-import org.opensearch.backends.Backend;
-import org.opensearch.model.QueryRequest;
+import org.opensearch.ubl.model.QueryResponse;
+import org.opensearch.ubl.backends.Backend;
+import org.opensearch.ubl.model.QueryRequest;
 import org.opensearch.tasks.Task;
 
 import java.util.*;

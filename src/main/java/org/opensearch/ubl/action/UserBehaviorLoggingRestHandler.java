@@ -6,14 +6,14 @@
  * compatible open source license.
  */
 
-package org.opensearch.action;
+package org.opensearch.ubl.action;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.client.node.NodeClient;
 import org.opensearch.core.rest.RestStatus;
-import org.opensearch.backends.Backend;
+import org.opensearch.ubl.backends.Backend;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
