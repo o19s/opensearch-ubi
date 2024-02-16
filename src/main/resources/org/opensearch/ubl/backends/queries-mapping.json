@@ -1,0 +1,17 @@
+{
+  "dynamic": false,
+  "properties": {
+    "queryId": {
+      "type": "keyword"
+    },
+    "query": {
+      "type": "text"
+    },
+    "queryResponseId": {
+      "type": "keyword"
+    },
+    "queryResponseHitIds": {
+      "type": "keyword"
+    }
+  }
+}

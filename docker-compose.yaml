@@ -17,7 +17,7 @@ services:
       http.cors.allow-credentials: true
       http.cors.allow-headers: X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
       plugins.ubl.indices: "awesome"
-      logger.level: debug
+      logger.level: info
     ulimits:
       memlock:
         soft: -1

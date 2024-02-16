@@ -18,19 +18,21 @@ import org.opensearch.cluster.metadata.IndexMetadata;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.io.Streams;
 import org.opensearch.common.xcontent.XContentType;
-import org.opensearch.ubl.events.EventManager;
-import org.opensearch.ubl.model.QueryResponse;
-import org.opensearch.ubl.SettingsConstants;
-import org.opensearch.ubl.model.QueryRequest;
 import org.opensearch.rest.RestChannel;
 import org.opensearch.rest.action.RestToXContentListener;
+import org.opensearch.ubl.SettingsConstants;
+import org.opensearch.ubl.events.EventManager;
+import org.opensearch.ubl.model.QueryRequest;
+import org.opensearch.ubl.model.QueryResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OpenSearchBackend implements Backend {
 
@@ -102,16 +104,23 @@ public class OpenSearchBackend implements Backend {
     }
 
     @Override
-    public void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) {
+    public void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) throws Exception {
 
         LOGGER.info("Writing query ID {} with response ID {}", queryRequest.getQueryId(), queryResponse.getQueryResponseId());
 
-        // TODO: Format what to index as JSON.
-        final String json = "";
+        // What will be indexed - adheres to the queries-mapping.json
+        final Map<String, Object> source = new HashMap<>();
+        source.put("queryId", queryRequest.getQueryId());
+        source.put("query", queryRequest.getQuery());
+        source.put("queryResponseId", queryResponse.getQueryResponseId());
+        source.put("queryResponseHitIds", queryResponse.getQueryResponseHitIds());
 
+        // Get the name of the queries.
         final String queriesIndexName = getQueriesIndexName(storeName);
+
+        // Build the index request.
         final IndexRequest indexRequest = new IndexRequest(queriesIndexName)
-                .source(json, XContentType.JSON);
+                .source(source, XContentType.JSON);
 
         //return (channel) -> client.index(indexRequest, new RestToXContentListener<>(channel));
         EventManager.getInstance(client).addIndexRequest(indexRequest);

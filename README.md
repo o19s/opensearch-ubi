@@ -35,7 +35,17 @@ curl -X POST http://localhost:9200/_plugins/ubl/awesome -H "Content-Type: applic
 Get events:
 
 ```
-curl http://localhost:9200/.awesome_events/_search
+curl -s http://localhost:9200/.awesome_events/_search | jq
+```
+
+```
+curl -s http://localhost:9200/.awesome_events/_search -H 'Content-Type: application/json' -d '{"query": {"term": {"type": "instant-search"}}}' | jq
+```
+
+Get queries:
+
+```
+curl -s http://localhost:9200/.awesome_queries/_search | jq
 ```
 
 Delete the store:

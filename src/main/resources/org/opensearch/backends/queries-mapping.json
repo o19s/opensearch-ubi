@@ -1,8 +1,0 @@
-{
-  "dynamic": false,
-  "properties": {
-    "query": {
-      "type": "keyword"
-    }
-  }
-}
