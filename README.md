@@ -29,7 +29,7 @@ curl -X PUT http://localhost:9200/_plugins/ubl/awesome
 Send an event to the `awesome` store:
 
 ```
-curl -X POST http://localhost:9200/_plugins/ubl/awesome -H "Content-Type: application/json" -d @instant-search.json
+curl -X POST http://localhost:9200/_plugins/ubl/awesome -H "Content-Type: application/json" -d @./scripts/instant-search.json
 ```
 
 Get events:
