@@ -54,9 +54,9 @@ publishing {
     publications {
         gpr(MavenPublication) {
             from(components.java)
-            groupId = project.group
-            artifactId = project.name
-            version = project.version
+            groupId = 'org.opensearch.ubl'
+            artifactId = 'opensearch-ubl'
+            version = '0.0.1'
         }
     }
 }
