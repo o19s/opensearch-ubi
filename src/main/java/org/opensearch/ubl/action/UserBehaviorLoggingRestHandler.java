@@ -83,7 +83,7 @@ public class UserBehaviorLoggingRestHandler extends BaseRestHandler {
 
         }
 
-        // TODO: List names of all search_relevance stores.
+        // TODO: Return a list names of all search_relevance stores.
         return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "ok"));
 
     }

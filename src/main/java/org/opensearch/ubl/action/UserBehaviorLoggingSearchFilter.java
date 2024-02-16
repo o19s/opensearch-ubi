@@ -69,15 +69,14 @@ public class UserBehaviorLoggingSearchFilter implements ActionFilter {
 
                     // Create a UUID for this search request.
                     final String queryId = UUID.randomUUID().toString();
-                    final String query = searchRequest.source().toString();
 
-                    LOGGER.info("Query: {}", query);
-                    LOGGER.info("Query ID: {}", queryId);
+                    // The query will be empty when there is no query, e.g. /_search
+                    final String query = searchRequest.source().toString();
 
                     // Create a UUID for this search response.
                     final String queryResponseId = UUID.randomUUID().toString();
 
-                    final List<Integer> queryResponseHitIds = new LinkedList<>();
+                    final List<String> queryResponseHitIds = new LinkedList<>();
 
                     // Get all search hits from the response.
                     if (response instanceof SearchResponse) {
@@ -86,14 +85,21 @@ public class UserBehaviorLoggingSearchFilter implements ActionFilter {
 
                         // Add each hit to the list of query responses.
                         searchResponse.getHits().forEach(hit -> {
-                            queryResponseHitIds.add(hit.docId());
+                            queryResponseHitIds.add(String.valueOf(hit.docId()));
                         });
 
-                        // Persist the query to the backend.
-                        // TODO: How do we know which storeName?
-                        backend.persistQuery("storeName",
-                                new QueryRequest(queryId, query),
-                                new QueryResponse(queryId, queryResponseId, queryResponseHitIds));
+                        try {
+
+                            // Persist the query to the backend.
+                            // TODO: How do we know which storeName?
+                            backend.persistQuery("awesome",
+                                    new QueryRequest(queryId, query),
+                                    new QueryResponse(queryId, queryResponseId, queryResponseHitIds));
+
+                        } catch (Exception ex) {
+                            // TODO: Handle this.
+                            LOGGER.error("Unable to persist query.", ex);
+                        }
 
                     }
 

@@ -22,7 +22,7 @@ public interface Backend {
 
     void persistEvent(final String storeName, String event);
 
-    void persistQuery(final String storeName, QueryRequest queryRequest, QueryResponse queryResponse);
+    void persistQuery(final String storeName, QueryRequest queryRequest, QueryResponse queryResponse) throws Exception;
 
     List<String> get();
 

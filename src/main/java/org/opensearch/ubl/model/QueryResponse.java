@@ -14,9 +14,9 @@ public class QueryResponse {
 
     private final String queryId;
     private final String queryResponseId;
-    private final List<Integer> queryResponseHitIds;
+    private final List<String> queryResponseHitIds;
 
-    public QueryResponse(final String queryId, final String queryResponseId, final List<Integer> queryResponseHitIds) {
+    public QueryResponse(final String queryId, final String queryResponseId, final List<String> queryResponseHitIds) {
         this.queryId = queryId;
         this.queryResponseId = queryResponseId;
         this.queryResponseHitIds = queryResponseHitIds;
@@ -30,7 +30,7 @@ public class QueryResponse {
         return queryResponseId;
     }
 
-    public List<Integer> getQueryResponseHitIds() {
+    public List<String> getQueryResponseHitIds() {
         return queryResponseHitIds;
     }
 
