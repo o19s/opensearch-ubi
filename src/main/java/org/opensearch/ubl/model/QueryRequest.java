@@ -10,12 +10,18 @@ package org.opensearch.ubl.model;
 
 public class QueryRequest {
 
+    private final long timestamp;
     private final String queryId;
     private final String query;
 
     public QueryRequest(final String queryId, final String query) {
+        this.timestamp = System.currentTimeMillis();
         this.queryId = queryId;
         this.query = query;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
     }
 
     public String getQueryId() {

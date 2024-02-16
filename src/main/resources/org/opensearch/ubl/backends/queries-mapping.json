@@ -1,6 +1,9 @@
 {
   "dynamic": false,
   "properties": {
+    "timestamp": {
+      "type": "date"
+    },
     "queryId": {
       "type": "keyword"
     },
