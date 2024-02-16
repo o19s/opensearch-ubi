@@ -2,6 +2,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'opensearch.opensearchplugin'
 apply plugin: 'opensearch.yaml-rest-test'
+apply plugin: 'maven-publish'
 
 opensearchplugin {
     name 'opensearch-ubl'
@@ -26,7 +27,7 @@ buildscript {
 
     dependencies {
         classpath "org.opensearch.gradle:build-tools:${opensearchVersion}"
-    }
+    }    
 }
 
 repositories {
@@ -37,4 +38,22 @@ dependencies {
     // required for the yaml test to run
     yamlRestTestImplementation 'org.apache.logging.log4j:log4j-core:2.20.0'
     runtimeOnly 'org.apache.logging.log4j:log4j-core:2.20.0'
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/o19s/opensearch-ubl")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
