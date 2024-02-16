@@ -56,7 +56,7 @@ publishing {
             from(components.java)
             groupId = 'org.opensearch.ubl'
             artifactId = 'opensearch-ubl'
-            version = '0.0.1'
+            version = '0.0.1-SNAPSHOT'
         }
     }
 }
