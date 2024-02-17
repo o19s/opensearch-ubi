@@ -16,8 +16,10 @@ import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.support.ActionFilter;
 import org.opensearch.action.support.ActionFilterChain;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.common.util.concurrent.ThreadContext;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
+import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.ubl.model.QueryResponse;
 import org.opensearch.ubl.backends.Backend;
 import org.opensearch.ubl.model.QueryRequest;
@@ -25,16 +27,18 @@ import org.opensearch.tasks.Task;
 
 import java.util.*;
 
-public class UserBehaviorLoggingSearchFilter implements ActionFilter {
+public class UserBehaviorLoggingActionFilter implements ActionFilter {
 
-    private static final Logger LOGGER = LogManager.getLogger(UserBehaviorLoggingSearchFilter.class);
+    private static final Logger LOGGER = LogManager.getLogger(UserBehaviorLoggingActionFilter.class);
 
     private final Backend backend;
     private final Settings settings;
+    private final ThreadPool threadPool;
 
-    public UserBehaviorLoggingSearchFilter(final Backend backend, final Settings settings) {
+    public UserBehaviorLoggingActionFilter(final Backend backend, final Settings settings, ThreadPool threadPool) {
         this.backend = backend;
         this.settings = settings;
+        this.threadPool = threadPool;
     }
 
     @Override
@@ -57,6 +61,8 @@ public class UserBehaviorLoggingSearchFilter implements ActionFilter {
             @Override
             public void onResponse(Response response) {
 
+                LOGGER.info("Query ID header: " + task.getHeader("query-id"));
+
                 final long startTime = System.currentTimeMillis();
 
                 // Get the search itself.
@@ -67,19 +73,19 @@ public class UserBehaviorLoggingSearchFilter implements ActionFilter {
                 //final Set<String> indicesToLog = new HashSet<>(Arrays.asList(settings.get(SettingsConstants.INDEX_NAMES).split(",")));
                 //if(indicesToLog.containsAll(indices)) {
 
-                    // Create a UUID for this search request.
-                    final String queryId = UUID.randomUUID().toString();
-
-                    // The query will be empty when there is no query, e.g. /_search
-                    final String query = searchRequest.source().toString();
-
-                    // Create a UUID for this search response.
-                    final String queryResponseId = UUID.randomUUID().toString();
-
-                    final List<String> queryResponseHitIds = new LinkedList<>();
-
                     // Get all search hits from the response.
                     if (response instanceof SearchResponse) {
+
+                        // Create a UUID for this search request.
+                        final String queryId = UUID.randomUUID().toString();
+
+                        // The query will be empty when there is no query, e.g. /_search
+                        final String query = searchRequest.source().toString();
+
+                        // Create a UUID for this search response.
+                        final String queryResponseId = UUID.randomUUID().toString();
+
+                        final List<String> queryResponseHitIds = new LinkedList<>();
 
                         final SearchResponse searchResponse = (SearchResponse) response;
 
@@ -100,6 +106,8 @@ public class UserBehaviorLoggingSearchFilter implements ActionFilter {
                             // TODO: Handle this.
                             LOGGER.error("Unable to persist query.", ex);
                         }
+
+                        threadPool.getThreadContext().addResponseHeader("query_id", queryId);
 
                     }
 
