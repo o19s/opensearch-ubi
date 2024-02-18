@@ -13,22 +13,20 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.action.bulk.BulkRequest;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.client.Client;
-import org.opensearch.ubl.events.queues.EventQueue;
-import org.opensearch.ubl.events.queues.InternalQueue;
+import org.opensearch.common.xcontent.XContentType;
 
-public class EventManager {
+public class OpenSearchEventManager extends AbstractEventManager {
 
-    private static final Logger LOGGER = LogManager.getLogger(EventManager.class);
+    private static final Logger LOGGER = LogManager.getLogger(OpenSearchEventManager.class);
 
-    private final EventQueue eventQueue;
     private final Client client;
-    private static EventManager eventManager;
+    private static OpenSearchEventManager openSearchEventManager;
 
-    private EventManager(Client client) {
+    private OpenSearchEventManager(Client client) {
         this.client = client;
-        this.eventQueue = new InternalQueue();
     }
 
+    @Override
     public void process() {
 
         if(eventQueue.size() > 0) {
@@ -36,8 +34,13 @@ public class EventManager {
             final BulkRequest bulkRequest = new BulkRequest();
             LOGGER.info("Bulk inserting " + eventQueue.size() + " search relevance events");
 
-            for (final IndexRequest indexRequest : eventQueue.get()) {
+            for (final Event event : eventQueue.get()) {
+
+                final IndexRequest indexRequest = new IndexRequest(event.getIndexName())
+                        .source(event.getEvent(), XContentType.JSON);
+
                 bulkRequest.add(indexRequest);
+
             }
 
             eventQueue.clear();
@@ -47,15 +50,16 @@ public class EventManager {
 
     }
 
-    public static EventManager getInstance(Client client) {
-        if(eventManager == null) {
-            eventManager = new EventManager(client);
-        }
-        return eventManager;
+    @Override
+    public void add(Event event) {
+        eventQueue.add(event);
     }
 
-    public void addIndexRequest(IndexRequest request) {
-        eventQueue.add(request);
+    public static OpenSearchEventManager getInstance(Client client) {
+        if(openSearchEventManager == null) {
+            openSearchEventManager = new OpenSearchEventManager(client);
+        }
+        return openSearchEventManager;
     }
 
 }

@@ -72,8 +72,8 @@ public class UserBehaviorLoggingRestHandler extends BaseRestHandler {
                 final String storeName = request.param("store");
 
                 LOGGER.info("Persisting event into {}", storeName);
-                final String event = request.content().utf8ToString();
-                backend.persistEvent(storeName, event);
+                final String eventJson = request.content().utf8ToString();
+                backend.persistEvent(storeName, eventJson);
 
                 return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "Event received"));
 

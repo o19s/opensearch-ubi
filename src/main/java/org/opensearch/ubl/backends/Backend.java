@@ -20,7 +20,7 @@ public interface Backend {
 
     void delete(final String storeName, RestChannel channel);
 
-    void persistEvent(final String storeName, String event);
+    void persistEvent(final String storeName, String eventJson);
 
     void persistQuery(final String storeName, QueryRequest queryRequest, QueryResponse queryResponse) throws Exception;
 
