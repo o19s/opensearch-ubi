@@ -10,12 +10,7 @@ package org.opensearch.ubl;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.rest.RestHeaderDefinition;
-import org.opensearch.ubl.action.UserBehaviorLoggingRestHandler;
-import org.opensearch.ubl.action.UserBehaviorLoggingSearchFilter;
 import org.opensearch.action.support.ActionFilter;
-import org.opensearch.ubl.backends.Backend;
-import org.opensearch.ubl.backends.OpenSearchBackend;
 import org.opensearch.client.Client;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.cluster.node.DiscoveryNodes;
@@ -25,14 +20,19 @@ import org.opensearch.core.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.env.Environment;
 import org.opensearch.env.NodeEnvironment;
-import org.opensearch.ubl.events.EventManager;
 import org.opensearch.plugins.ActionPlugin;
 import org.opensearch.plugins.Plugin;
 import org.opensearch.repositories.RepositoriesService;
 import org.opensearch.rest.RestController;
 import org.opensearch.rest.RestHandler;
+import org.opensearch.rest.RestHeaderDefinition;
 import org.opensearch.script.ScriptService;
 import org.opensearch.threadpool.ThreadPool;
+import org.opensearch.ubl.action.UserBehaviorLoggingActionFilter;
+import org.opensearch.ubl.action.UserBehaviorLoggingRestHandler;
+import org.opensearch.ubl.backends.Backend;
+import org.opensearch.ubl.backends.OpenSearchBackend;
+import org.opensearch.ubl.events.EventManager;
 import org.opensearch.watcher.ResourceWatcherService;
 
 import java.util.ArrayList;
@@ -109,7 +109,7 @@ public class UserBehaviorLoggingPlugin extends Plugin implements ActionPlugin {
     ) {
 
         this.backend = new OpenSearchBackend(client);
-        this.userBehaviorLoggingFilter =  new UserBehaviorLoggingSearchFilter(backend, environment.settings());
+        this.userBehaviorLoggingFilter =  new UserBehaviorLoggingActionFilter(backend, environment.settings(), threadPool);
 
         LOGGER.info("Creating scheduled task");
 
