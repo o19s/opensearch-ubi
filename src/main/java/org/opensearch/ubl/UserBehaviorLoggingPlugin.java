@@ -10,6 +10,7 @@ package org.opensearch.ubl;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.opensearch.rest.RestHeaderDefinition;
 import org.opensearch.ubl.action.UserBehaviorLoggingRestHandler;
 import org.opensearch.ubl.action.UserBehaviorLoggingSearchFilter;
 import org.opensearch.action.support.ActionFilter;
@@ -49,6 +50,16 @@ public class UserBehaviorLoggingPlugin extends Plugin implements ActionPlugin {
 
     private Backend backend;
     private ActionFilter userBehaviorLoggingFilter;
+
+    @Override
+    public Collection<RestHeaderDefinition> getRestHeaders() {
+        return List.of(new RestHeaderDefinition(HeaderConstants.EVENT_STORE_HEADER, false));
+    }
+
+    @Override
+    public Collection<String> getTaskHeaders() {
+        return List.of(HeaderConstants.EVENT_STORE_HEADER);
+    }
 
     @Override
     public List<RestHandler> getRestHandlers(final Settings settings,

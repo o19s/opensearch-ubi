@@ -10,6 +10,7 @@ package org.opensearch.ubl.action;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.lucene.queryparser.flexible.core.util.StringUtils;
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
@@ -18,6 +19,7 @@ import org.opensearch.action.support.ActionFilterChain;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
+import org.opensearch.ubl.HeaderConstants;
 import org.opensearch.ubl.model.QueryResponse;
 import org.opensearch.ubl.backends.Backend;
 import org.opensearch.ubl.model.QueryRequest;
@@ -59,13 +61,18 @@ public class UserBehaviorLoggingSearchFilter implements ActionFilter {
 
                 final long startTime = System.currentTimeMillis();
 
-                // Get the search itself.
-                final SearchRequest searchRequest = (SearchRequest) request;
+                final String eventStore = task.getHeader(HeaderConstants.EVENT_STORE_HEADER);
 
-                // Restrict this to only searches of certain indices specified in the settings.
-                //final List<String> indices = Arrays.asList(searchRequest.indices());
-                //final Set<String> indicesToLog = new HashSet<>(Arrays.asList(settings.get(SettingsConstants.INDEX_NAMES).split(",")));
-                //if(indicesToLog.containsAll(indices)) {
+                // If there is no event store header we should not continue anything.
+                if(eventStore != null && !eventStore.trim().isEmpty()) {
+
+                    // Get the search itself.
+                    final SearchRequest searchRequest = (SearchRequest) request;
+
+                    // TODO: Restrict logging to only queries of certain indices specified in the settings.
+                    //final List<String> indices = Arrays.asList(searchRequest.indices());
+                    //final Set<String> indicesToLog = new HashSet<>(Arrays.asList(settings.get(SettingsConstants.INDEX_NAMES).split(",")));
+                    //if(indicesToLog.containsAll(indices)) {
 
                     // Create a UUID for this search request.
                     final String queryId = UUID.randomUUID().toString();
@@ -91,8 +98,7 @@ public class UserBehaviorLoggingSearchFilter implements ActionFilter {
                         try {
 
                             // Persist the query to the backend.
-                            // TODO: How do we know which storeName?
-                            backend.persistQuery("awesome",
+                            backend.persistQuery(eventStore,
                                     new QueryRequest(queryId, query),
                                     new QueryResponse(queryId, queryResponseId, queryResponseHitIds));
 
@@ -103,10 +109,12 @@ public class UserBehaviorLoggingSearchFilter implements ActionFilter {
 
                     }
 
-                //}
+                    //}
 
-                final long elapsedTime = System.currentTimeMillis() - startTime;
-                LOGGER.info("UBL search request filter took {} ms", elapsedTime);
+                    final long elapsedTime = System.currentTimeMillis() - startTime;
+                    LOGGER.info("UBL search request filter took {} ms", elapsedTime);
+
+                }
 
                 listener.onResponse(response);
 
