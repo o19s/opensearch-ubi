@@ -45,7 +45,7 @@ curl -s http://localhost:9200/.awesome_events/_search -H 'Content-Type: applicat
 Get queries:
 
 ```
-curl -s http://localhost:9200/.awesome_queries/_search | jq
+curl -s http://localhost:9200/.awesome_queries/_search -H "X-ubi-store: awesome" | jq
 ```
 
 Delete the store:

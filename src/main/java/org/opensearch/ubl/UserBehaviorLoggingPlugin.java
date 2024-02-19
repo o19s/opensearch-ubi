@@ -25,6 +25,7 @@ import org.opensearch.plugins.Plugin;
 import org.opensearch.repositories.RepositoriesService;
 import org.opensearch.rest.RestController;
 import org.opensearch.rest.RestHandler;
+import org.opensearch.rest.RestHeaderDefinition;
 import org.opensearch.script.ScriptService;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.ubl.action.UserBehaviorLoggingActionFilter;
@@ -49,6 +50,16 @@ public class UserBehaviorLoggingPlugin extends Plugin implements ActionPlugin {
 
     private Backend backend;
     private ActionFilter userBehaviorLoggingFilter;
+
+    @Override
+    public Collection<RestHeaderDefinition> getRestHeaders() {
+        return List.of(new RestHeaderDefinition(HeaderConstants.EVENT_STORE_HEADER, false));
+    }
+
+    @Override
+    public Collection<String> getTaskHeaders() {
+        return List.of(HeaderConstants.EVENT_STORE_HEADER);
+    }
 
     @Override
     public List<RestHandler> getRestHandlers(final Settings settings,
