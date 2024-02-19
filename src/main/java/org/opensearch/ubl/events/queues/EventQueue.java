@@ -9,16 +9,17 @@
 package org.opensearch.ubl.events.queues;
 
 import org.opensearch.action.index.IndexRequest;
+import org.opensearch.ubl.events.Event;
 
 import java.util.List;
 
 public interface EventQueue {
 
-    void add(IndexRequest indexRequest);
+    void add(Event event);
 
     void clear();
 
-    List<IndexRequest> get();
+    List<Event> get();
 
     int size();
 

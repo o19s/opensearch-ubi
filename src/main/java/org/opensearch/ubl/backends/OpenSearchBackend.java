@@ -21,7 +21,8 @@ import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.rest.RestChannel;
 import org.opensearch.rest.action.RestToXContentListener;
 import org.opensearch.ubl.SettingsConstants;
-import org.opensearch.ubl.events.EventManager;
+import org.opensearch.ubl.events.Event;
+import org.opensearch.ubl.events.OpenSearchEventManager;
 import org.opensearch.ubl.model.QueryRequest;
 import org.opensearch.ubl.model.QueryResponse;
 
@@ -90,16 +91,15 @@ public class OpenSearchBackend implements Backend {
     }
 
     @Override
-    public void persistEvent(String storeName, String event) {
+    public void persistEvent(String storeName, String eventJson) {
 
         // Add the event for indexing.
         LOGGER.info("Indexing event into {}", storeName);
         final String eventsIndexName = getEventsIndexName(storeName);
-        final IndexRequest indexRequest = new IndexRequest(eventsIndexName)
-                .source(event, XContentType.JSON);
 
         //return (channel) -> client.index(indexRequest, new RestToXContentListener<>(channel));
-        EventManager.getInstance(client).addIndexRequest(indexRequest);
+        final Event event = new Event(eventsIndexName, eventJson);
+        OpenSearchEventManager.getInstance(client).add(event);
 
     }
 
@@ -123,8 +123,8 @@ public class OpenSearchBackend implements Backend {
         final IndexRequest indexRequest = new IndexRequest(queriesIndexName)
                 .source(source, XContentType.JSON);
 
-        //return (channel) -> client.index(indexRequest, new RestToXContentListener<>(channel));
-        EventManager.getInstance(client).addIndexRequest(indexRequest);
+        // TODO: Move this to the queue, too.
+        client.index(indexRequest);
 
     }
 
@@ -148,7 +148,7 @@ public class OpenSearchBackend implements Backend {
             Streams.copy(is, out);
             return out.toString(StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new IllegalStateException("failed to create index with resource [" + OpenSearchBackend.EVENTS_MAPPING_FILE + "]", e);
+            throw new IllegalStateException("Unable to create index with resource [" + OpenSearchBackend.EVENTS_MAPPING_FILE + "]", e);
         }
     }
 

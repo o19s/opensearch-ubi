@@ -32,7 +32,7 @@ import org.opensearch.ubl.action.UserBehaviorLoggingActionFilter;
 import org.opensearch.ubl.action.UserBehaviorLoggingRestHandler;
 import org.opensearch.ubl.backends.Backend;
 import org.opensearch.ubl.backends.OpenSearchBackend;
-import org.opensearch.ubl.events.EventManager;
+import org.opensearch.ubl.events.OpenSearchEventManager;
 import org.opensearch.watcher.ResourceWatcherService;
 
 import java.util.ArrayList;
@@ -113,9 +113,10 @@ public class UserBehaviorLoggingPlugin extends Plugin implements ActionPlugin {
 
         LOGGER.info("Creating scheduled task");
 
-        // TODO: Only start this if already initialized.
+        // TODO: Only start this if an OpenSearch store is already initialized.
+        // Otherwise, start it when a store is initialized.
         threadPool.scheduler().scheduleAtFixedRate(() -> {
-            EventManager.getInstance(client).process();
+            OpenSearchEventManager.getInstance(client).process();
         }, 0, 2000, TimeUnit.MILLISECONDS);
 
         return Collections.emptyList();

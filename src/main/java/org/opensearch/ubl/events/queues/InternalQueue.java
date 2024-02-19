@@ -8,18 +8,18 @@
 
 package org.opensearch.ubl.events.queues;
 
-import org.opensearch.action.index.IndexRequest;
+import org.opensearch.ubl.events.Event;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class InternalQueue implements EventQueue {
 
-    private static final List<IndexRequest> indexRequests = new LinkedList<>();
+    private static final List<Event> indexRequests = new LinkedList<>();
 
     @Override
-    public void add(IndexRequest indexRequest) {
-        indexRequests.add(indexRequest);
+    public void add(Event event) {
+        indexRequests.add(event);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class InternalQueue implements EventQueue {
     }
 
     @Override
-    public List<IndexRequest> get() {
+    public List<Event> get() {
         return indexRequests;
     }
 
