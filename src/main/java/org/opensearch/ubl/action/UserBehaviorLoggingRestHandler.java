@@ -56,20 +56,26 @@ public class UserBehaviorLoggingRestHandler extends BaseRestHandler {
             final String storeName = request.param("store");
 
             LOGGER.info("Creating search relevance index {}", storeName);
-            return (channel) -> backend.initialize(storeName, channel);
+            backend.initialize(storeName);
+            return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "created"));
 
         } else if (request.method() == DELETE) {
 
             final String storeName = request.param("store");
 
+            // TODO: Make sure the store actually exists first.
+
             LOGGER.info("Deleting search relevance index {}", storeName);
-            return (channel) -> backend.delete(storeName, channel);
+            backend.delete(storeName);
+            return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "deleted"));
 
         } else if (request.method() == POST) {
 
             if (request.hasContent()) {
 
                 final String storeName = request.param("store");
+
+                // TODO: Make sure the store actually exists first.
 
                 LOGGER.info("Persisting event into {}", storeName);
                 final String eventJson = request.content().utf8ToString();

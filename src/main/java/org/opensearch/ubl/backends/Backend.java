@@ -16,9 +16,9 @@ import java.util.List;
 
 public interface Backend {
 
-    void initialize(final String storeName, RestChannel channel);
+    void initialize(final String storeName);
 
-    void delete(final String storeName, RestChannel channel);
+    void delete(final String storeName);
 
     void persistEvent(final String storeName, String eventJson);
 

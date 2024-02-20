@@ -18,8 +18,6 @@ import org.opensearch.cluster.metadata.IndexMetadata;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.io.Streams;
 import org.opensearch.common.xcontent.XContentType;
-import org.opensearch.rest.RestChannel;
-import org.opensearch.rest.action.RestToXContentListener;
 import org.opensearch.ubl.SettingsConstants;
 import org.opensearch.ubl.events.Event;
 import org.opensearch.ubl.events.OpenSearchEventManager;
@@ -51,7 +49,7 @@ public class OpenSearchBackend implements Backend {
     }
 
     @Override
-    public void initialize(final String storeName, final RestChannel channel) {
+    public void initialize(final String storeName) {
 
         // TODO: Determine if already initialized with this index name first.
         // TODO: Also need some error handling around this in case one or both of these index creations fail.
@@ -65,7 +63,7 @@ public class OpenSearchBackend implements Backend {
                 .mapping(getResourceFile(EVENTS_MAPPING_FILE))
                 .settings(getIndexSettings());
 
-        client.admin().indices().create(createEventsIndexRequest, new RestToXContentListener<>(channel));
+        client.admin().indices().create(createEventsIndexRequest);
 
         // Create the queries index.
         final String queriesIndexName = getQueriesIndexName(storeName);
@@ -74,19 +72,19 @@ public class OpenSearchBackend implements Backend {
                 .mapping(getResourceFile(QUERIES_MAPPING_FILE))
                 .settings(getIndexSettings());
 
-        client.admin().indices().create(createQueryIndexRequest, new RestToXContentListener<>(channel));
+        client.admin().indices().create(createQueryIndexRequest);
 
     }
 
     @Override
-    public void delete(String storeName, RestChannel channel) {
+    public void delete(String storeName) {
 
         LOGGER.info("Deleting search relevance store {}", storeName);
 
         final String eventsIndexName = getEventsIndexName(storeName);
         final String queriesIndexName = getQueriesIndexName(storeName);
         final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(eventsIndexName, queriesIndexName);
-        client.admin().indices().delete(deleteIndexRequest, new RestToXContentListener<>(channel));
+        client.admin().indices().delete(deleteIndexRequest);
 
     }
 
