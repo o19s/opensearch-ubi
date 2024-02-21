@@ -10,10 +10,10 @@ package org.opensearch.ubl;
 
 public enum HeaderConstants {
 
-    QUERY_ID_HEADER("X-ubi-query-id"),
-    EVENT_STORE_HEADER("X-ubi-store"),
-    USER_ID_HEADER("X-ubi-user-id"),
-    SESSION_ID_HEADER("X-ubi-session-id");
+    QUERY_ID_HEADER("X-ubl-query-id"),
+    EVENT_STORE_HEADER("X-ubl-store"),
+    USER_ID_HEADER("X-ubl-user-id"),
+    SESSION_ID_HEADER("X-ubl-session-id");
 
     private final String header;
 
