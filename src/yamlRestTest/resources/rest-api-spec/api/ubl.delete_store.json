@@ -1,0 +1,29 @@
+{
+  "ubl.delete_store": {
+    "stability": "stable",
+    "url": {
+      "paths": [
+        {
+          "path": "/_plugins/ubl",
+          "methods": [
+            "DELETE"
+          ]
+        },
+        {
+          "path": "/_plugins/ubl/{store}",
+          "parts": {
+            "store": {
+              "required": false,
+              "type": "string",
+              "description": "The store name"
+            }
+          },
+          "methods": [
+            "DELETE"
+          ]
+        }
+      ]
+    },
+    "body": null
+  }
+}

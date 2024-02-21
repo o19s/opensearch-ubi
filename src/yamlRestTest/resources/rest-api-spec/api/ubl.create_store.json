@@ -1,0 +1,23 @@
+{
+  "ubl.create_store": {
+    "stability": "stable",
+    "url": {
+      "paths": [
+        {
+          "path": "/_plugins/ubl/{store}",
+          "parts": {
+            "store": {
+              "required": false,
+              "type": "string",
+              "description": "The name of the store"
+            }
+          },
+          "methods": [
+            "PUT"
+          ]
+        }
+      ]
+    },
+    "body": null
+  }
+}
