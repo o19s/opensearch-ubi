@@ -20,7 +20,6 @@ import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.transport.Header;
 import org.opensearch.ubl.HeaderConstants;
 import org.opensearch.ubl.backends.Backend;
 import org.opensearch.ubl.model.QueryRequest;
@@ -90,7 +89,6 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
                     final String queryResponseId = UUID.randomUUID().toString();
 
                     final List<String> queryResponseHitIds = new LinkedList<>();
-
                     final SearchResponse searchResponse = (SearchResponse) response;
 
                     // Add each hit to the list of query responses.
@@ -132,9 +130,9 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
 
     }
 
-    private String getHeaderValue(final HeaderConstants header, final String defaultValue, Task task) {
+    private String getHeaderValue(final HeaderConstants header, final String defaultValue, final Task task) {
 
-        String value = task.getHeader(header.getHeader());
+        final String value = task.getHeader(header.getHeader());
 
         // If there is no event store header we'll use a "default" store.
         if(value == null || value.trim().isEmpty()) {
