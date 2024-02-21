@@ -4,16 +4,22 @@
     "timestamp": {
       "type": "date"
     },
-    "queryId": {
+    "query_id": {
       "type": "keyword"
     },
     "query": {
       "type": "text"
     },
-    "queryResponseId": {
+    "query_response_id": {
       "type": "keyword"
     },
-    "queryResponseHitIds": {
+    "query_response_hit_ids": {
+      "type": "keyword"
+    },
+    "user_id": {
+      "type": "keyword"
+    },
+    "session_id": {
       "type": "keyword"
     }
   }
