@@ -84,6 +84,7 @@ public class OpenSearchBackend implements Backend {
         final String eventsIndexName = getEventsIndexName(storeName);
         final String queriesIndexName = getQueriesIndexName(storeName);
         final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(eventsIndexName, queriesIndexName);
+
         client.admin().indices().delete(deleteIndexRequest);
 
     }
@@ -102,7 +103,7 @@ public class OpenSearchBackend implements Backend {
     }
 
     @Override
-    public void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) throws Exception {
+    public void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) {
 
         LOGGER.info("Writing query ID {} with response ID {}", queryRequest.getQueryId(), queryResponse.getQueryResponseId());
 

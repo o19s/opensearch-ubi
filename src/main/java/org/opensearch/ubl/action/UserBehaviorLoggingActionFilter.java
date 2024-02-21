@@ -92,9 +92,7 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
                     final SearchResponse searchResponse = (SearchResponse) response;
 
                     // Add each hit to the list of query responses.
-                    searchResponse.getHits().forEach(hit -> {
-                        queryResponseHitIds.add(String.valueOf(hit.docId()));
-                    });
+                    searchResponse.getHits().forEach(hit -> queryResponseHitIds.add(String.valueOf(hit.docId())));
 
                     try {
 
@@ -134,7 +132,6 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
 
         final String value = task.getHeader(header.getHeader());
 
-        // If there is no event store header we'll use a "default" store.
         if(value == null || value.trim().isEmpty()) {
             return defaultValue;
         } else {
