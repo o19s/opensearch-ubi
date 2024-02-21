@@ -109,10 +109,12 @@ public class OpenSearchBackend implements Backend {
         // What will be indexed - adheres to the queries-mapping.json
         final Map<String, Object> source = new HashMap<>();
         source.put("timestamp", queryRequest.getTimestamp());
-        source.put("queryId", queryRequest.getQueryId());
+        source.put("query_id", queryRequest.getQueryId());
         source.put("query", queryRequest.getQuery());
-        source.put("queryResponseId", queryResponse.getQueryResponseId());
-        source.put("queryResponseHitIds", queryResponse.getQueryResponseHitIds());
+        source.put("query_response_id", queryResponse.getQueryResponseId());
+        source.put("query_response_hit_ids", queryResponse.getQueryResponseHitIds());
+        source.put("user_id", queryRequest.getUserId());
+        source.put("session_id", queryRequest.getSessionId());
 
         // Get the name of the queries.
         final String queriesIndexName = getQueriesIndexName(storeName);

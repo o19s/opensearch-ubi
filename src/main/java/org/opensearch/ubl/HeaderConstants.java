@@ -11,5 +11,7 @@ package org.opensearch.ubl;
 public class HeaderConstants {
 
     public static final String EVENT_STORE_HEADER = "X-ubi-store";
+    public static final String USER_ID_HEADER = "X-ubi-user-id";
+    public static final String SESSION_ID_HEADER = "X-ubi-session-id";
 
 }

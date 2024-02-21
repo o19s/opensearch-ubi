@@ -53,12 +53,20 @@ public class UserBehaviorLoggingPlugin extends Plugin implements ActionPlugin {
 
     @Override
     public Collection<RestHeaderDefinition> getRestHeaders() {
-        return List.of(new RestHeaderDefinition(HeaderConstants.EVENT_STORE_HEADER, false));
+        return List.of(
+                new RestHeaderDefinition(HeaderConstants.EVENT_STORE_HEADER, false),
+                new RestHeaderDefinition(HeaderConstants.SESSION_ID_HEADER, false),
+                new RestHeaderDefinition(HeaderConstants.USER_ID_HEADER, false)
+        );
     }
 
     @Override
     public Collection<String> getTaskHeaders() {
-        return List.of(HeaderConstants.EVENT_STORE_HEADER);
+        return List.of(
+                HeaderConstants.EVENT_STORE_HEADER,
+                HeaderConstants.SESSION_ID_HEADER,
+                HeaderConstants.USER_ID_HEADER
+        );
     }
 
     @Override

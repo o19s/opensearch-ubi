@@ -91,6 +91,10 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
                     // Create a UUID for this search request.
                     final String queryId = UUID.randomUUID().toString();
 
+                    // Get info from the headers.
+                    final String userId = task.getHeader(HeaderConstants.USER_ID_HEADER);
+                    final String sessionId = task.getHeader(HeaderConstants.SESSION_ID_HEADER);
+
                     // The query will be empty when there is no query, e.g. /_search
                     final String query = searchRequest.source().toString();
 
@@ -110,7 +114,7 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
 
                         // Persist the query to the backend.
                         backend.persistQuery(eventStore,
-                                new QueryRequest(queryId, query),
+                                new QueryRequest(queryId, query, userId, sessionId),
                                 new QueryResponse(queryId, queryResponseId, queryResponseHitIds));
 
                     } catch (Exception ex) {
