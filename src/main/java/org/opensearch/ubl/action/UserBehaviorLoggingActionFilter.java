@@ -20,6 +20,7 @@ import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
+import org.opensearch.transport.Header;
 import org.opensearch.ubl.HeaderConstants;
 import org.opensearch.ubl.backends.Backend;
 import org.opensearch.ubl.model.QueryRequest;
@@ -63,59 +64,61 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
             @Override
             public void onResponse(Response response) {
 
-                LOGGER.info("Query ID header: " + task.getHeader("query-id"));
+                //LOGGER.info("Query ID header: " + task.getHeader("query-id"));
 
                 final long startTime = System.currentTimeMillis();
 
-                final String eventStore = task.getHeader(HeaderConstants.EVENT_STORE_HEADER);
+                String eventStore = task.getHeader(HeaderConstants.EVENT_STORE_HEADER);
 
-                // If there is no event store header we should not continue anything.
-                if(eventStore != null && !eventStore.trim().isEmpty()) {
+                // If there is no event store header we'll use a "default" store.
+                if(eventStore == null || eventStore.trim().isEmpty()) {
+                    eventStore = "default";
+                }
 
-                    // Get the search itself.
-                    final SearchRequest searchRequest = (SearchRequest) request;
+                LOGGER.info("Using UBL event store: {}", eventStore);
 
-                    // TODO: Restrict logging to only queries of certain indices specified in the settings.
-                    //final List<String> indices = Arrays.asList(searchRequest.indices());
-                    //final Set<String> indicesToLog = new HashSet<>(Arrays.asList(settings.get(SettingsConstants.INDEX_NAMES).split(",")));
-                    //if(indicesToLog.containsAll(indices)) {
+                // Get the search itself.
+                final SearchRequest searchRequest = (SearchRequest) request;
 
-                    // Get all search hits from the response.
-                    if (response instanceof SearchResponse) {
+                // TODO: Restrict logging to only queries of certain indices specified in the settings.
+                //final List<String> indices = Arrays.asList(searchRequest.indices());
+                //final Set<String> indicesToLog = new HashSet<>(Arrays.asList(settings.get(SettingsConstants.INDEX_NAMES).split(",")));
+                //if(indicesToLog.containsAll(indices)) {
 
-                        // Create a UUID for this search request.
-                        final String queryId = UUID.randomUUID().toString();
+                // Get all search hits from the response.
+                if (response instanceof SearchResponse) {
 
-                        // The query will be empty when there is no query, e.g. /_search
-                        final String query = searchRequest.source().toString();
+                    // Create a UUID for this search request.
+                    final String queryId = UUID.randomUUID().toString();
 
-                        // Create a UUID for this search response.
-                        final String queryResponseId = UUID.randomUUID().toString();
+                    // The query will be empty when there is no query, e.g. /_search
+                    final String query = searchRequest.source().toString();
 
-                        final List<String> queryResponseHitIds = new LinkedList<>();
+                    // Create a UUID for this search response.
+                    final String queryResponseId = UUID.randomUUID().toString();
 
-                        final SearchResponse searchResponse = (SearchResponse) response;
+                    final List<String> queryResponseHitIds = new LinkedList<>();
 
-                        // Add each hit to the list of query responses.
-                        searchResponse.getHits().forEach(hit -> {
-                            queryResponseHitIds.add(String.valueOf(hit.docId()));
-                        });
+                    final SearchResponse searchResponse = (SearchResponse) response;
 
-                        try {
+                    // Add each hit to the list of query responses.
+                    searchResponse.getHits().forEach(hit -> {
+                        queryResponseHitIds.add(String.valueOf(hit.docId()));
+                    });
 
-                            // Persist the query to the backend.
-                            backend.persistQuery(eventStore,
-                                    new QueryRequest(queryId, query),
-                                    new QueryResponse(queryId, queryResponseId, queryResponseHitIds));
+                    try {
 
-                        } catch (Exception ex) {
-                            // TODO: Handle this.
-                            LOGGER.error("Unable to persist query.", ex);
-                        }
+                        // Persist the query to the backend.
+                        backend.persistQuery(eventStore,
+                                new QueryRequest(queryId, query),
+                                new QueryResponse(queryId, queryResponseId, queryResponseHitIds));
 
-                        threadPool.getThreadContext().addResponseHeader("query_id", queryId);
-
+                    } catch (Exception ex) {
+                        // TODO: Handle this.
+                        LOGGER.error("Unable to persist query.", ex);
                     }
+
+                    threadPool.getThreadContext().addResponseHeader("query_id", queryId);
 
                     //}
 
