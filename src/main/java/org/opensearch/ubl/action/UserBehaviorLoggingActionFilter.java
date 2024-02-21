@@ -64,18 +64,7 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
             @Override
             public void onResponse(Response response) {
 
-                //LOGGER.info("Query ID header: " + task.getHeader("query-id"));
-
                 final long startTime = System.currentTimeMillis();
-
-                String eventStore = task.getHeader(HeaderConstants.EVENT_STORE_HEADER);
-
-                // If there is no event store header we'll use a "default" store.
-                if(eventStore == null || eventStore.trim().isEmpty()) {
-                    eventStore = "default";
-                }
-
-                LOGGER.info("Using UBL event store: {}", eventStore);
 
                 // Get the search itself.
                 final SearchRequest searchRequest = (SearchRequest) request;
@@ -88,12 +77,11 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
                 // Get all search hits from the response.
                 if (response instanceof SearchResponse) {
 
-                    // Create a UUID for this search request.
-                    final String queryId = UUID.randomUUID().toString();
-
                     // Get info from the headers.
-                    final String userId = task.getHeader(HeaderConstants.USER_ID_HEADER);
-                    final String sessionId = task.getHeader(HeaderConstants.SESSION_ID_HEADER);
+                    final String queryId = getHeaderValue(HeaderConstants.QUERY_ID_HEADER, UUID.randomUUID().toString(), task);
+                    final String eventStore = getHeaderValue(HeaderConstants.EVENT_STORE_HEADER, "default", task);
+                    final String userId = getHeaderValue(HeaderConstants.USER_ID_HEADER, "", task);
+                    final String sessionId = getHeaderValue(HeaderConstants.SESSION_ID_HEADER, "", task);
 
                     // The query will be empty when there is no query, e.g. /_search
                     final String query = searchRequest.source().toString();
@@ -141,6 +129,19 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
             }
 
         });
+
+    }
+
+    private String getHeaderValue(final HeaderConstants header, final String defaultValue, Task task) {
+
+        String value = task.getHeader(header.getHeader());
+
+        // If there is no event store header we'll use a "default" store.
+        if(value == null || value.trim().isEmpty()) {
+            return defaultValue;
+        } else {
+            return value;
+        }
 
     }
 
