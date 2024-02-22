@@ -55,6 +55,7 @@ public class UserBehaviorLoggingPlugin extends Plugin implements ActionPlugin {
     public Collection<RestHeaderDefinition> getRestHeaders() {
         return List.of(
                 new RestHeaderDefinition(HeaderConstants.EVENT_STORE_HEADER.getHeader(), false),
+                new RestHeaderDefinition(HeaderConstants.QUERY_ID_HEADER.getHeader(), false),
                 new RestHeaderDefinition(HeaderConstants.SESSION_ID_HEADER.getHeader(), false),
                 new RestHeaderDefinition(HeaderConstants.USER_ID_HEADER.getHeader(), false)
         );
@@ -64,6 +65,7 @@ public class UserBehaviorLoggingPlugin extends Plugin implements ActionPlugin {
     public Collection<String> getTaskHeaders() {
         return List.of(
                 HeaderConstants.EVENT_STORE_HEADER.getHeader(),
+                HeaderConstants.QUERY_ID_HEADER.getHeader(),
                 HeaderConstants.SESSION_ID_HEADER.getHeader(),
                 HeaderConstants.USER_ID_HEADER.getHeader()
         );
