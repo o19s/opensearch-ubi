@@ -84,6 +84,7 @@ public class OpenSearchBackend implements Backend {
         final String eventsIndexName = getEventsIndexName(storeName);
         final String queriesIndexName = getQueriesIndexName(storeName);
         final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(eventsIndexName, queriesIndexName);
+
         client.admin().indices().delete(deleteIndexRequest);
 
     }
@@ -102,17 +103,19 @@ public class OpenSearchBackend implements Backend {
     }
 
     @Override
-    public void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) throws Exception {
+    public void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) {
 
         LOGGER.info("Writing query ID {} with response ID {}", queryRequest.getQueryId(), queryResponse.getQueryResponseId());
 
         // What will be indexed - adheres to the queries-mapping.json
         final Map<String, Object> source = new HashMap<>();
         source.put("timestamp", queryRequest.getTimestamp());
-        source.put("queryId", queryRequest.getQueryId());
+        source.put("query_id", queryRequest.getQueryId());
         source.put("query", queryRequest.getQuery());
-        source.put("queryResponseId", queryResponse.getQueryResponseId());
-        source.put("queryResponseHitIds", queryResponse.getQueryResponseHitIds());
+        source.put("query_response_id", queryResponse.getQueryResponseId());
+        source.put("query_response_hit_ids", queryResponse.getQueryResponseHitIds());
+        source.put("user_id", queryRequest.getUserId());
+        source.put("session_id", queryRequest.getSessionId());
 
         // Get the name of the queries.
         final String queriesIndexName = getQueriesIndexName(storeName);

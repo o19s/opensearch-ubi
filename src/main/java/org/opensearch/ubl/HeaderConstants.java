@@ -8,8 +8,26 @@
 
 package org.opensearch.ubl;
 
-public class HeaderConstants {
+public enum HeaderConstants {
 
-    public static final String EVENT_STORE_HEADER = "X-ubi-store";
+    QUERY_ID_HEADER("X-ubl-query-id"),
+    EVENT_STORE_HEADER("X-ubl-store"),
+    USER_ID_HEADER("X-ubl-user-id"),
+    SESSION_ID_HEADER("X-ubl-session-id");
+
+    private final String header;
+
+    private HeaderConstants(String header) {
+        this.header = header;
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    @Override
+    public String toString() {
+        return header;
+    }
 
 }

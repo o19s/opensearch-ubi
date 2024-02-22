@@ -20,7 +20,6 @@ import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.transport.Header;
 import org.opensearch.ubl.HeaderConstants;
 import org.opensearch.ubl.backends.Backend;
 import org.opensearch.ubl.model.QueryRequest;
@@ -64,18 +63,7 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
             @Override
             public void onResponse(Response response) {
 
-                //LOGGER.info("Query ID header: " + task.getHeader("query-id"));
-
                 final long startTime = System.currentTimeMillis();
-
-                String eventStore = task.getHeader(HeaderConstants.EVENT_STORE_HEADER);
-
-                // If there is no event store header we'll use a "default" store.
-                if(eventStore == null || eventStore.trim().isEmpty()) {
-                    eventStore = "default";
-                }
-
-                LOGGER.info("Using UBL event store: {}", eventStore);
 
                 // Get the search itself.
                 final SearchRequest searchRequest = (SearchRequest) request;
@@ -88,8 +76,11 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
                 // Get all search hits from the response.
                 if (response instanceof SearchResponse) {
 
-                    // Create a UUID for this search request.
-                    final String queryId = UUID.randomUUID().toString();
+                    // Get info from the headers.
+                    final String queryId = getHeaderValue(HeaderConstants.QUERY_ID_HEADER, UUID.randomUUID().toString(), task);
+                    final String eventStore = getHeaderValue(HeaderConstants.EVENT_STORE_HEADER, "default", task);
+                    final String userId = getHeaderValue(HeaderConstants.USER_ID_HEADER, "", task);
+                    final String sessionId = getHeaderValue(HeaderConstants.SESSION_ID_HEADER, "", task);
 
                     // The query will be empty when there is no query, e.g. /_search
                     final String query = searchRequest.source().toString();
@@ -98,19 +89,16 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
                     final String queryResponseId = UUID.randomUUID().toString();
 
                     final List<String> queryResponseHitIds = new LinkedList<>();
-
                     final SearchResponse searchResponse = (SearchResponse) response;
 
                     // Add each hit to the list of query responses.
-                    searchResponse.getHits().forEach(hit -> {
-                        queryResponseHitIds.add(String.valueOf(hit.docId()));
-                    });
+                    searchResponse.getHits().forEach(hit -> queryResponseHitIds.add(String.valueOf(hit.docId())));
 
                     try {
 
                         // Persist the query to the backend.
                         backend.persistQuery(eventStore,
-                                new QueryRequest(queryId, query),
+                                new QueryRequest(queryId, query, userId, sessionId),
                                 new QueryResponse(queryId, queryResponseId, queryResponseHitIds));
 
                     } catch (Exception ex) {
@@ -137,6 +125,18 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
             }
 
         });
+
+    }
+
+    private String getHeaderValue(final HeaderConstants header, final String defaultValue, final Task task) {
+
+        final String value = task.getHeader(header.getHeader());
+
+        if(value == null || value.trim().isEmpty()) {
+            return defaultValue;
+        } else {
+            return value;
+        }
 
     }
 

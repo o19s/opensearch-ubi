@@ -13,11 +13,15 @@ public class QueryRequest {
     private final long timestamp;
     private final String queryId;
     private final String query;
+    private final String userId;
+    private final String sessionId;
 
-    public QueryRequest(final String queryId, final String query) {
+    public QueryRequest(final String queryId, final String query, final String userId, final String sessionId) {
         this.timestamp = System.currentTimeMillis();
         this.queryId = queryId;
         this.query = query;
+        this.userId = userId;
+        this.sessionId = sessionId;
     }
 
     public long getTimestamp() {
@@ -30,6 +34,14 @@ public class QueryRequest {
 
     public String getQuery() {
         return query;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getSessionId() {
+        return sessionId;
     }
 
 }
