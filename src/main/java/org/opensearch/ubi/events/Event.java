@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubl.events;
+package org.opensearch.ubi.events;
 
 public class Event {
 

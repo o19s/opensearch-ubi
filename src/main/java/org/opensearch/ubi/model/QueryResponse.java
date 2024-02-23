@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubl.model;
+package org.opensearch.ubi.model;
 
 import java.util.List;
 

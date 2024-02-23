@@ -5,4 +5,4 @@
         h: component
 
   - match:
-      $body: /^opensearch-ubl\n$/
+      $body: /^opensearch-ubi\n$/

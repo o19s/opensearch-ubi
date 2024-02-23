@@ -6,14 +6,14 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubl.action;
+package org.opensearch.ubi.action;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.client.node.NodeClient;
 import org.opensearch.core.rest.RestStatus;
-import org.opensearch.ubl.backends.Backend;
+import org.opensearch.ubi.backends.Backend;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
@@ -22,13 +22,13 @@ import java.util.List;
 
 import static org.opensearch.rest.RestRequest.Method.*;
 
-public class UserBehaviorLoggingRestHandler extends BaseRestHandler {
+public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
-    private static final Logger LOGGER = LogManager.getLogger(UserBehaviorLoggingRestHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(UserBehaviorInsightsRestHandler.class);
 
     private final Backend backend;
 
-    public UserBehaviorLoggingRestHandler(final Backend backend) {
+    public UserBehaviorInsightsRestHandler(final Backend backend) {
         this.backend = backend;
     }
 
@@ -40,10 +40,10 @@ public class UserBehaviorLoggingRestHandler extends BaseRestHandler {
     @Override
     public List<Route> routes() {
         return List.of(
-                new Route(PUT, "/_plugins/ubl/{store}"), // Initializes the store.
-                new Route(DELETE, "/_plugins/ubl/{store}"), // Deletes a store.
-                new Route(GET, "/_plugins/ubl"), // Lists all stores
-                new Route(POST, "/_plugins/ubl/{store}")); // Indexes events into the store.
+                new Route(PUT, "/_plugins/ubi/{store}"), // Initializes the store.
+                new Route(DELETE, "/_plugins/ubi/{store}"), // Deletes a store.
+                new Route(GET, "/_plugins/ubi"), // Lists all stores
+                new Route(POST, "/_plugins/ubi/{store}")); // Indexes events into the store.
     }
 
     @Override

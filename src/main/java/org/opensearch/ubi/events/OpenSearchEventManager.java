@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubl.events;
+package org.opensearch.ubi.events;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

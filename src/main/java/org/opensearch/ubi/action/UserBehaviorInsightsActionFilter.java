@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubl.action;
+package org.opensearch.ubi.action;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,24 +20,24 @@ import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.ubl.HeaderConstants;
-import org.opensearch.ubl.backends.Backend;
-import org.opensearch.ubl.model.QueryRequest;
-import org.opensearch.ubl.model.QueryResponse;
+import org.opensearch.ubi.HeaderConstants;
+import org.opensearch.ubi.backends.Backend;
+import org.opensearch.ubi.model.QueryRequest;
+import org.opensearch.ubi.model.QueryResponse;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class UserBehaviorLoggingActionFilter implements ActionFilter {
+public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
-    private static final Logger LOGGER = LogManager.getLogger(UserBehaviorLoggingActionFilter.class);
+    private static final Logger LOGGER = LogManager.getLogger(UserBehaviorInsightsActionFilter.class);
 
     private final Backend backend;
     private final Settings settings;
     private final ThreadPool threadPool;
 
-    public UserBehaviorLoggingActionFilter(final Backend backend, final Settings settings, ThreadPool threadPool) {
+    public UserBehaviorInsightsActionFilter(final Backend backend, final Settings settings, ThreadPool threadPool) {
         this.backend = backend;
         this.settings = settings;
         this.threadPool = threadPool;
@@ -111,7 +111,7 @@ public class UserBehaviorLoggingActionFilter implements ActionFilter {
                     //}
 
                     final long elapsedTime = System.currentTimeMillis() - startTime;
-                    LOGGER.info("UBL search request filter took {} ms", elapsedTime);
+                    LOGGER.info("UBI search request filter took {} ms", elapsedTime);
 
                 }
 
