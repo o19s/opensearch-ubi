@@ -12,6 +12,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.admin.indices.create.CreateIndexRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.opensearch.action.admin.indices.exists.indices.IndicesExistsRequest;
+import org.opensearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.client.Client;
 import org.opensearch.cluster.metadata.IndexMetadata;
@@ -28,10 +30,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class OpenSearchBackend implements Backend {
 
@@ -50,9 +52,6 @@ public class OpenSearchBackend implements Backend {
 
     @Override
     public void initialize(final String storeName) {
-
-        // TODO: Determine if already initialized with this index name first.
-        // TODO: Also need some error handling around this in case one or both of these index creations fail.
 
         LOGGER.info("Creating search relevance store {}", storeName);
 
@@ -130,9 +129,46 @@ public class OpenSearchBackend implements Backend {
     }
 
     @Override
-    public List<String> get() {
-        // TODO: Get the list of initialized stores for the plugin.
-        return new ArrayList<>();
+    public Set<String> get() {
+
+        /*final GetIndexRequest getIndexRequest = new GetIndexRequest();
+        final GetIndexResponse getIndexResponse = client.admin().indices().getIndex(getIndexRequest).actionGet();
+
+        final String[] indexes = getIndexResponse.indices();
+        final Set<String> stores = new HashSet<>();
+
+        for(final String index : indexes) {
+            LOGGER.info("Index name: " + index);
+            if(index.startsWith(".") && index.endsWith("_queries")) {
+                stores.add(index);
+            }
+        }
+
+        return stores;*/
+
+        return Collections.emptySet();
+
+    }
+
+    @Override
+    public boolean exists(final String storeName) {
+
+        final String indexName = getEventsIndexName(storeName);
+
+        // TODO: This has to run on a non-blocking thread.
+        final IndicesExistsRequest indicesExistsRequest = new IndicesExistsRequest(indexName);
+        final IndicesExistsResponse indicesExistsResponse = client.admin().indices().exists(indicesExistsRequest).actionGet();
+
+        return indicesExistsResponse.isExists();
+
+    }
+
+    @Override
+    public boolean validateStoreName(final String storeName) {
+
+        // Validate the store name.
+        return storeName != null && !storeName.isEmpty();
+
     }
 
     private String getEventsIndexName(final String storeName) {

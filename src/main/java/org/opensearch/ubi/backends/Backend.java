@@ -8,10 +8,10 @@
 
 package org.opensearch.ubi.backends;
 
-import org.opensearch.ubi.model.QueryResponse;
 import org.opensearch.ubi.model.QueryRequest;
+import org.opensearch.ubi.model.QueryResponse;
 
-import java.util.List;
+import java.util.Set;
 
 public interface Backend {
 
@@ -23,6 +23,10 @@ public interface Backend {
 
     void persistQuery(final String storeName, QueryRequest queryRequest, QueryResponse queryResponse) throws Exception;
 
-    List<String> get();
+    Set<String> get();
+
+    boolean exists(final String storeName);
+
+    boolean validateStoreName(final String storeName);
 
 }
