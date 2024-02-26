@@ -1,0 +1,21 @@
+---
+"Create and delete a store":
+  - do:
+      ubl.create_store:
+        store: mystore
+
+  - do:
+      indices.exists:
+        index: .mystore_events
+
+  - match: { created }
+
+  - do:
+      ubl.delete_store:
+        store: mystore
+
+  - do:
+      indices.exists:
+        index: .mystore_events
+
+  - is_false: ''

@@ -8,11 +8,11 @@
 
 package org.opensearch.ubl.backends;
 
-import org.opensearch.ubl.model.QueryResponse;
 import org.opensearch.ubl.model.QueryRequest;
-import org.opensearch.rest.RestChannel;
+import org.opensearch.ubl.model.QueryResponse;
 
-import java.util.List;
+import java.nio.channels.Channel;
+import java.util.Set;
 
 public interface Backend {
 
@@ -24,6 +24,10 @@ public interface Backend {
 
     void persistQuery(final String storeName, QueryRequest queryRequest, QueryResponse queryResponse) throws Exception;
 
-    List<String> get();
+    Set<String> get();
+
+    boolean exists(final String storeName);
+
+    boolean validateStoreName(final String storeName);
 
 }
