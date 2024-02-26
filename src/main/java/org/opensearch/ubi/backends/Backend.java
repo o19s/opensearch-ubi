@@ -6,12 +6,11 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubl.backends;
+package org.opensearch.ubi.backends;
 
-import org.opensearch.ubl.model.QueryRequest;
-import org.opensearch.ubl.model.QueryResponse;
+import org.opensearch.ubi.model.QueryRequest;
+import org.opensearch.ubi.model.QueryResponse;
 
-import java.nio.channels.Channel;
 import java.util.Set;
 
 public interface Backend {

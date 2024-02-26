@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubl.backends;
+package org.opensearch.ubi.backends;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,11 +20,11 @@ import org.opensearch.cluster.metadata.IndexMetadata;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.io.Streams;
 import org.opensearch.common.xcontent.XContentType;
-import org.opensearch.ubl.SettingsConstants;
-import org.opensearch.ubl.events.Event;
-import org.opensearch.ubl.events.OpenSearchEventManager;
-import org.opensearch.ubl.model.QueryRequest;
-import org.opensearch.ubl.model.QueryResponse;
+import org.opensearch.ubi.SettingsConstants;
+import org.opensearch.ubi.events.Event;
+import org.opensearch.ubi.events.OpenSearchEventManager;
+import org.opensearch.ubi.model.QueryRequest;
+import org.opensearch.ubi.model.QueryResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

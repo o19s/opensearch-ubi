@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubl;
+package org.opensearch.ubi;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,11 +28,11 @@ import org.opensearch.rest.RestHandler;
 import org.opensearch.rest.RestHeaderDefinition;
 import org.opensearch.script.ScriptService;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.ubl.action.UserBehaviorLoggingActionFilter;
-import org.opensearch.ubl.action.UserBehaviorLoggingRestHandler;
-import org.opensearch.ubl.backends.Backend;
-import org.opensearch.ubl.backends.OpenSearchBackend;
-import org.opensearch.ubl.events.OpenSearchEventManager;
+import org.opensearch.ubi.action.UserBehaviorInsightsActionFilter;
+import org.opensearch.ubi.action.UserBehaviorInsightsRestHandler;
+import org.opensearch.ubi.backends.Backend;
+import org.opensearch.ubi.backends.OpenSearchBackend;
+import org.opensearch.ubi.events.OpenSearchEventManager;
 import org.opensearch.watcher.ResourceWatcherService;
 
 import java.util.ArrayList;
@@ -44,9 +44,9 @@ import java.util.function.Supplier;
 
 import static java.util.Collections.singletonList;
 
-public class UserBehaviorLoggingPlugin extends Plugin implements ActionPlugin {
+public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
 
-    private static final Logger LOGGER = LogManager.getLogger(UserBehaviorLoggingPlugin.class);
+    private static final Logger LOGGER = LogManager.getLogger(UserBehaviorInsightsPlugin.class);
 
     private Backend backend;
     private ActionFilter userBehaviorLoggingFilter;
@@ -80,7 +80,7 @@ public class UserBehaviorLoggingPlugin extends Plugin implements ActionPlugin {
                                              final IndexNameExpressionResolver indexNameExpressionResolver,
                                              final Supplier<DiscoveryNodes> nodesInCluster) {
 
-        return singletonList(new UserBehaviorLoggingRestHandler(backend));
+        return singletonList(new UserBehaviorInsightsRestHandler(backend));
 
     }
 
@@ -119,7 +119,7 @@ public class UserBehaviorLoggingPlugin extends Plugin implements ActionPlugin {
     ) {
 
         this.backend = new OpenSearchBackend(client);
-        this.userBehaviorLoggingFilter =  new UserBehaviorLoggingActionFilter(backend, environment.settings(), threadPool);
+        this.userBehaviorLoggingFilter =  new UserBehaviorInsightsActionFilter(backend, environment.settings(), threadPool);
 
         LOGGER.info("Creating scheduled task");
 

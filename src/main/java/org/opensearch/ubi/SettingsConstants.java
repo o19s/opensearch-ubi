@@ -6,11 +6,11 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubl;
+package org.opensearch.ubi;
 
 public class SettingsConstants {
 
-    public static final String INDEX_NAMES = "plugins.ubl.indices";
-    public static final String VERSION_SETTING = "index.ublstore.version";
+    public static final String INDEX_NAMES = "plugins.ubi.indices";
+    public static final String VERSION_SETTING = "index.ubistore.version";
 
 }

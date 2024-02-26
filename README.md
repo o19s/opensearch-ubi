@@ -1,6 +1,4 @@
-# OpenSearch User Behavior Logging
-
-This project is getting a new name! See the voting - https://forum.opensearch.org/t/vote-user-behavior-logging-and-insights/17838
+# OpenSearch User Behavior Insights
 
 OpenSearch RFC - https://github.com/opensearch-project/OpenSearch/issues/12084
 
@@ -23,13 +21,13 @@ Start the containers:
 Initialize the `awesome` UBL store:
 
 ```
-curl -X PUT http://localhost:9200/_plugins/ubl/awesome
+curl -X PUT http://localhost:9200/_plugins/ubi/awesome
 ```
 
 Send an event to the `awesome` store:
 
 ```
-curl -X POST http://localhost:9200/_plugins/ubl/awesome -H "Content-Type: application/json" -d @./scripts/instant-search.json
+curl -X POST http://localhost:9200/_plugins/ubi/awesome -H "Content-Type: application/json" -d @./scripts/instant-search.json
 ```
 
 Get events:
@@ -51,5 +49,5 @@ curl -s http://localhost:9200/.awesome_queries/_search -H "X-ubi-store: awesome"
 Delete the store:
 
 ```
-curl -X DELETE http://localhost:9200/_plugins/ubl/awesome
+curl -X DELETE http://localhost:9200/_plugins/ubi/awesome
 ```

@@ -5,9 +5,9 @@ apply plugin: 'opensearch.yaml-rest-test'
 apply plugin: 'maven-publish'
 
 opensearchplugin {
-    name 'opensearch-ubl'
-    description 'OpenSearch User Behavior Logging Plugin'
-    classname 'org.opensearch.ubl.UserBehaviorLoggingPlugin'
+    name 'opensearch-ubi'
+    description 'OpenSearch User Behavior Insights Plugin'
+    classname 'org.opensearch.ubi.UserBehaviorInsightsPlugin'
     licenseFile rootProject.file('LICENSE.txt')
     noticeFile rootProject.file('NOTICE.txt')
 }
@@ -44,7 +44,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/o19s/opensearch-ubl")
+            url = uri("https://maven.pkg.github.com/o19s/opensearch-ubi")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
@@ -54,8 +54,8 @@ publishing {
     publications {
         pluginZip(MavenPublication) { publication ->
             pom {
-                name = "opensearch-ubl"
-                description = "Provides User Behavior Logging for OpenSearch"
+                name = "opensearch-ubi"
+                description = "Provides User Behavior Insights for OpenSearch"
                 groupId = "org.opensearch"
                 licenses {
                     license {
@@ -66,7 +66,7 @@ publishing {
                 developers {
                     developer {
                         name = "OpenSearch"
-                        url = "https://github.com/o19s/opensearch-ubl"
+                        url = "https://github.com/o19s/opensearch-ubi"
                     }
                 }
             }

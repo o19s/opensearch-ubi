@@ -1,0 +1,21 @@
+{
+  "_plugins.search_relevance": {
+    "stability" : "stable",
+    "url": {
+      "paths": [
+        {
+          "path": "/_plugins/ubi",
+          "methods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ]
+        }
+      ]
+    },
+    "body": {
+      "description": "The JSON event"
+    }
+  }
+}
