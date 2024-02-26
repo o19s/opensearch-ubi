@@ -4,13 +4,13 @@
     "url": {
       "paths": [
         {
-          "path": "/_plugins/ubl",
+          "path": "/_plugins/ubi",
           "methods": [
             "DELETE"
           ]
         },
         {
-          "path": "/_plugins/ubl/{store}",
+          "path": "/_plugins/ubi/{store}",
           "parts": {
             "store": {
               "required": false,

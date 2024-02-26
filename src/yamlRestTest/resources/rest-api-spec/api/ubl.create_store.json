@@ -4,7 +4,7 @@
     "url": {
       "paths": [
         {
-          "path": "/_plugins/ubl/{store}",
+          "path": "/_plugins/ubi/{store}",
           "parts": {
             "store": {
               "required": false,
