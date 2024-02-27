@@ -38,6 +38,12 @@ dependencies {
     // required for the yaml test to run
     yamlRestTestImplementation 'org.apache.logging.log4j:log4j-core:2.20.0'
     runtimeOnly 'org.apache.logging.log4j:log4j-core:2.20.0'
+    testImplementation 'org.mockito:mockito-core:5.5.0'
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+}
+
+test {
+    include '**/*.class'
 }
 
 publishing {
