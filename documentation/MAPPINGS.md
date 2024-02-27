@@ -7,7 +7,7 @@
 - `query_id` - ID for some query.  Note that it could be a unique search string, or it could represent a cluster of related searches (i.e.: *dress*, *red dress*, *long dress* could all have the same `query_id`).  Either the client could control these, or the `query_id` could be retrieved from the API's response headers as it keeps track of queries on the node
 - `message_type` - originally thought of in terms of ERROR, INFO, WARN...but could be anything useful such as `QUERY` or `PURCHASE` 
 - `message` - optional text for the log entry
-![event mapping schema](./event_mapping.png)
+![event mapping schema](event_mapping.png)
 
 ## Other fields & data objects
 - `event_attributes` - contains various, common attributes associated with many user events
