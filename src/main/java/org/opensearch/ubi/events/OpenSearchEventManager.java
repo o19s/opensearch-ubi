@@ -32,7 +32,7 @@ public class OpenSearchEventManager extends AbstractEventManager {
         if(eventQueue.size() > 0) {
 
             final BulkRequest bulkRequest = new BulkRequest();
-            LOGGER.info("Bulk inserting " + eventQueue.size() + " search relevance events");
+            LOGGER.info("Bulk inserting " + eventQueue.size() + " UBI events");
 
             for (final Event event : eventQueue.get()) {
 

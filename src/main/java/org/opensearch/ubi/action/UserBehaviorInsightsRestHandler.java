@@ -8,6 +8,10 @@
 
 package org.opensearch.ubi.action;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +23,7 @@ import org.opensearch.rest.RestRequest;
 import org.opensearch.ubi.backends.Backend;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.opensearch.rest.RestRequest.Method.*;
@@ -101,9 +106,18 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
                 LOGGER.info("Queuing event for storage into UBL store {}", storeName);
                 final String eventJson = request.content().utf8ToString();
-                backend.persistEvent(storeName, eventJson);
 
-                return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "event received"));
+                try {
+
+                    final String eventJsonWithTimestamp = setEventTimestamp(eventJson);
+
+                    backend.persistEvent(storeName, eventJsonWithTimestamp);
+                    return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "event received"));
+
+                } catch (JsonProcessingException ex) {
+                    LOGGER.error("Unable to get/set timestamp on event.", ex);
+                    return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST, "unable to set event timestamp"));
+                }
 
             } else {
                 throw new IllegalArgumentException("Missing event content");
@@ -120,6 +134,21 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
         // TODO: Return a list names of all search_relevance stores.
         return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "ok"));
+
+    }
+
+    private String setEventTimestamp(final String eventJson) throws JsonProcessingException {
+
+        final JsonNode rootNode = new ObjectMapper().readTree(eventJson);
+
+        ObjectNode target = (ObjectNode) rootNode;
+
+        // If there is already a timestamp don't overwrite it.
+        if(target.get("timestamp") == null || Objects.equals(target.get("timestamp").asText(), "")) {
+            target.put("timestamp", System.currentTimeMillis());
+        }
+
+        return new ObjectMapper().writeValueAsString(rootNode);
 
     }
 

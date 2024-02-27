@@ -38,6 +38,8 @@ dependencies {
     // required for the yaml test to run
     yamlRestTestImplementation 'org.apache.logging.log4j:log4j-core:2.20.0'
     runtimeOnly 'org.apache.logging.log4j:log4j-core:2.20.0'
+    implementation "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}"
 }
 
 publishing {
