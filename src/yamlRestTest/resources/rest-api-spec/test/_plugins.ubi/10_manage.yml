@@ -1,7 +1,7 @@
 ---
 "Create and delete a store":
   - do:
-      ubl.create_store:
+      ubi.create_store:
         store: mystore
 
   - do:
@@ -11,7 +11,7 @@
   - match: { created }
 
   - do:
-      ubl.delete_store:
+      ubi.delete_store:
         store: mystore
 
   - do:

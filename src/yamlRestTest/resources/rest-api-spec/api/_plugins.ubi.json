@@ -1,5 +1,5 @@
 {
-  "_plugins.search_relevance": {
+  "_plugins.ubi": {
     "stability" : "stable",
     "url": {
       "paths": [
