@@ -1,25 +1,19 @@
 {
-  "ubl.delete_store": {
+  "ubi.create_store": {
     "stability": "stable",
     "url": {
       "paths": [
-        {
-          "path": "/_plugins/ubi",
-          "methods": [
-            "DELETE"
-          ]
-        },
         {
           "path": "/_plugins/ubi/{store}",
           "parts": {
             "store": {
               "required": false,
               "type": "string",
-              "description": "The store name"
+              "description": "The name of the store"
             }
           },
           "methods": [
-            "DELETE"
+            "PUT"
           ]
         }
       ]
