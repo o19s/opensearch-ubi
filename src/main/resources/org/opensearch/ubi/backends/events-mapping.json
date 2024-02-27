@@ -17,7 +17,6 @@
     "message_type": { "type": "keyword" },
     "timestamp": {
       "type": "date",
-      "format": "yyyy-MM-dd HH:mm:ss.SSSSSS||date_time",
       "doc_values": true
     },
     "event_attributes": {
