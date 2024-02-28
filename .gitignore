@@ -11,3 +11,6 @@ build
 *.iws
 build-idea/
 out/
+
+venv/
+__pycache__/
