@@ -92,6 +92,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                     final SearchResponse searchResponse = (SearchResponse) response;
 
                     // Add each hit to the list of query responses.
+                    // TODO: Get the name of the id_field from the settings.
                     searchResponse.getHits().forEach(hit -> queryResponseHitIds.add(String.valueOf(hit.docId())));
 
                     try {
