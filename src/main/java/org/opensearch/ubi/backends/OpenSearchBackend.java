@@ -55,40 +55,31 @@ public class OpenSearchBackend implements Backend {
 
         LOGGER.info("Creating search relevance store {}", storeName);
 
-        // Create the events index.
-        final String eventsIndexName = getEventsIndexName(storeName);
-
-        final Settings eventsIndexSettings = Settings.builder()
+        final Settings indexSettings = Settings.builder()
                 .put(IndexMetadata.INDEX_NUMBER_OF_SHARDS_SETTING.getKey(), 1)
                 .put(IndexMetadata.INDEX_AUTO_EXPAND_REPLICAS_SETTING.getKey(), "0-2")
                 .put(IndexMetadata.SETTING_PRIORITY, Integer.MAX_VALUE)
                 .put(IndexMetadata.SETTING_INDEX_HIDDEN, true)
                 .put(SettingsConstants.INDEX, index)
                 .put(SettingsConstants.ID_FIELD, index)
+                .put(SettingsConstants.VERSION_SETTING, VERSION)
                 .build();
+
+        // Create the events index.
+        final String eventsIndexName = getEventsIndexName(storeName);
 
         final CreateIndexRequest createEventsIndexRequest = new CreateIndexRequest(eventsIndexName)
                 .mapping(getResourceFile(EVENTS_MAPPING_FILE))
-                .settings(eventsIndexSettings);
+                .settings(indexSettings);
 
         client.admin().indices().create(createEventsIndexRequest);
 
         // Create the queries index.
         final String queriesIndexName = getQueriesIndexName(storeName);
 
-        final Settings queriesIndexSettings = Settings.builder()
-                .put(IndexMetadata.INDEX_NUMBER_OF_SHARDS_SETTING.getKey(), 1)
-                .put(IndexMetadata.INDEX_AUTO_EXPAND_REPLICAS_SETTING.getKey(), "0-2")
-                .put(SettingsConstants.VERSION_SETTING, VERSION)
-                .put(IndexMetadata.SETTING_PRIORITY, Integer.MAX_VALUE)
-                .put(IndexMetadata.SETTING_INDEX_HIDDEN, true)
-                .put(SettingsConstants.INDEX, index)
-                .put(SettingsConstants.ID_FIELD, index)
-                .build();
-
         final CreateIndexRequest createQueryIndexRequest = new CreateIndexRequest(queriesIndexName)
                 .mapping(getResourceFile(QUERIES_MAPPING_FILE))
-                .settings(queriesIndexSettings);
+                .settings(indexSettings);
 
         client.admin().indices().create(createQueryIndexRequest);
 
