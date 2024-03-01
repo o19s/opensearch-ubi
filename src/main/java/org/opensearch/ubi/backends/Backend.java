@@ -15,7 +15,7 @@ import java.util.Set;
 
 public interface Backend {
 
-    void initialize(final String storeName);
+    void initialize(final String storeName, final String index, final String idField);
 
     void delete(final String storeName);
 

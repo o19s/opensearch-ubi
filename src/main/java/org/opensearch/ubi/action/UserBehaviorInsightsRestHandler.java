@@ -60,6 +60,8 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
         if (request.method() == PUT) {
 
             final String storeName = request.param("store");
+            final String index = request.param("index");
+            final String idField = request.param("id_field");
 
             // Validate the store name.
             if(!backend.validateStoreName(storeName)) {
@@ -72,7 +74,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
                 /*if(backend.exists(storeName)) {
                     channel.sendResponse(new BytesRestResponse(RestStatus.CONFLICT, "already exists"));
                 } else {*/
-                    backend.initialize(storeName);
+                    backend.initialize(storeName, index, idField);
                     channel.sendResponse(new BytesRestResponse(RestStatus.OK, "created"));
                 //}
             };

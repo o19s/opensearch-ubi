@@ -51,25 +51,44 @@ public class OpenSearchBackend implements Backend {
     }
 
     @Override
-    public void initialize(final String storeName) {
+    public void initialize(final String storeName, final String index, final String idField) {
 
         LOGGER.info("Creating search relevance store {}", storeName);
 
         // Create the events index.
         final String eventsIndexName = getEventsIndexName(storeName);
 
+        final Settings eventsIndexSettings = Settings.builder()
+                .put(IndexMetadata.INDEX_NUMBER_OF_SHARDS_SETTING.getKey(), 1)
+                .put(IndexMetadata.INDEX_AUTO_EXPAND_REPLICAS_SETTING.getKey(), "0-2")
+                .put(IndexMetadata.SETTING_PRIORITY, Integer.MAX_VALUE)
+                .put(IndexMetadata.SETTING_INDEX_HIDDEN, true)
+                .put(SettingsConstants.INDEX, index)
+                .put(SettingsConstants.ID_FIELD, index)
+                .build();
+
         final CreateIndexRequest createEventsIndexRequest = new CreateIndexRequest(eventsIndexName)
                 .mapping(getResourceFile(EVENTS_MAPPING_FILE))
-                .settings(getIndexSettings());
+                .settings(eventsIndexSettings);
 
         client.admin().indices().create(createEventsIndexRequest);
 
         // Create the queries index.
         final String queriesIndexName = getQueriesIndexName(storeName);
 
+        final Settings queriesIndexSettings = Settings.builder()
+                .put(IndexMetadata.INDEX_NUMBER_OF_SHARDS_SETTING.getKey(), 1)
+                .put(IndexMetadata.INDEX_AUTO_EXPAND_REPLICAS_SETTING.getKey(), "0-2")
+                .put(SettingsConstants.VERSION_SETTING, VERSION)
+                .put(IndexMetadata.SETTING_PRIORITY, Integer.MAX_VALUE)
+                .put(IndexMetadata.SETTING_INDEX_HIDDEN, true)
+                .put(SettingsConstants.INDEX, index)
+                .put(SettingsConstants.ID_FIELD, index)
+                .build();
+
         final CreateIndexRequest createQueryIndexRequest = new CreateIndexRequest(queriesIndexName)
                 .mapping(getResourceFile(QUERIES_MAPPING_FILE))
-                .settings(getIndexSettings());
+                .settings(queriesIndexSettings);
 
         client.admin().indices().create(createQueryIndexRequest);
 
@@ -187,16 +206,6 @@ public class OpenSearchBackend implements Backend {
         } catch (IOException e) {
             throw new IllegalStateException("Unable to create index with resource [" + OpenSearchBackend.EVENTS_MAPPING_FILE + "]", e);
         }
-    }
-
-    private Settings getIndexSettings() {
-        return Settings.builder()
-                .put(IndexMetadata.INDEX_NUMBER_OF_SHARDS_SETTING.getKey(), 1)
-                .put(IndexMetadata.INDEX_AUTO_EXPAND_REPLICAS_SETTING.getKey(), "0-2")
-                .put(SettingsConstants.VERSION_SETTING, VERSION)
-                .put(IndexMetadata.SETTING_PRIORITY, Integer.MAX_VALUE)
-                .put(IndexMetadata.SETTING_INDEX_HIDDEN, true)
-                .build();
     }
 
 }

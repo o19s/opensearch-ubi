@@ -13,4 +13,7 @@ public class SettingsConstants {
     public static final String INDEX_NAMES = "plugins.ubi.indices";
     public static final String VERSION_SETTING = "index.ubistore.version";
 
+    public static final String INDEX = "ubi.store.index";
+    public static final String ID_FIELD = "ubi.store.id_field";
+
 }
