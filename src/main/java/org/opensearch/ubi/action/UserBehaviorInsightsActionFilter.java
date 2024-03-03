@@ -106,9 +106,9 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                         LOGGER.error("Unable to persist query.", ex);
                     }
 
+                    LOGGER.warn("######### Setting and exposing query_id {}", queryId);
+                    threadPool.getThreadContext().addResponseHeader("Access-Control-Expose-Headers", "query_id");
                     threadPool.getThreadContext().addResponseHeader("query_id", queryId);
-
-                    //}
 
                     final long elapsedTime = System.currentTimeMillis() - startTime;
                     LOGGER.info("UBI search request filter took {} ms", elapsedTime);

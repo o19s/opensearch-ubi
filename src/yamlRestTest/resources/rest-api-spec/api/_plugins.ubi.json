@@ -9,6 +9,7 @@
             "DELETE",
             "GET",
             "POST",
+            "TRACE",
             "PUT"
           ]
         }

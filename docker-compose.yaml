@@ -3,7 +3,8 @@ version: '3'
 services:
   opensearch:
     build: ./
-    container_name: opensearch
+    # TODO: maybe rename the demo opensearch node instead
+    container_name: opensearch_ubi  #Chorus demo already has an `opensearch` container
     environment:
       discovery.type: single-node
       node.name: opensearch
@@ -13,8 +14,9 @@ services:
 #      Warning: this is opening it up to all cross domains
 #      http.cors.allow-origin: "http://localhost"...
       http.cors.allow-origin: "*"
-      http.cors.allow-methods: OPTIONS,HEAD,GET,POST,PUT,DELETE
+      http.cors.allow-methods: OPTIONS,TRACE,HEAD,GET,POST,PUT,DELETE
       http.cors.allow-credentials: true
+      # TODO: add REST headers required here
       http.cors.allow-headers: X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
       plugins.ubi.indices: "awesome"
       logger.level: info
