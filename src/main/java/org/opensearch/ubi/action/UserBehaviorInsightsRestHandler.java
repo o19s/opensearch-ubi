@@ -135,7 +135,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
             return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, s));
 
         } else if (request.method() == TRACE) {
-            LOGGER.warn("TRACE ############################################");
+            LOGGER.warn("TRACE");
             
             final Map<String, List<String>> headers = request.getHeaders();
             LOGGER.info("Exposed headers: " + String.join(",", headers.keySet()));
