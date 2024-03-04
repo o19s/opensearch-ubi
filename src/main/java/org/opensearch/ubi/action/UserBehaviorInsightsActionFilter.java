@@ -37,6 +37,10 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
     private final Settings settings;
     private final ThreadPool threadPool;
 
+    public Settings getSettings(){
+        return this.settings;
+    }
+
     public UserBehaviorInsightsActionFilter(final Backend backend, final Settings settings, ThreadPool threadPool) {
         this.backend = backend;
         this.settings = settings;
@@ -106,7 +110,8 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                         LOGGER.error("Unable to persist query.", ex);
                     }
 
-                    LOGGER.warn("######### Setting and exposing query_id {}", queryId);
+                    LOGGER.info("######### Setting and exposing query_id {}", queryId);
+
                     threadPool.getThreadContext().addResponseHeader("Access-Control-Expose-Headers", "query_id");
                     threadPool.getThreadContext().addResponseHeader("query_id", queryId);
 

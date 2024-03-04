@@ -23,7 +23,6 @@ import org.opensearch.rest.RestRequest;
 import org.opensearch.ubi.HeaderConstants;
 import org.opensearch.ubi.backends.Backend;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
