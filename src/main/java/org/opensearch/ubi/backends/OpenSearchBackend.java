@@ -21,6 +21,7 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.io.Streams;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.ubi.SettingsConstants;
+import org.opensearch.ubi.UserBehaviorInsightsPlugin;
 import org.opensearch.ubi.events.Event;
 import org.opensearch.ubi.events.OpenSearchEventManager;
 import org.opensearch.ubi.model.QueryRequest;
@@ -83,6 +84,12 @@ public class OpenSearchBackend implements Backend {
 
         client.admin().indices().create(createQueryIndexRequest);
 
+        // Store the settings.
+        final Map<String, String> settings = new HashMap<>();
+        settings.put("index", index);
+        settings.put("id_field", idField);
+        UserBehaviorInsightsPlugin.storeSettings.put(storeName, settings);
+
     }
 
     @Override
@@ -95,6 +102,7 @@ public class OpenSearchBackend implements Backend {
         final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(eventsIndexName, queriesIndexName);
 
         client.admin().indices().delete(deleteIndexRequest);
+        UserBehaviorInsightsPlugin.storeSettings.remove(storeName);
 
     }
 
