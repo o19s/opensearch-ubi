@@ -49,6 +49,7 @@ The plugin exposes a REST API.
 | `DELETE` | `/_plugins/ubi/{store}` | Delete a backend store |
 | `GET` | `/_plugins/ubi` | Get a list of all stores |
 | `POST` | `/_plugins/ubi/{store}` | Index events into the store |
+| `TRACE` | `/_plugins/ubi` | For temporary developer debugging  |
 
 ### Creating a Store
 

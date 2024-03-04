@@ -155,6 +155,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
             
 
             final String s = "query_id:" + queryId + "&stores:" + String.join(",", stores);
+            
             BytesRestResponse response = new BytesRestResponse(RestStatus.OK, "application/x-www-form-urlencoded", s);
             response.addHeader("Access-Control-Expose-Headers", "query_id");
             response.addHeader("query_id", queryId);
