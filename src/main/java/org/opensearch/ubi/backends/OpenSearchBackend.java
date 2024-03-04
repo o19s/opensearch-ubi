@@ -14,6 +14,8 @@ import org.opensearch.action.admin.indices.create.CreateIndexRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.opensearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.opensearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.opensearch.action.admin.indices.get.GetIndexRequest;
+import org.opensearch.action.admin.indices.get.GetIndexResponse;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.client.Client;
 import org.opensearch.cluster.metadata.IndexMetadata;
@@ -21,7 +23,6 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.io.Streams;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.ubi.SettingsConstants;
-import org.opensearch.ubi.UserBehaviorInsightsPlugin;
 import org.opensearch.ubi.events.Event;
 import org.opensearch.ubi.events.OpenSearchEventManager;
 import org.opensearch.ubi.model.QueryRequest;
@@ -31,8 +32,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,8 +48,28 @@ public class OpenSearchBackend implements Backend {
 
     private final Client client;
 
+    private Map<String, Map<String, String>> storeSettings = new HashMap<>();
+
     public OpenSearchBackend(final Client client) {
         this.client = client;
+    }
+
+    @Override
+    public Map<String, Map<String, String>> getStoreSettings() {
+
+        final Map<String, Map<String, String>> settings = new HashMap<>();
+
+        // TODO: Get each index for the store.
+        final Set<String> stores = get();
+
+        for(final String store : stores) {
+            // TODO: Get this index.
+            // TODO: Get the settings for this index.
+        }
+
+        // TODO: Get the settings for the store.
+        return settings;
+
     }
 
     @Override
@@ -88,7 +109,7 @@ public class OpenSearchBackend implements Backend {
         final Map<String, String> settings = new HashMap<>();
         settings.put("index", index);
         settings.put("id_field", idField);
-        UserBehaviorInsightsPlugin.storeSettings.put(storeName, settings);
+        storeSettings.put(storeName, settings);
 
     }
 
@@ -102,7 +123,7 @@ public class OpenSearchBackend implements Backend {
         final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(eventsIndexName, queriesIndexName);
 
         client.admin().indices().delete(deleteIndexRequest);
-        UserBehaviorInsightsPlugin.storeSettings.remove(storeName);
+        storeSettings.remove(storeName);
 
     }
 
@@ -149,9 +170,8 @@ public class OpenSearchBackend implements Backend {
     @Override
     public Set<String> get() {
 
-        /*final GetIndexRequest getIndexRequest = new GetIndexRequest();
+        final GetIndexRequest getIndexRequest = new GetIndexRequest();
         final GetIndexResponse getIndexResponse = client.admin().indices().getIndex(getIndexRequest).actionGet();
-
         final String[] indexes = getIndexResponse.indices();
         final Set<String> stores = new HashSet<>();
 
@@ -162,9 +182,9 @@ public class OpenSearchBackend implements Backend {
             }
         }
 
-        return stores;*/
+        return stores;
 
-        return Collections.emptySet();
+        //return Collections.emptySet();
 
     }
 

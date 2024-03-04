@@ -11,6 +11,7 @@ package org.opensearch.ubi.backends;
 import org.opensearch.ubi.model.QueryRequest;
 import org.opensearch.ubi.model.QueryResponse;
 
+import java.util.Map;
 import java.util.Set;
 
 public interface Backend {
@@ -28,5 +29,7 @@ public interface Backend {
     boolean exists(final String storeName);
 
     boolean validateStoreName(final String storeName);
+
+    Map<String, Map<String, String>> getStoreSettings();
 
 }

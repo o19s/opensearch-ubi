@@ -47,7 +47,6 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
 
     private Backend backend;
     private ActionFilter userBehaviorLoggingFilter;
-    public static Map<String, Map<String, String>> storeSettings = new HashMap<>();
 
     @Override
     public Collection<RestHeaderDefinition> getRestHeaders() {
@@ -97,7 +96,6 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
 
     @Override
     public List<ActionFilter> getActionFilters() {
-        // LOGGER.info("Index name: {}", settings.get(ConfigConstants.INDEX_NAME));
         return singletonList(userBehaviorLoggingFilter);
     }
 
@@ -117,24 +115,21 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
     ) {
 
         this.backend = new OpenSearchBackend(client);
-        this.userBehaviorLoggingFilter =  new UserBehaviorInsightsActionFilter(backend, environment.settings(), threadPool);
 
-        LOGGER.info("Creating scheduled task");
-
-        // TODO: Only start this if an OpenSearch store is already initialized.
+        // TODO Only start this if an OpenSearch store is already initialized.
         // Otherwise, start it when a store is initialized.
+
+        LOGGER.info("Creating UBI scheduled task to persist events.");
+        // TODO: Allow these time parameters to be configurable.
         threadPool.scheduler().scheduleAtFixedRate(() -> {
             OpenSearchEventManager.getInstance(client).process();
         }, 0, 2000, TimeUnit.MILLISECONDS);
 
+        // Initialize the action filter.
+        this.userBehaviorLoggingFilter = new UserBehaviorInsightsActionFilter(backend, environment.settings(), threadPool);
+
         return Collections.emptyList();
 
     }
-
-//    @Override
-//    public void close() {
-//        LOGGER.info("Stopping scheduled runnable.");
-//        FutureUtils.cancel(scheduled);
-//    }
 
 }

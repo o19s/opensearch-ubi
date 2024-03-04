@@ -18,12 +18,10 @@ import org.opensearch.action.support.ActionFilterChain;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
-import org.opensearch.index.reindex.ScrollableHitSource;
 import org.opensearch.search.SearchHit;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.ubi.HeaderConstants;
-import org.opensearch.ubi.UserBehaviorInsightsPlugin;
 import org.opensearch.ubi.backends.Backend;
 import org.opensearch.ubi.model.QueryRequest;
 import org.opensearch.ubi.model.QueryResponse;
@@ -87,7 +85,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                     final String sessionId = getHeaderValue(HeaderConstants.SESSION_ID_HEADER, "", task);
 
                     // Get the store settings.
-                    final String index = UserBehaviorInsightsPlugin.storeSettings.get(eventStore).get("index");
+                    final String index = backend.getStoreSettings().get(eventStore).get("index");
 
                     // Only consider this search if the index being searched matches the store's index setting.
                     if (Arrays.asList(searchRequest.indices()).contains(index)) {
@@ -102,7 +100,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                         final SearchResponse searchResponse = (SearchResponse) response;
 
                         // Get the id_field to use for each result's unique identifier.
-                        final String idField = UserBehaviorInsightsPlugin.storeSettings.get(eventStore).getOrDefault("id_field", "");
+                        final String idField = backend.getStoreSettings().get(eventStore).getOrDefault("id_field", "");
 
                         // Add each hit to the list of query responses.
                         for (final SearchHit hit : searchResponse.getHits()) {
