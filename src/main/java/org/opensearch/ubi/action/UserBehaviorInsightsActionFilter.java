@@ -111,7 +111,9 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                     }
 
                     LOGGER.info("######### Setting and exposing query_id {}", queryId);
-
+                    //HACK: this should be set in the OpenSearch config (to send to the client code just once),
+                    // and not on every single response,
+                    // but that server setting doesn't appear to be exposed.
                     threadPool.getThreadContext().addResponseHeader("Access-Control-Expose-Headers", "query_id");
                     threadPool.getThreadContext().addResponseHeader("query_id", queryId);
 
