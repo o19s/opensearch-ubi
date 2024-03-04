@@ -111,7 +111,6 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                     }
 
                     LOGGER.info("######### Setting and exposing query_id {}", queryId);
-
                     threadPool.getThreadContext().addResponseHeader("Access-Control-Expose-Headers", "query_id");
                     threadPool.getThreadContext().addResponseHeader("query_id", queryId);
 
