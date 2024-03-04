@@ -37,6 +37,10 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
     private final Settings settings;
     private final ThreadPool threadPool;
 
+    public Settings getSettings(){
+        return this.settings;
+    }
+
     public UserBehaviorInsightsActionFilter(final Backend backend, final Settings settings, ThreadPool threadPool) {
         this.backend = backend;
         this.settings = settings;
@@ -106,9 +110,12 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                         LOGGER.error("Unable to persist query.", ex);
                     }
 
+                    LOGGER.info("Setting and exposing query_id {}", queryId);
+                    //HACK: this should be set in the OpenSearch config (to send to the client code just once),
+                    // and not on every single search response,
+                    // but that server setting doesn't appear to be exposed.
+                    threadPool.getThreadContext().addResponseHeader("Access-Control-Expose-Headers", "query_id");
                     threadPool.getThreadContext().addResponseHeader("query_id", queryId);
-
-                    //}
 
                     final long elapsedTime = System.currentTimeMillis() - startTime;
                     LOGGER.info("UBI search request filter took {} ms", elapsedTime);

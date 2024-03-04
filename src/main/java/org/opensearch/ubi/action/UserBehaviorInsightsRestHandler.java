@@ -20,11 +20,14 @@ import org.opensearch.core.rest.RestStatus;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
+import org.opensearch.ubi.HeaderConstants;
 import org.opensearch.ubi.backends.Backend;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.opensearch.rest.RestRequest.Method.*;
 
@@ -49,13 +52,14 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
                 new Route(PUT, "/_plugins/ubi/{store}"), // Initializes the store.
                 new Route(DELETE, "/_plugins/ubi/{store}"), // Deletes a store.
                 new Route(GET, "/_plugins/ubi"), // Lists all stores
+                new Route(TRACE, "/_plugins/ubi"),          // for debugging rest weirdness
                 new Route(POST, "/_plugins/ubi/{store}")); // Indexes events into the store.
     }
 
     @Override
     protected RestChannelConsumer prepareRequest(RestRequest request, NodeClient nodeClient) {
 
-        LOGGER.log(Level.INFO, "received event");
+        LOGGER.log(Level.INFO, "{}: received event", request.method());
 
         if (request.method() == PUT) {
 
@@ -66,7 +70,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
                 return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST, "missing store name"));
             }
 
-            LOGGER.info("Creating UBL store {}", storeName);
+            LOGGER.info("Creating UBI store {}", storeName);
 
             return (channel) -> {
                 /*if(backend.exists(storeName)) {
@@ -86,7 +90,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
                 return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST, "missing store name"));
             }
 
-            LOGGER.info("Deleting UBL store {}", storeName);
+            LOGGER.info("Deleting UBI store {}", storeName);
 
             return (channel) -> {
                 backend.delete(storeName);
@@ -104,7 +108,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
                     return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.NOT_FOUND, "store not found"));
                 }*/
 
-                LOGGER.info("Queuing event for storage into UBL store {}", storeName);
+                LOGGER.info("Queuing event for storage into UBI store {}", storeName);
                 final String eventJson = request.content().utf8ToString();
 
                 try {
@@ -130,7 +134,35 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
             return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, s));
 
-        }
+        } else if (request.method() == TRACE) {
+            LOGGER.warn("TRACE");
+            
+            final Map<String, List<String>> headers = request.getHeaders();
+            LOGGER.info("Exposed headers: " + String.join(",", headers.keySet()));
+            
+            List<String> ids = headers.get(HeaderConstants.QUERY_ID_HEADER.toString());
+            String queryId = null;
+            if(ids == null || ids.size() == 0){
+                LOGGER.warn("Null REST parameter: {}. Using default id.", HeaderConstants.QUERY_ID_HEADER);
+                queryId = UUID.randomUUID().toString();
+            }
+            else {
+                queryId = ids.get(0); 
+            }
+
+            final Set<String> stores = backend.get();
+            
+
+            final String s = "query_id:" + queryId + "&stores:" + String.join(",", stores);
+            
+            BytesRestResponse response = new BytesRestResponse(RestStatus.OK, "application/x-www-form-urlencoded", s);
+            response.addHeader("Access-Control-Expose-Headers", "query_id");
+            response.addHeader("query_id", queryId);
+
+            return (channel) -> channel.sendResponse(response);
+        } 
+        else
+            LOGGER.warn("Unknown method " + request.method());
 
         // TODO: Return a list names of all search_relevance stores.
         return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "ok"));
