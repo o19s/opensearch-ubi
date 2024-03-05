@@ -19,6 +19,7 @@ import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.support.ActionFilter;
 import org.opensearch.action.support.ActionFilterChain;
 import org.opensearch.client.Client;
+import org.opensearch.common.document.DocumentField;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.core.action.ActionListener;
@@ -100,12 +101,18 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
                         // Add each hit to the list of query responses.
                         for (final SearchHit hit : searchResponse.getHits()) {
-                            if ("".equals(idField)) {
+                            LOGGER.info("HIT FIELD LENGTH = " + hit.getFields().size());
+
+                            for(final String f : hit.getFields().keySet()) {
+                                LOGGER.info("FIELD = " + f + ",   VALUE = " + hit.field(f).toString());
+                            }
+
+                            /*if ("".equals(idField)) {
                                 // Use the _id since there is no id_field setting for this index.
                                 queryResponseHitIds.add(String.valueOf(hit.docId()));
                             } else {
-                                queryResponseHitIds.add(String.valueOf(hit.field(idField)));
-                            }
+                                queryResponseHitIds.add(hit.field(idField).getValue());
+                            }*/
                         }
 
                         try {
