@@ -7,7 +7,7 @@
           "path": "/_plugins/ubi/{store}",
           "parts": {
             "store": {
-              "required": false,
+              "required": true,
               "type": "string",
               "description": "The name of the store"
             }
@@ -18,6 +18,17 @@
         }
       ]
     },
-    "body": null
+    "params": {
+      "index": {
+        "required": true,
+        "type": "string",
+        "description": "The name of the index being searched"
+      },
+      "id_field": {
+        "required": false,
+        "type": "string",
+        "description": "The name of the field to use for the doc ID field"
+      }
+    }
   }
 }

@@ -26,12 +26,15 @@ import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.action.RestToXContentListener;
-import org.opensearch.ubi.model.SettingsConstants;
 import org.opensearch.ubi.events.Event;
 import org.opensearch.ubi.events.OpenSearchEventManager;
+import org.opensearch.ubi.model.SettingsConstants;
 import org.opensearch.ubi.utils.UbiUtils;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static org.opensearch.rest.RestRequest.Method.*;
 
@@ -63,9 +66,9 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
         final String storeName = restRequest.param("store");
 
         if (restRequest.method() == PUT) {
-            //final String index = request.param("index");
-            //final String idField = request.param("id_field");
-            return create(nodeClient, storeName);
+            final String index = restRequest.param("index");
+            final String idField = restRequest.param("id_field");
+            return create(nodeClient, storeName, index, idField);
         } else if(restRequest.method() == DELETE) {
             return delete(nodeClient, storeName);
         } else if(restRequest.method() == POST) {
@@ -87,19 +90,18 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
             for (final String index : indexes) {
                 LOGGER.info("Index name: " + index);
-                if (index.startsWith(".") && index.endsWith("_queries")) {
+                if (index.startsWith(".") && index.endsWith("_events")) {
                     stores.add(index);
                 }
             }
 
-            //return stores;
             channel.sendResponse(new BytesRestResponse(RestStatus.OK, String.join(",", stores)));
 
         };
 
     }
 
-    private RestChannelConsumer create(final NodeClient nodeClient, final String storeName) {
+    private RestChannelConsumer create(final NodeClient nodeClient, final String storeName, final String index, final String idField) {
         return (channel) -> {
 
             final Settings indexSettings = Settings.builder()
@@ -107,8 +109,8 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
                     .put(IndexMetadata.INDEX_AUTO_EXPAND_REPLICAS_SETTING.getKey(), "0-2")
                     .put(IndexMetadata.SETTING_PRIORITY, Integer.MAX_VALUE)
                     .put(IndexMetadata.SETTING_INDEX_HIDDEN, true)
-                    //.put(SettingsConstants.INDEX, index)
-                    // .put(SettingsConstants.ID_FIELD, index)
+                    .put(SettingsConstants.INDEX, index)
+                    .put(SettingsConstants.ID_FIELD, idField)
                     .put(SettingsConstants.VERSION_SETTING, VERSION)
                     .build();
 
@@ -121,12 +123,12 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
             nodeClient.admin().indices().create(createEventsIndexRequest, new RestToXContentListener<>(channel));
 
 //            // Create the queries index.
-//            final String queriesIndex = getEventsIndexName(storeName);
-//            final CreateIndexRequest createQueriesIndexRequest = new CreateIndexRequest(eventsIndex)
-//                    .mapping(getResourceFile(EVENTS_MAPPING_FILE))
+//            final String queriesIndex = UbiUtils.getEventsIndexName(storeName);
+//            final CreateIndexRequest createQueriesIndexRequest = new CreateIndexRequest(queriesIndex)
+//                    .mapping(UbiUtils.getResourceFile(QUERIES_MAPPING_FILE))
 //                    .settings(indexSettings);
 //
-//            nodeClient.admin().indices().create(createEventsIndexRequest, new RestToXContentListener<>(channel));
+//            nodeClient.admin().indices().create(createQueriesIndexRequest, new RestToXContentListener<>(channel));
 
         };
     }
@@ -138,15 +140,12 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
             final String eventJson = restRequest.content().utf8ToString();
             final String eventJsonWithTimestamp = setEventTimestamp(eventJson);
 
-            //backend.persistEvent(storeName, eventJsonWithTimestamp);
-            //return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "event received"));
-
             // Add the event for indexing.
             LOGGER.info("Indexing event into {}", storeName);
             final String eventsIndexName = UbiUtils.getEventsIndexName(storeName);
 
             //return (channel) -> client.index(indexRequest, new RestToXContentListener<>(channel));
-            final Event event = new Event(eventsIndexName, eventJson);
+            final Event event = new Event(eventsIndexName, eventJsonWithTimestamp);
             OpenSearchEventManager.getInstance(nodeClient).add(event);
 
         } catch (JsonProcessingException ex) {

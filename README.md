@@ -52,6 +52,12 @@ Delete the store:
 curl -X DELETE http://localhost:9200/_plugins/ubi/awesome
 ```
 
+Get the stores:
+
+```
+curl http://localhost:9200/_plugins/ubi
+```
+
 ## Load Test
 
 The `load-test` directory contains a basic load testing example. The purpose of the files under `load-test` are to provide a means of testing the plugin's ability to receive and store a large number of events over time. To use the load test, first start OpenSearch on `localhost:9200`, and then:

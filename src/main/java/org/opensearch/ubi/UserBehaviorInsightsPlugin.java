@@ -35,7 +35,10 @@ import org.opensearch.ubi.model.HeaderConstants;
 import org.opensearch.ubi.model.SettingsConstants;
 import org.opensearch.watcher.ResourceWatcherService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -84,10 +87,10 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
     public List<Setting<?>> getSettings() {
 
         final List<Setting<?>> settings = new ArrayList<>();
-        settings.add(Setting.simpleString(SettingsConstants.INDEX_NAMES, "", Setting.Property.NodeScope));
 
-        // The version of the index mapping.
         settings.add(Setting.intSetting(SettingsConstants.VERSION_SETTING, 1, -1, Integer.MAX_VALUE, Setting.Property.IndexScope));
+        settings.add(Setting.simpleString(SettingsConstants.INDEX, "", Setting.Property.IndexScope));
+        settings.add(Setting.simpleString(SettingsConstants.ID_FIELD, "", Setting.Property.IndexScope));
 
         return settings;
 

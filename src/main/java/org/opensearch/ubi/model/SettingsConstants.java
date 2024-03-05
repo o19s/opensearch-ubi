@@ -10,10 +10,9 @@ package org.opensearch.ubi.model;
 
 public class SettingsConstants {
 
-    public static final String INDEX_NAMES = "plugins.ubi.indices";
-    public static final String VERSION_SETTING = "index.ubistore.version";
+    public static final String VERSION_SETTING = "index.ubi.version";
 
-    public static final String INDEX = "ubi.store.index";
-    public static final String ID_FIELD = "ubi.store.id_field";
+    public static final String INDEX = "index.ubi.index";
+    public static final String ID_FIELD = "index.ubi.id_field";
 
 }

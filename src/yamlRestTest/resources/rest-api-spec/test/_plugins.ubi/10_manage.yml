@@ -3,6 +3,7 @@
   - do:
       ubi.create_store:
         store: mystore
+        index: ecommerce
 
   - do:
       indices.exists:
