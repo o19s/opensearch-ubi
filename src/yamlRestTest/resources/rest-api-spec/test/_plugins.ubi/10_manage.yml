@@ -1,13 +1,13 @@
 ---
 "Create and delete a store":
-#  - do:
-#      ubi.create_store:
-#        store: mystore
+  - do:
+      ubi.create_store:
+        store: mystore
 
-#  - do:
-#      indices.exists:
-#        index: .mystore_events
-#
+  - do:
+      indices.exists:
+        index: .mystore_events
+
 #  - match: { created }
 #
 #  - do:

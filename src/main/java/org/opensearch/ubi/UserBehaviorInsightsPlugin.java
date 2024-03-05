@@ -30,9 +30,9 @@ import org.opensearch.script.ScriptService;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.ubi.action.UserBehaviorInsightsActionFilter;
 import org.opensearch.ubi.action.UserBehaviorInsightsRestHandler;
-import org.opensearch.ubi.backends.Backend;
-import org.opensearch.ubi.backends.OpenSearchBackend;
 import org.opensearch.ubi.events.OpenSearchEventManager;
+import org.opensearch.ubi.model.HeaderConstants;
+import org.opensearch.ubi.model.SettingsConstants;
 import org.opensearch.watcher.ResourceWatcherService;
 
 import java.util.*;
@@ -45,7 +45,6 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
 
     private static final Logger LOGGER = LogManager.getLogger(UserBehaviorInsightsPlugin.class);
 
-    private Backend backend;
     private ActionFilter userBehaviorLoggingFilter;
 
     @Override
@@ -77,7 +76,7 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
                                              final IndexNameExpressionResolver indexNameExpressionResolver,
                                              final Supplier<DiscoveryNodes> nodesInCluster) {
 
-        return singletonList(new UserBehaviorInsightsRestHandler(backend));
+        return singletonList(new UserBehaviorInsightsRestHandler());
 
     }
 
@@ -114,8 +113,6 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
             Supplier<RepositoriesService> repositoriesServiceSupplier
     ) {
 
-        this.backend = new OpenSearchBackend(client);
-
         // TODO Only start this if an OpenSearch store is already initialized.
         // Otherwise, start it when a store is initialized.
 
@@ -126,7 +123,7 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
         }, 0, 2000, TimeUnit.MILLISECONDS);
 
         // Initialize the action filter.
-        this.userBehaviorLoggingFilter = new UserBehaviorInsightsActionFilter(backend, environment.settings(), threadPool);
+        this.userBehaviorLoggingFilter = new UserBehaviorInsightsActionFilter(client, threadPool);
 
         return Collections.emptyList();
 

@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi;
+package org.opensearch.ubi.model;
 
 public enum HeaderConstants {
 

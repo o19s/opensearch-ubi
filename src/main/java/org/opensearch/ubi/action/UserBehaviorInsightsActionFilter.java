@@ -11,37 +11,34 @@ package org.opensearch.ubi.action;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionRequest;
+import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.support.ActionFilter;
 import org.opensearch.action.support.ActionFilterChain;
-import org.opensearch.common.settings.Settings;
+import org.opensearch.client.Client;
+import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
 import org.opensearch.search.SearchHit;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.ubi.HeaderConstants;
-import org.opensearch.ubi.backends.Backend;
+import org.opensearch.ubi.model.HeaderConstants;
 import org.opensearch.ubi.model.QueryRequest;
 import org.opensearch.ubi.model.QueryResponse;
+import org.opensearch.ubi.utils.UbiUtils;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
     private static final Logger LOGGER = LogManager.getLogger(UserBehaviorInsightsActionFilter.class);
 
-    private final Backend backend;
-    private final Settings settings;
+    private final Client client;
     private final ThreadPool threadPool;
 
-    public UserBehaviorInsightsActionFilter(final Backend backend, final Settings settings, ThreadPool threadPool) {
-        this.backend = backend;
-        this.settings = settings;
+    public UserBehaviorInsightsActionFilter(Client client, ThreadPool threadPool) {
+        this.client = client;
         this.threadPool = threadPool;
     }
 
@@ -85,7 +82,8 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                     final String sessionId = getHeaderValue(HeaderConstants.SESSION_ID_HEADER, "", task);
 
                     // Get the store settings.
-                    final String index = backend.getStoreSettings().get(eventStore).get("index");
+                    final String index = "ecommerce";
+                    //final String index = backend.getStoreSettings().get(eventStore).get("index");
 
                     // Only consider this search if the index being searched matches the store's index setting.
                     if (Arrays.asList(searchRequest.indices()).contains(index)) {
@@ -100,7 +98,8 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                         final SearchResponse searchResponse = (SearchResponse) response;
 
                         // Get the id_field to use for each result's unique identifier.
-                        final String idField = backend.getStoreSettings().get(eventStore).getOrDefault("id_field", "");
+                        final String idField = "";
+                        //final String idField = backend.getStoreSettings().get(eventStore).getOrDefault("id_field", "");
 
                         // Add each hit to the list of query responses.
                         for (final SearchHit hit : searchResponse.getHits()) {
@@ -115,7 +114,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                         try {
 
                             // Persist the query to the backend.
-                            backend.persistQuery(eventStore,
+                            persistQuery(eventStore,
                                     new QueryRequest(queryId, query, userId, sessionId),
                                     new QueryResponse(queryId, queryResponseId, queryResponseHitIds));
 
@@ -157,6 +156,32 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
         } else {
             return value;
         }
+
+    }
+
+    public void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) {
+
+        LOGGER.info("Writing query ID {} with response ID {}", queryRequest.getQueryId(), queryResponse.getQueryResponseId());
+
+        // What will be indexed - adheres to the queries-mapping.json
+        final Map<String, Object> source = new HashMap<>();
+        source.put("timestamp", queryRequest.getTimestamp());
+        source.put("query_id", queryRequest.getQueryId());
+        source.put("query", queryRequest.getQuery());
+        source.put("query_response_id", queryResponse.getQueryResponseId());
+        source.put("query_response_hit_ids", queryResponse.getQueryResponseHitIds());
+        source.put("user_id", queryRequest.getUserId());
+        source.put("session_id", queryRequest.getSessionId());
+
+        // Get the name of the queries.
+        final String queriesIndexName = UbiUtils.getQueriesIndexName(storeName);
+
+        // Build the index request.
+        final IndexRequest indexRequest = new IndexRequest(queriesIndexName)
+                .source(source, XContentType.JSON);
+
+        // TODO: Move this to the queue, too.
+        client.index(indexRequest);
 
     }
 
