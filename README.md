@@ -49,7 +49,7 @@ curl -s http://localhost:9200/ecommerce/_search -H "X-ubi-store: awesome" | jq
 Get queries:
 
 ```
-curl -s http://localhost:9200/.awesome_queries/_search -H "X-ubi-store: awesome" | jq
+curl -s http://localhost:9200/.awesome_queries/_search | jq
 ```
 
 Delete the store:

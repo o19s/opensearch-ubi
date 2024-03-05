@@ -29,7 +29,7 @@ import org.opensearch.rest.RestHeaderDefinition;
 import org.opensearch.script.ScriptService;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.ubi.action.UserBehaviorInsightsActionFilter;
-import org.opensearch.ubi.action.UserBehaviorInsightsRestHandler;
+import org.opensearch.ubi.rest.UserBehaviorInsightsRestHandler;
 import org.opensearch.ubi.events.OpenSearchEventManager;
 import org.opensearch.ubi.model.HeaderConstants;
 import org.opensearch.ubi.model.SettingsConstants;

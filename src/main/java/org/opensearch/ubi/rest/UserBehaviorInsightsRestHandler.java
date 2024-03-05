@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi.action;
+package org.opensearch.ubi.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

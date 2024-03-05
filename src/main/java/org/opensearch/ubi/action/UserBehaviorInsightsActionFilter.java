@@ -101,18 +101,19 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
                         // Add each hit to the list of query responses.
                         for (final SearchHit hit : searchResponse.getHits()) {
-                            LOGGER.info("HIT FIELD LENGTH = " + hit.getFields().size());
 
-                            for(final String f : hit.getFields().keySet()) {
-                                LOGGER.info("FIELD = " + f + ",   VALUE = " + hit.field(f).toString());
-                            }
+                            if ("".equals(idField)) {
 
-                            /*if ("".equals(idField)) {
                                 // Use the _id since there is no id_field setting for this index.
                                 queryResponseHitIds.add(String.valueOf(hit.docId()));
+
                             } else {
-                                queryResponseHitIds.add(hit.field(idField).getValue());
-                            }*/
+
+                                final Map<String, Object> source = hit.getSourceAsMap();
+                                queryResponseHitIds.add((String) source.get(idField));
+
+                            }
+
                         }
 
                         try {
