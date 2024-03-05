@@ -21,7 +21,7 @@ Start the containers:
 Initialize the `awesome` UBL store:
 
 ```
-curl -X PUT http://localhost:9200/_plugins/ubi/awesome
+curl -X PUT "http://localhost:9200/_plugins/ubi/awesome?index=ecommerce&id_field=name"
 ```
 
 Send an event to the `awesome` store:

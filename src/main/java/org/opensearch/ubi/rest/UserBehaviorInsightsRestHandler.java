@@ -108,6 +108,8 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
     private RestChannelConsumer create(final NodeClient nodeClient, final String storeName, final String index, final String idField) throws IOException {
 
+        LOGGER.info("Creating UBI store [{}] for index [{}] using field [{}]", storeName, index, idField);
+
         final Settings indexSettings = Settings.builder()
                 .put(IndexMetadata.INDEX_NUMBER_OF_SHARDS_SETTING.getKey(), 1)
                 .put(IndexMetadata.INDEX_AUTO_EXPAND_REPLICAS_SETTING.getKey(), "0-2")
@@ -126,7 +128,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
         nodeClient.admin().indices().create(createEventsIndexRequest);
 
         // Create the queries index.
-        final String queriesIndex = UbiUtils.getEventsIndexName(storeName);
+        final String queriesIndex = UbiUtils.getQueriesIndexName(storeName);
         final CreateIndexRequest createQueriesIndexRequest = new CreateIndexRequest(queriesIndex)
                 .mapping(UbiUtils.getResourceFile(QUERIES_MAPPING_FILE))
                 .settings(indexSettings);
