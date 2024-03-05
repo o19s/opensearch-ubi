@@ -29,14 +29,12 @@ import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.ubi.events.Event;
 import org.opensearch.ubi.events.OpenSearchEventManager;
+import org.opensearch.ubi.model.HeaderConstants;
 import org.opensearch.ubi.model.SettingsConstants;
 import org.opensearch.ubi.utils.UbiUtils;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static org.opensearch.rest.RestRequest.Method.*;
 
@@ -59,6 +57,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
                 new Route(PUT, "/_plugins/ubi/{store}"), // Initializes the store.
                 new Route(DELETE, "/_plugins/ubi/{store}"), // Deletes a store.
                 new Route(GET, "/_plugins/ubi"), // Lists all stores
+                new Route(TRACE, "/_plugins/ubi"),
                 new Route(POST, "/_plugins/ubi/{store}")); // Indexes events into the store.
     }
 
@@ -75,9 +74,45 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
             return delete(nodeClient, storeName);
         } else if(restRequest.method() == POST) {
             return post(nodeClient, storeName, restRequest);
+        } else if(restRequest.method() == TRACE) {
+            return trace(nodeClient, restRequest);
         }
 
         return get(nodeClient);
+
+    }
+
+    private RestChannelConsumer trace(NodeClient nodeClient, RestRequest restRequest) {
+
+        return (channel) -> {
+
+            LOGGER.warn("TRACE");
+
+            final Map<String, List<String>> headers = restRequest.getHeaders();
+            LOGGER.info("Exposed headers: " + String.join(",", headers.keySet()));
+
+            List<String> ids = headers.get(HeaderConstants.QUERY_ID_HEADER.toString());
+            String queryId = null;
+            if (ids == null || ids.size() == 0) {
+                LOGGER.warn("Null REST parameter: {}. Using default id.", HeaderConstants.QUERY_ID_HEADER);
+                queryId = UUID.randomUUID().toString();
+            } else {
+                queryId = ids.get(0);
+            }
+
+            final GetIndexRequest getIndexRequest = new GetIndexRequest();
+            final GetIndexResponse getIndexResponse = nodeClient.admin().indices().getIndex(getIndexRequest).actionGet();
+            final Set<String> stores = getStoreNames(getIndexResponse.indices());
+
+            final String s = "query_id:" + queryId + "&stores:" + String.join(",", stores);
+
+            BytesRestResponse response = new BytesRestResponse(RestStatus.OK, "application/x-www-form-urlencoded", s);
+            response.addHeader("Access-Control-Expose-Headers", "query_id");
+            response.addHeader("query_id", queryId);
+
+            channel.sendResponse(response);
+
+        };
 
     }
 
@@ -87,14 +122,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
             final GetIndexRequest getIndexRequest = new GetIndexRequest();
             final GetIndexResponse getIndexResponse = nodeClient.admin().indices().getIndex(getIndexRequest).actionGet();
-            final String[] indexes = getIndexResponse.indices();
-            final Set<String> stores = new HashSet<>();
-
-            for (final String index : indexes) {
-                if (index.startsWith(".") && index.endsWith("_events")) {
-                    stores.add(index.substring(1, index.length() - 7));
-                }
-            }
+            final Set<String> stores = getStoreNames(getIndexResponse.indices());
 
             final XContentBuilder builder = XContentType.JSON.contentBuilder();
             builder.startObject().field("stores", stores);
@@ -205,6 +233,16 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
         return new ObjectMapper().writeValueAsString(rootNode);
 
+    }
+
+    private Set<String> getStoreNames(String[] indices) {
+        final Set<String> stores = new HashSet<>();
+        for (final String index : indices) {
+            if (index.startsWith(".") && index.endsWith("_events")) {
+                stores.add(index.substring(1, index.length() - 7));
+            }
+        }
+        return stores;
     }
 
     private boolean validateStoreName(final String storeName) {

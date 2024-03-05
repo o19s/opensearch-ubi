@@ -15,6 +15,7 @@ import org.opensearch.ubi.events.queues.InternalQueue;
 
 public abstract class AbstractEventManager {
 
+    @SuppressWarnings("unused")
     private final Logger LOGGER = LogManager.getLogger(AbstractEventManager.class);
 
     protected final EventQueue eventQueue;

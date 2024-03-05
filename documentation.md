@@ -17,7 +17,7 @@ index is used to store events, and the other index is for storing queries.
 #### OpenSearch Data Mappings
 
 * The current event mappings file can be found [here](https://github.com/o19s/opensearch-ubi/blob/main/src/main/resources/events-mapping.json).
-* The current query mappings file can be found [here](https://github.com/o19s/opensearch-ubi/blob/main/src/main/resources/query-mapping.json).
+* The current query mappings file can be found [here](https://github.com/o19s/opensearch-ubi/blob/main/src/main/resources/queries-mapping.json).
 
 Schema for events:
 
@@ -49,6 +49,7 @@ The plugin exposes a REST API.
 | `DELETE` | `/_plugins/ubi/{store}` | Delete a backend store |
 | `GET` | `/_plugins/ubi` | Get a list of all stores |
 | `POST` | `/_plugins/ubi/{store}` | Index events into the store |
+| `TRACE` | `/_plugins/ubi` | For temporary developer debugging  |
 
 ### Creating a Store
 
