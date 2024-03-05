@@ -21,16 +21,18 @@ import org.opensearch.action.admin.indices.get.GetIndexResponse;
 import org.opensearch.client.node.NodeClient;
 import org.opensearch.cluster.metadata.IndexMetadata;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.core.rest.RestStatus;
+import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
-import org.opensearch.rest.action.RestToXContentListener;
 import org.opensearch.ubi.events.Event;
 import org.opensearch.ubi.events.OpenSearchEventManager;
 import org.opensearch.ubi.model.SettingsConstants;
 import org.opensearch.ubi.utils.UbiUtils;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -61,7 +63,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
     }
 
     @Override
-    protected RestChannelConsumer prepareRequest(RestRequest restRequest, NodeClient nodeClient) {
+    protected RestChannelConsumer prepareRequest(RestRequest restRequest, NodeClient nodeClient) throws IOException {
 
         final String storeName = restRequest.param("store");
 
@@ -89,87 +91,102 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
             final Set<String> stores = new HashSet<>();
 
             for (final String index : indexes) {
-                LOGGER.info("Index name: " + index);
                 if (index.startsWith(".") && index.endsWith("_events")) {
-                    stores.add(index);
+                    stores.add(index.substring(1, index.length() - 7));
                 }
             }
 
-            channel.sendResponse(new BytesRestResponse(RestStatus.OK, String.join(",", stores)));
+            final XContentBuilder builder = XContentType.JSON.contentBuilder();
+            builder.startObject().field("stores", stores);
+            builder.endObject();
+
+            channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
 
         };
 
     }
 
-    private RestChannelConsumer create(final NodeClient nodeClient, final String storeName, final String index, final String idField) {
-        return (channel) -> {
+    private RestChannelConsumer create(final NodeClient nodeClient, final String storeName, final String index, final String idField) throws IOException {
 
-            final Settings indexSettings = Settings.builder()
-                    .put(IndexMetadata.INDEX_NUMBER_OF_SHARDS_SETTING.getKey(), 1)
-                    .put(IndexMetadata.INDEX_AUTO_EXPAND_REPLICAS_SETTING.getKey(), "0-2")
-                    .put(IndexMetadata.SETTING_PRIORITY, Integer.MAX_VALUE)
-                    .put(IndexMetadata.SETTING_INDEX_HIDDEN, true)
-                    .put(SettingsConstants.INDEX, index)
-                    .put(SettingsConstants.ID_FIELD, idField)
-                    .put(SettingsConstants.VERSION_SETTING, VERSION)
-                    .build();
+        final Settings indexSettings = Settings.builder()
+                .put(IndexMetadata.INDEX_NUMBER_OF_SHARDS_SETTING.getKey(), 1)
+                .put(IndexMetadata.INDEX_AUTO_EXPAND_REPLICAS_SETTING.getKey(), "0-2")
+                .put(IndexMetadata.SETTING_PRIORITY, Integer.MAX_VALUE)
+                .put(SettingsConstants.INDEX, index)
+                .put(SettingsConstants.ID_FIELD, idField)
+                .put(SettingsConstants.VERSION_SETTING, VERSION)
+                .build();
 
-            // Create the events index.
-            final String eventsIndex = UbiUtils.getEventsIndexName(storeName);
-            final CreateIndexRequest createEventsIndexRequest = new CreateIndexRequest(eventsIndex)
-                    .mapping(UbiUtils.getResourceFile(EVENTS_MAPPING_FILE))
-                    .settings(indexSettings);
+        // Create the events index.
+        final String eventsIndex = UbiUtils.getEventsIndexName(storeName);
+        final CreateIndexRequest createEventsIndexRequest = new CreateIndexRequest(eventsIndex)
+                .mapping(UbiUtils.getResourceFile(EVENTS_MAPPING_FILE))
+                .settings(indexSettings);
 
-            nodeClient.admin().indices().create(createEventsIndexRequest, new RestToXContentListener<>(channel));
+        nodeClient.admin().indices().create(createEventsIndexRequest);
 
-//            // Create the queries index.
-//            final String queriesIndex = UbiUtils.getEventsIndexName(storeName);
-//            final CreateIndexRequest createQueriesIndexRequest = new CreateIndexRequest(queriesIndex)
-//                    .mapping(UbiUtils.getResourceFile(QUERIES_MAPPING_FILE))
-//                    .settings(indexSettings);
-//
-//            nodeClient.admin().indices().create(createQueriesIndexRequest, new RestToXContentListener<>(channel));
+        // Create the queries index.
+        final String queriesIndex = UbiUtils.getEventsIndexName(storeName);
+        final CreateIndexRequest createQueriesIndexRequest = new CreateIndexRequest(queriesIndex)
+                .mapping(UbiUtils.getResourceFile(QUERIES_MAPPING_FILE))
+                .settings(indexSettings);
 
-        };
+        nodeClient.admin().indices().create(createQueriesIndexRequest);
+
+        final XContentBuilder builder = XContentType.JSON.contentBuilder();
+        builder.startObject().field("status", "initialized");
+        builder.endObject();
+
+        return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
+
     }
 
-    private RestChannelConsumer post(final NodeClient nodeClient, final String storeName, final RestRequest restRequest) {
+    private RestChannelConsumer post(final NodeClient nodeClient, final String storeName, final RestRequest restRequest) throws IOException {
 
         try {
 
             final String eventJson = restRequest.content().utf8ToString();
             final String eventJsonWithTimestamp = setEventTimestamp(eventJson);
 
-            // Add the event for indexing.
-            LOGGER.info("Indexing event into {}", storeName);
+            LOGGER.info("Indexing UBI event into store {}", storeName);
             final String eventsIndexName = UbiUtils.getEventsIndexName(storeName);
 
-            //return (channel) -> client.index(indexRequest, new RestToXContentListener<>(channel));
             final Event event = new Event(eventsIndexName, eventJsonWithTimestamp);
             OpenSearchEventManager.getInstance(nodeClient).add(event);
 
         } catch (JsonProcessingException ex) {
-            LOGGER.error("Unable to get/set timestamp on event.", ex);
-            return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST, "unable to set event timestamp"));
+            LOGGER.error("Unable to get/set timestamp on UBI event.", ex);
+
+            final XContentBuilder builder = XContentType.JSON.contentBuilder();
+            builder.startObject().field("error", "unable to set event timestamp");
+            builder.endObject();
+
+            return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST, builder));
         }
 
-        return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, "event received"));
+        final XContentBuilder builder = XContentType.JSON.contentBuilder();
+        builder.startObject().field("status", "received");
+        builder.endObject();
+
+        return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
 
     }
 
-    private RestChannelConsumer delete(final NodeClient nodeClient, final String storeName) {
+    private RestChannelConsumer delete(final NodeClient nodeClient, final String storeName) throws IOException {
 
-        return (channel) -> {
+        // Delete the events index.
+        final DeleteIndexRequest deleteEventsIndexRequest = new DeleteIndexRequest(UbiUtils.getEventsIndexName(storeName));
+        nodeClient.admin().indices().delete(deleteEventsIndexRequest);
 
-            // Delete the events index.
-            final DeleteIndexRequest deleteEventsIndexRequest = new DeleteIndexRequest(UbiUtils.getEventsIndexName(storeName));
-            nodeClient.admin().indices().delete(deleteEventsIndexRequest, new RestToXContentListener<>(channel));
+        // Delete the queries index.
+        final DeleteIndexRequest deleteQueriesIndexRequest = new DeleteIndexRequest(UbiUtils.getQueriesIndexName(storeName));
+        nodeClient.admin().indices().delete(deleteQueriesIndexRequest);
 
-            // Delete the queries index.
-            final DeleteIndexRequest deleteQueriesIndexRequest = new DeleteIndexRequest(UbiUtils.getQueriesIndexName(storeName));
-            nodeClient.admin().indices().delete(deleteQueriesIndexRequest, new RestToXContentListener<>(channel));
+        final XContentBuilder builder = XContentType.JSON.contentBuilder();
+        builder.startObject().field("status", "deleted");
+        builder.endObject();
 
-        };
+        return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
 
     }
 
@@ -177,7 +194,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
         final JsonNode rootNode = new ObjectMapper().readTree(eventJson);
 
-        ObjectNode target = (ObjectNode) rootNode;
+        final ObjectNode target = (ObjectNode) rootNode;
 
         // If there is already a timestamp don't overwrite it.
         if(target.get("timestamp") == null || Objects.equals(target.get("timestamp").asText(), "")) {
