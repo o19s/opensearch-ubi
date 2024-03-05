@@ -11,12 +11,15 @@ package org.opensearch.ubi.action;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionRequest;
+import org.opensearch.action.admin.indices.settings.get.GetSettingsRequest;
+import org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.support.ActionFilter;
 import org.opensearch.action.support.ActionFilterChain;
 import org.opensearch.client.Client;
+import org.opensearch.common.settings.Settings;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
@@ -26,8 +29,10 @@ import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.ubi.model.HeaderConstants;
 import org.opensearch.ubi.model.QueryRequest;
 import org.opensearch.ubi.model.QueryResponse;
+import org.opensearch.ubi.model.SettingsConstants;
 import org.opensearch.ubi.utils.UbiUtils;
 
+import java.io.IOException;
 import java.util.*;
 
 public class UserBehaviorInsightsActionFilter implements ActionFilter {
@@ -67,11 +72,6 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                 // Get the search itself.
                 final SearchRequest searchRequest = (SearchRequest) request;
 
-                // TODO: Restrict logging to only queries of certain indices specified in the settings.
-                //final List<String> indices = Arrays.asList(searchRequest.indices());
-                //final Set<String> indicesToLog = new HashSet<>(Arrays.asList(settings.get(SettingsConstants.INDEX_NAMES).split(",")));
-                //if(indicesToLog.containsAll(indices)) {
-
                 // Get all search hits from the response.
                 if (response instanceof SearchResponse) {
 
@@ -81,9 +81,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                     final String userId = getHeaderValue(HeaderConstants.USER_ID_HEADER, "", task);
                     final String sessionId = getHeaderValue(HeaderConstants.SESSION_ID_HEADER, "", task);
 
-                    // Get the store settings.
                     final String index = "ecommerce";
-                    //final String index = backend.getStoreSettings().get(eventStore).get("index");
 
                     // Only consider this search if the index being searched matches the store's index setting.
                     if (Arrays.asList(searchRequest.indices()).contains(index)) {
@@ -98,8 +96,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                         final SearchResponse searchResponse = (SearchResponse) response;
 
                         // Get the id_field to use for each result's unique identifier.
-                        final String idField = "";
-                        //final String idField = backend.getStoreSettings().get(eventStore).getOrDefault("id_field", "");
+                        final String idField = "name";
 
                         // Add each hit to the list of query responses.
                         for (final SearchHit hit : searchResponse.getHits()) {
@@ -161,7 +158,8 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
     public void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) {
 
-        LOGGER.info("Writing query ID {} with response ID {}", queryRequest.getQueryId(), queryResponse.getQueryResponseId());
+        LOGGER.info("Writing query ID {} with response ID {}",
+                queryRequest.getQueryId(), queryResponse.getQueryResponseId());
 
         // What will be indexed - adheres to the queries-mapping.json
         final Map<String, Object> source = new HashMap<>();

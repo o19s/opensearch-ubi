@@ -12,7 +12,7 @@ public class SettingsConstants {
 
     public static final String VERSION_SETTING = "index.ubi.version";
 
-    public static final String INDEX = "index.ubi.index";
+    public static final String INDEX = "index.ubi.store";
     public static final String ID_FIELD = "index.ubi.id_field";
 
 }

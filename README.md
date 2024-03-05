@@ -40,6 +40,12 @@ curl -s http://localhost:9200/.awesome_events/_search | jq
 curl -s http://localhost:9200/.awesome_events/_search -H 'Content-Type: application/json' -d '{"query": {"term": {"type": "instant-search"}}}' | jq
 ```
 
+Do a search of the `ecommerce` index:
+
+```
+curl -s http://localhost:9200/ecommerce/_search -H "X-ubi-store: awesome" | jq
+```
+
 Get queries:
 
 ```
