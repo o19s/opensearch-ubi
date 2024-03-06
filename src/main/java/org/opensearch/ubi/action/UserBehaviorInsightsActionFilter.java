@@ -11,39 +11,37 @@ package org.opensearch.ubi.action;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionRequest;
+import org.opensearch.action.admin.indices.settings.get.GetSettingsRequest;
+import org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
+import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.support.ActionFilter;
 import org.opensearch.action.support.ActionFilterChain;
-import org.opensearch.common.settings.Settings;
+import org.opensearch.client.Client;
+import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
+import org.opensearch.search.SearchHit;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.ubi.HeaderConstants;
-import org.opensearch.ubi.backends.Backend;
+import org.opensearch.ubi.model.HeaderConstants;
 import org.opensearch.ubi.model.QueryRequest;
 import org.opensearch.ubi.model.QueryResponse;
+import org.opensearch.ubi.model.SettingsConstants;
+import org.opensearch.ubi.utils.UbiUtils;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
     private static final Logger LOGGER = LogManager.getLogger(UserBehaviorInsightsActionFilter.class);
 
-    private final Backend backend;
-    private final Settings settings;
+    private final Client client;
     private final ThreadPool threadPool;
 
-    public Settings getSettings(){
-        return this.settings;
-    }
-
-    public UserBehaviorInsightsActionFilter(final Backend backend, final Settings settings, ThreadPool threadPool) {
-        this.backend = backend;
-        this.settings = settings;
+    public UserBehaviorInsightsActionFilter(Client client, ThreadPool threadPool) {
+        this.client = client;
         this.threadPool = threadPool;
     }
 
@@ -72,42 +70,78 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                 // Get the search itself.
                 final SearchRequest searchRequest = (SearchRequest) request;
 
-                // TODO: Restrict logging to only queries of certain indices specified in the settings.
-                //final List<String> indices = Arrays.asList(searchRequest.indices());
-                //final Set<String> indicesToLog = new HashSet<>(Arrays.asList(settings.get(SettingsConstants.INDEX_NAMES).split(",")));
-                //if(indicesToLog.containsAll(indices)) {
-
                 // Get all search hits from the response.
                 if (response instanceof SearchResponse) {
 
                     // Get info from the headers.
                     final String queryId = getHeaderValue(HeaderConstants.QUERY_ID_HEADER, UUID.randomUUID().toString(), task);
-                    final String eventStore = getHeaderValue(HeaderConstants.EVENT_STORE_HEADER, "default", task);
+                    final String eventStore = getHeaderValue(HeaderConstants.EVENT_STORE_HEADER, "", task);
                     final String userId = getHeaderValue(HeaderConstants.USER_ID_HEADER, "", task);
                     final String sessionId = getHeaderValue(HeaderConstants.SESSION_ID_HEADER, "", task);
 
-                    // The query will be empty when there is no query, e.g. /_search
-                    final String query = searchRequest.source().toString();
+                    // If there is no event store header, ignore this search.
+                    if(!"".equals(eventStore)) {
 
-                    // Create a UUID for this search response.
-                    final String queryResponseId = UUID.randomUUID().toString();
+                        // Get the id_field to use for each result's unique identifier.
+                        final String queriesIndexName = UbiUtils.getQueriesIndexName(eventStore);
+                        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest().indices(queriesIndexName);
 
-                    final List<String> queryResponseHitIds = new LinkedList<>();
-                    final SearchResponse searchResponse = (SearchResponse) response;
+                        final GetSettingsResponse getSettingsResponse = client.admin().indices().getSettings(getSettingsRequest).actionGet();
+                        final String idField = getSettingsResponse.getSetting(queriesIndexName, SettingsConstants.ID_FIELD);
+                        final String index = getSettingsResponse.getSetting(queriesIndexName, SettingsConstants.INDEX);
 
-                    // Add each hit to the list of query responses.
-                    searchResponse.getHits().forEach(hit -> queryResponseHitIds.add(String.valueOf(hit.docId())));
+                        LOGGER.info("Using id_field [{}] of index [{}] for UBI query.", idField, index);
 
-                    try {
+                        // Only consider this search if the index being searched matches the store's index setting.
+                        if (Arrays.asList(searchRequest.indices()).contains(index)) {
 
-                        // Persist the query to the backend.
-                        backend.persistQuery(eventStore,
-                                new QueryRequest(queryId, query, userId, sessionId),
-                                new QueryResponse(queryId, queryResponseId, queryResponseHitIds));
+                            // The query will be empty when there is no query, e.g. /_search
+                            final String query = searchRequest.source().toString();
 
-                    } catch (Exception ex) {
-                        // TODO: Handle this.
-                        LOGGER.error("Unable to persist query.", ex);
+                            // Create a UUID for this search response.
+                            final String queryResponseId = UUID.randomUUID().toString();
+
+                            final List<String> queryResponseHitIds = new LinkedList<>();
+                            final SearchResponse searchResponse = (SearchResponse) response;
+
+                            // Add each hit to the list of query responses.
+                            for (final SearchHit hit : searchResponse.getHits()) {
+
+                                if ("".equals(idField)) {
+
+                                    // Use the _id since there is no id_field setting for this index.
+                                    queryResponseHitIds.add(String.valueOf(hit.docId()));
+
+                                } else {
+
+                                    final Map<String, Object> source = hit.getSourceAsMap();
+                                    queryResponseHitIds.add((String) source.get(idField));
+
+                                }
+
+                            }
+
+                            try {
+
+                                // Persist the query to the backend.
+                                persistQuery(eventStore,
+                                        new QueryRequest(queryId, query, userId, sessionId),
+                                        new QueryResponse(queryId, queryResponseId, queryResponseHitIds));
+
+                            } catch (Exception ex) {
+                                // TODO: Handle this.
+                                LOGGER.error("Unable to persist query.", ex);
+                            }
+
+                            threadPool.getThreadContext().addResponseHeader("query_id", queryId);
+
+                            //}
+
+                            final long elapsedTime = System.currentTimeMillis() - startTime;
+                            LOGGER.info("UBI search request filter took {} ms", elapsedTime);
+
+                        }
+
                     }
 
                     LOGGER.info("Setting and exposing query_id {}", queryId);
@@ -144,6 +178,33 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
         } else {
             return value;
         }
+
+    }
+
+    public void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) {
+
+        LOGGER.info("Writing query ID {} with response ID {}",
+                queryRequest.getQueryId(), queryResponse.getQueryResponseId());
+
+        // What will be indexed - adheres to the queries-mapping.json
+        final Map<String, Object> source = new HashMap<>();
+        source.put("timestamp", queryRequest.getTimestamp());
+        source.put("query_id", queryRequest.getQueryId());
+        source.put("query", queryRequest.getQuery());
+        source.put("query_response_id", queryResponse.getQueryResponseId());
+        source.put("query_response_hit_ids", queryResponse.getQueryResponseHitIds());
+        source.put("user_id", queryRequest.getUserId());
+        source.put("session_id", queryRequest.getSessionId());
+
+        // Get the name of the queries.
+        final String queriesIndexName = UbiUtils.getQueriesIndexName(storeName);
+
+        // Build the index request.
+        final IndexRequest indexRequest = new IndexRequest(queriesIndexName)
+                .source(source, XContentType.JSON);
+
+        // TODO: Move this to the queue, too.
+        client.index(indexRequest);
 
     }
 

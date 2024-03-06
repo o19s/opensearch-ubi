@@ -29,10 +29,10 @@ import org.opensearch.rest.RestHeaderDefinition;
 import org.opensearch.script.ScriptService;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.ubi.action.UserBehaviorInsightsActionFilter;
-import org.opensearch.ubi.action.UserBehaviorInsightsRestHandler;
-import org.opensearch.ubi.backends.Backend;
-import org.opensearch.ubi.backends.OpenSearchBackend;
+import org.opensearch.ubi.rest.UserBehaviorInsightsRestHandler;
 import org.opensearch.ubi.events.OpenSearchEventManager;
+import org.opensearch.ubi.model.HeaderConstants;
+import org.opensearch.ubi.model.SettingsConstants;
 import org.opensearch.watcher.ResourceWatcherService;
 
 import java.util.ArrayList;
@@ -48,7 +48,6 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
 
     private static final Logger LOGGER = LogManager.getLogger(UserBehaviorInsightsPlugin.class);
 
-    private Backend backend;
     private ActionFilter userBehaviorLoggingFilter;
 
     @Override
@@ -80,7 +79,7 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
                                              final IndexNameExpressionResolver indexNameExpressionResolver,
                                              final Supplier<DiscoveryNodes> nodesInCluster) {
 
-        return singletonList(new UserBehaviorInsightsRestHandler(backend));
+        return singletonList(new UserBehaviorInsightsRestHandler());
 
     }
 
@@ -88,10 +87,10 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
     public List<Setting<?>> getSettings() {
 
         final List<Setting<?>> settings = new ArrayList<>();
-        settings.add(Setting.simpleString(SettingsConstants.INDEX_NAMES, "", Setting.Property.NodeScope));
 
-        // The version of the index mapping.
         settings.add(Setting.intSetting(SettingsConstants.VERSION_SETTING, 1, -1, Integer.MAX_VALUE, Setting.Property.IndexScope));
+        settings.add(Setting.simpleString(SettingsConstants.INDEX, "", Setting.Property.IndexScope));
+        settings.add(Setting.simpleString(SettingsConstants.ID_FIELD, "", Setting.Property.IndexScope));
 
         return settings;
 
@@ -99,7 +98,6 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
 
     @Override
     public List<ActionFilter> getActionFilters() {
-        // LOGGER.info("Index name: {}", settings.get(ConfigConstants.INDEX_NAME));
         return singletonList(userBehaviorLoggingFilter);
     }
 
@@ -118,25 +116,20 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
             Supplier<RepositoriesService> repositoriesServiceSupplier
     ) {
 
-        this.backend = new OpenSearchBackend(client);
-        this.userBehaviorLoggingFilter =  new UserBehaviorInsightsActionFilter(backend, environment.settings(), threadPool);
-
-        LOGGER.info("Creating scheduled task");
-
-        // TODO: Only start this if an OpenSearch store is already initialized.
+        // TODO Only start this if an OpenSearch store is already initialized.
         // Otherwise, start it when a store is initialized.
+
+        LOGGER.info("Creating UBI scheduled task to persist events.");
+        // TODO: Allow these time parameters to be configurable.
         threadPool.scheduler().scheduleAtFixedRate(() -> {
             OpenSearchEventManager.getInstance(client).process();
         }, 0, 2000, TimeUnit.MILLISECONDS);
 
+        // Initialize the action filter.
+        this.userBehaviorLoggingFilter = new UserBehaviorInsightsActionFilter(client, threadPool);
+
         return Collections.emptyList();
 
     }
-
-//    @Override
-//    public void close() {
-//        LOGGER.info("Stopping scheduled runnable.");
-//        FutureUtils.cancel(scheduled);
-//    }
 
 }

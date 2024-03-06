@@ -16,8 +16,8 @@ index is used to store events, and the other index is for storing queries.
 
 #### OpenSearch Data Mappings
 
-* The current event mappings file can be found [here](https://github.com/o19s/opensearch-ubi/blob/main/src/main/resources/org/opensearch/ubi/backends/events-mapping.json).
-* The current query mappings file can be found [here](https://github.com/o19s/opensearch-ubi/blob/main/src/main/resources/org/opensearch/ubi/backends/queries-mapping.json).
+* The current event mappings file can be found [here](https://github.com/o19s/opensearch-ubi/blob/main/src/main/resources/events-mapping.json).
+* The current query mappings file can be found [here](https://github.com/o19s/opensearch-ubi/blob/main/src/main/resources/queries-mapping.json).
 
 Schema for events:
 

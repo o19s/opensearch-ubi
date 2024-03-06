@@ -18,10 +18,10 @@ Start the containers:
 
 `docker compose up`
 
-Initialize the `awesome` UBL store:
+Initialize the `awesome` UBI store:
 
 ```
-curl -X PUT http://localhost:9200/_plugins/ubi/awesome
+curl -X PUT "http://localhost:9200/_plugins/ubi/awesome?index=ecommerce&id_field=name"
 ```
 
 Send an event to the `awesome` store:
@@ -40,16 +40,28 @@ curl -s http://localhost:9200/.awesome_events/_search | jq
 curl -s http://localhost:9200/.awesome_events/_search -H 'Content-Type: application/json' -d '{"query": {"term": {"type": "instant-search"}}}' | jq
 ```
 
+Do a search of the `ecommerce` index:
+
+```
+curl -s http://localhost:9200/ecommerce/_search -H "X-ubi-store: awesome" | jq
+```
+
 Get queries:
 
 ```
-curl -s http://localhost:9200/.awesome_queries/_search -H "X-ubi-store: awesome" | jq
+curl -s http://localhost:9200/.awesome_queries/_search | jq
 ```
 
 Delete the store:
 
 ```
 curl -X DELETE http://localhost:9200/_plugins/ubi/awesome
+```
+
+Get the stores:
+
+```
+curl http://localhost:9200/_plugins/ubi
 ```
 
 ## Load Test
