@@ -78,9 +78,10 @@ In the query log:
 ```sql
 select *
 from .ubi_log_queries
-where query_id ='14039d3e-b91d-4cf8-a11b-55d31d14d7ae'
+where query_id ='0b72b056-294c-4d3b-9a4b-1468b4e9cb93'
 order by timestamp
 ```
+(In this generated data, the `query` field is plain text; however in the real implementation the query will be in internal OS formatting of the query and parameters.)
 hits|query_response_id|query_id|user_id|query|session_id|timestamp
 ---|---|---|---|---|---|---
 {id=1377142}|14039d3e-b91d-4cf8-a11b-55d31d14d7ae|14039d3e-b91d-4cf8-a11b-55d31d14d7ae|172_073f163d-b2d0-401b-b7fa-b060834350ee|Virtual flexibility systematic|6044bc19-78da-40d5-8e7b-725d00dd2a78_1916|1.8079822E9
@@ -88,27 +89,27 @@ hits|query_response_id|query_id|user_id|query|session_id|timestamp
 In the event log
 ```sql
 select 
-	user_id, action_name, message_type, message
-from .ubi_log_events
-where query_id ='14039d3e-b91d-4cf8-a11b-55d31d14d7ae'
+  query_id, action_name, message_type, message, event_attributes.data.data_id, event_attributes.data.description, session_id, user_id
+from .ubi_log_events 
+where query_id = '0b72b056-294c-4d3b-9a4b-1468b4e9cb93'
 order by timestamp
 ```
-user_id|action_name|message_type|message
----|---|---|---
-172_073f163d-b2d0-401b-b7fa-b060834350ee|on_search|WARN|Virtual flexibility systematic
-172_073f163d-b2d0-401b-b7fa-b060834350ee|brand_filter|WARN|
-172_073f163d-b2d0-401b-b7fa-b060834350ee|product_sort|INFO|
-172_073f163d-b2d0-401b-b7fa-b060834350ee|product_sort|INFO|Mandatory background adapter
-172_073f163d-b2d0-401b-b7fa-b060834350ee|product_hover|INFO|concepto bifurcada multiplataforma
-172_073f163d-b2d0-401b-b7fa-b060834350ee|button_click|INFO|Right-sized dynamic methodology
-172_073f163d-b2d0-401b-b7fa-b060834350ee|product_sort|INFO|
-172_073f163d-b2d0-401b-b7fa-b060834350ee|button_click|INFO|paradigma radical preventivo
-172_073f163d-b2d0-401b-b7fa-b060834350ee|product_sort|REJECT|middleware vÃ­a web personalizable
-172_073f163d-b2d0-401b-b7fa-b060834350ee|type_filter|INFO|Down-sized actuating paradigm
-172_073f163d-b2d0-401b-b7fa-b060834350ee|brand_filter|INFO|
-172_073f163d-b2d0-401b-b7fa-b060834350ee|button_click|INFO|
-172_073f163d-b2d0-401b-b7fa-b060834350ee|brand_filter|REJECT|algoritmo intermedia orientado a equipos
-172_073f163d-b2d0-401b-b7fa-b060834350ee|logout|PURCHASE|Automated uniform toolset
+query_id|action_name|message_type|message|event_attributes.data.data_id| event_attributes.data.description|session_id|user_id
+---|---|---|---|---|---|---|---
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|product_hover|PURCHASE||681577|StarTech.com DVI-I Coupler / Gender Changer - F/F|90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|product_hover|INQUERY|desafÃ­o explÃ­cita multicanal|2048070|StarTech.com 5ft Desktop USB Extension Cable - A Male to A Female|90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|type_filter|INFO|conjunto mÃ³vil exclusivo|||90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|product_sort|PURCHASE|Optional reciprocal service-desk|467909|APC ACF400 rack accessory|90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|on_search|WARN|Laptop|9105ea04-0e1e-4636-92fd-2ab1d91c9d8f||90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|on_search|WARN|Laptop|9105ea04-0e1e-4636-92fd-2ab1d91c9d8f||90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|brand_filter|INFO|Inverse exuding hierarchy|||90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|button_click|WARN|analista vÃ­a web realineado|||90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|product_sort|PURCHASE|soporte incremental descentralizado|77192955|MGA Entertainment Poopsie Slime Smash Style 2 motor skills toy|90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|type_filter|WARN|superestructura logÃ­stica monitoreado|||90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|type_filter|ERROR||||90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|type_filter|INFO||||90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|type_filter|INFO||||90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
+0b72b056-294c-4d3b-9a4b-1468b4e9cb93|product_sort|REJECT|Secured actuating support|694281|StarTech.com 4 ft Cat5e Blue Snagless RJ45 UTP Cat 5e Patch Cable - 4ft Patch Cord|90e2f9c5-a034-4aba-8322-4fc8720c639b_1059|88_f4028096-e7f1-42e7-87a3-29973554deea
 
 ## User sessions
 ```sql
@@ -119,11 +120,10 @@ where query_id ='14039d3e-b91d-4cf8-a11b-55d31d14d7ae'
 order by timestamp
 ```
 
-
-Note that each new session starts with a login:
+* Note that each new session starts with a login.
 
 action_name|message_type|message|session_id
----|---|---|---
+---|---|---|---|
 new_user_entry|ERROR|Profit-focused object-oriented pricing structure|a66d71cf-20f0-4e14-828c-4d15499b2776_1912
 login|PURCHASE|Pre-emptive global initiative|a66d71cf-20f0-4e14-828c-4d15499b2776_1912
 product_sort|INFO||a66d71cf-20f0-4e14-828c-4d15499b2776_1912
@@ -171,3 +171,30 @@ product_hover|WARN||6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
 on_search|PURCHASE|Virtual systematic flexibility|6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
 logout|ERROR||6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
 
+## List user sessions that logged out without any queries
+```sql
+select 
+    user_id, session_id, count(0) EventTotal
+from .ubi_log_events
+where action_name='logout' and query_id is null
+group by user_id, session_id
+order by EventTotal desc
+```
+user_id|session_id|EventTotal
+---|---|---
+156_c4130080-84ac-4b72-b333-9ed0d8715fc1|c016f7b7-41d4-40a1-bfd3-1d3c1ddf36e9_1926|1
+170_08147749-8ef3-4b68-ac92-32f870e060af|565eb562-e32f-4262-a55a-7ccab1d251ac_2094|1
+171_3254806f-7f76-4110-a002-e315c7253490|158ecffe-b354-4023-8338-9d6e5e9932dc_2113|1
+18_47961ea2-f2c1-4577-912b-15f6944b0a83|fd0f37b1-ea38-4dff-ad91-9fdc311ab9ad_146|1
+48_c7f7bfc5-1953-4959-b459-3956950de4ba|8e204c18-f121-486d-baf9-4c43723070cb_531|1
+
+
+## TODO: searches without results
+```sql
+select 
+  query_id, action_name, event_attributes.data.data_id as data_id, 
+  event_attributes.data.description as data_description, user_id, session_id
+from .ubi_log_events
+where query_id = '2328c2d4-d501-4556-b878-2c5de9a7bacb'
+order by timestamp
+``sql
