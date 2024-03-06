@@ -172,6 +172,7 @@ on_search|PURCHASE|Virtual systematic flexibility|6e589ef6-817d-4b94-b3ba-502829
 logout|ERROR||6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
 
 ## List user sessions that logged out without any queries
+- This query denotes users without a query_id.  Note that this could happen if the client side is not passing the returned query to other events.
 ```sql
 select 
     user_id, session_id, count(0) EventTotal
@@ -189,12 +190,24 @@ user_id|session_id|EventTotal
 48_c7f7bfc5-1953-4959-b459-3956950de4ba|8e204c18-f121-486d-baf9-4c43723070cb_531|1
 
 
-## TODO: searches without results
+
+## Queries with zero results
 ```sql
-select 
-  query_id, action_name, event_attributes.data.data_id as data_id, 
-  event_attributes.data.description as data_description, user_id, session_id
-from .ubi_log_events
-where query_id = '2328c2d4-d501-4556-b878-2c5de9a7bacb'
-order by timestamp
-``sql
+select
+   user_id, session_id, query_id, query
+from .ubi_log_queries
+where query_response_hit_ids is null
+order by user_id
+```
+user_id|session_id|query_id|query
+---|---|---|---
+100_0c4b48eb-6efa-406e-80f5-1a5925792492|f09c6736-3551-4cc5-a101-e5162ccce2ec_1218|1175a12d-fda6-40c3-8ed7-57e80de1a8a0|Optio id quis alias at.
+100_0c4b48eb-6efa-406e-80f5-1a5925792492|52f85f24-5bde-4604-8d05-d6f505192203_1226|82a0220b-87b5-43d2-adbb-9415d24f8134|re-intermediate dynamic partnerships
+101_1b24de1f-1dc0-4b21-9125-60657973cea0|209f0d5f-eabe-4c25-86b2-fb7794846e57_1237|2092ced1-1f5f-45cb-a9d1-92e1c2609889|Voluptas iusto illum eum autem cum illum.
+104_e8170ee9-d48b-4948-a2d5-a2f9f0fa56e5|7174b18b-6ba1-4370-a884-71c43144c1c7_1269|e1312523-b693-413e-8486-0420be1f5ea6|Optio id quis alias at.
+107_ecd1b629-fb99-4489-b691-0a50b8d4fd6b|65c4d41d-c28a-426e-b676-8267ede56f84_1295|33494d8a-a149-49c3-bd66-47b55cb6c082|Blanditiis quo sint repudiandae a sit.
+107_ecd1b629-fb99-4489-b691-0a50b8d4fd6b|2aebda66-7f53-4dbb-a222-b4e0c7694142_1299|d374812a-d1ec-45af-aa12-fd38ad725334|transforma plataformas lo Ãºltimo
+107_ecd1b629-fb99-4489-b691-0a50b8d4fd6b|0174c53d-c769-4a63-af45-13e9b404123f_1300|f0c9522d-33a4-468f-84f4-fb0fb8240e7a|what is ubi?
+108_c06807c9-7215-421d-be0a-c63b9fc649f3|af64d422-bd04-4063-881b-2aba131535a0_1313|8658cd9d-fe67-4c77-95c0-8b382447b6ea|synthesize bricks-and-clicks communities
+110_e47ac7b6-7c69-4d18-9c1c-0a5e12ac5758|b281fb7d-902a-4e76-a0f9-fd52d0f5f27f_1336|55755b6e-b975-4df8-b8e1-bf7bbba9c903|Virtual flexibility systematic
+113_82c27283-577b-4a19-9ab7-652ba6635bd5|378dc967-dfa1-49f2-af5e-a8594749aa38_1389|b1e42020-182a-4e86-849d-be132d2f5fae|what is ubi?
