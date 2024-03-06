@@ -1,5 +1,5 @@
 
-# Event type counts
+## Event type counts
 ```sql
 select 
 	action_name, count(0) Total  
@@ -9,18 +9,37 @@ order by Total desc
 ```
 action_name|Total
 |---|---|
+on_search|3199
 brand_filter|3112
 button_click|3150
+type_filter|3149
+product_hover|3132
+product_sort|3115
 login|2458
 logout|1499
 new_user_entry|208
-on_search|3199
-product_hover|3132
-product_sort|3115
-type_filter|3149
 
+### Events associated with queries
+Since the `query_id` is set during client-side search, all events with associated with a query will have that same `query_id`
+```sql
+select 
+	action_name, count(0) Total  
+from .ubi_log_events
+where query_id is not null
+group by action_name
+order by Total desc
+```
+action_name|Total
+|---|---|
+on_search|1329
+brand_filter|669
+button_click|648
+product_hover|639
+product_sort|625
+type_filter|613
+logout|408
 
-# Frequent queries
+## Frequent queries
 ```sql
 select 
 	message, count(0) Total  
