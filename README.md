@@ -18,7 +18,7 @@ Start the containers:
 
 `docker compose up`
 
-Initialize the `awesome` UBL store:
+Initialize the `awesome` UBI store:
 
 ```
 curl -X PUT "http://localhost:9200/_plugins/ubi/awesome?index=ecommerce&id_field=name"
