@@ -15,7 +15,11 @@ import org.opensearch.client.Client;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.cluster.node.DiscoveryNodes;
 import org.opensearch.cluster.service.ClusterService;
-import org.opensearch.common.settings.*;
+import org.opensearch.common.settings.ClusterSettings;
+import org.opensearch.common.settings.IndexScopedSettings;
+import org.opensearch.common.settings.Setting;
+import org.opensearch.common.settings.Settings;
+import org.opensearch.common.settings.SettingsFilter;
 import org.opensearch.core.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.env.Environment;
@@ -38,7 +42,9 @@ import org.opensearch.watcher.ResourceWatcherService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -52,6 +58,8 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
     private static final Logger LOGGER = LogManager.getLogger(UserBehaviorInsightsPlugin.class);
 
     private ActionFilter userBehaviorLoggingFilter;
+
+    public static final Map<String, String> storeSettings = new HashMap<>();
 
     @Override
     public Collection<RestHeaderDefinition> getRestHeaders() {

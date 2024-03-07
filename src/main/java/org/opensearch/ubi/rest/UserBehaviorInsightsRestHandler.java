@@ -27,6 +27,7 @@ import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
+import org.opensearch.ubi.UserBehaviorInsightsPlugin;
 import org.opensearch.ubi.events.Event;
 import org.opensearch.ubi.events.OpenSearchEventManager;
 import org.opensearch.ubi.model.HeaderConstants;
@@ -34,9 +35,18 @@ import org.opensearch.ubi.model.SettingsConstants;
 import org.opensearch.ubi.utils.UbiUtils;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
-import static org.opensearch.rest.RestRequest.Method.*;
+import static org.opensearch.rest.RestRequest.Method.DELETE;
+import static org.opensearch.rest.RestRequest.Method.GET;
+import static org.opensearch.rest.RestRequest.Method.POST;
+import static org.opensearch.rest.RestRequest.Method.PUT;
+import static org.opensearch.rest.RestRequest.Method.TRACE;
 
 /**
  * The REST handler for User Behavior Insights. The handler provides the
@@ -219,6 +229,9 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
         final XContentBuilder builder = XContentType.JSON.contentBuilder();
         builder.startObject().field("status", "deleted");
         builder.endObject();
+
+        // Remove this store's settings from the settings map.
+        UserBehaviorInsightsPlugin.storeSettings.entrySet().removeIf(entry -> entry.getKey().startsWith(storeName + "."));
 
         return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
 
