@@ -181,12 +181,12 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
         if(UserBehaviorInsightsPlugin.storeSettings.containsKey(key)) {
 
-            LOGGER.info("Getting setting " + setting + " for store " + storeName + " from the cache.");
+            LOGGER.debug("Getting setting " + setting + " for store " + storeName + " from the cache.");
             value = UserBehaviorInsightsPlugin.storeSettings.get(key);
 
         } else{
 
-            LOGGER.info("Getting setting " + setting + " for store " + storeName + " from the index.");
+            LOGGER.debug("Getting setting " + setting + " for store " + storeName + " from the index.");
 
             // Get the id_field to use for each result's unique identifier.
             final String queriesIndexName = UbiUtils.getQueriesIndexName(storeName);
