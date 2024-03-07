@@ -35,10 +35,7 @@ import org.opensearch.ubi.model.HeaderConstants;
 import org.opensearch.ubi.model.SettingsConstants;
 import org.opensearch.watcher.ResourceWatcherService;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -52,6 +49,8 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
     private static final Logger LOGGER = LogManager.getLogger(UserBehaviorInsightsPlugin.class);
 
     private ActionFilter userBehaviorLoggingFilter;
+
+    public static final Map<String, String> storeSettings = new HashMap<>();
 
     @Override
     public Collection<RestHeaderDefinition> getRestHeaders() {

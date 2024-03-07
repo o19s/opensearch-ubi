@@ -25,6 +25,7 @@ import org.opensearch.core.action.ActionResponse;
 import org.opensearch.search.SearchHit;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
+import org.opensearch.ubi.UserBehaviorInsightsPlugin;
 import org.opensearch.ubi.model.HeaderConstants;
 import org.opensearch.ubi.model.QueryRequest;
 import org.opensearch.ubi.model.QueryResponse;
@@ -91,13 +92,8 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                     // If there is no event store header, ignore this search.
                     if(!"".equals(eventStore)) {
 
-                        // Get the id_field to use for each result's unique identifier.
-                        final String queriesIndexName = UbiUtils.getQueriesIndexName(eventStore);
-                        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest().indices(queriesIndexName);
-
-                        final GetSettingsResponse getSettingsResponse = client.admin().indices().getSettings(getSettingsRequest).actionGet();
-                        final String idField = getSettingsResponse.getSetting(queriesIndexName, SettingsConstants.ID_FIELD);
-                        final String index = getSettingsResponse.getSetting(queriesIndexName, SettingsConstants.INDEX);
+                        final String index = getStoreSettings(eventStore, SettingsConstants.INDEX);
+                        final String idField = getStoreSettings(eventStore, SettingsConstants.ID_FIELD);
 
                         LOGGER.info("Using id_field [{}] of index [{}] for UBI query.", idField, index);
 
@@ -178,6 +174,36 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
     }
 
+    private String getStoreSettings(final String storeName, final String setting) {
+
+        final String key = storeName + "." + setting;
+        final String value;
+
+        if(UserBehaviorInsightsPlugin.storeSettings.containsKey(key)) {
+
+            LOGGER.info("Getting setting " + setting + " for store " + storeName + " from the cache.");
+            value = UserBehaviorInsightsPlugin.storeSettings.get(key);
+
+        } else{
+
+            LOGGER.info("Getting setting " + setting + " for store " + storeName + " from the index.");
+
+            // Get the id_field to use for each result's unique identifier.
+            final String queriesIndexName = UbiUtils.getQueriesIndexName(storeName);
+            final GetSettingsRequest getSettingsRequest = new GetSettingsRequest().indices(queriesIndexName);
+
+            final GetSettingsResponse getSettingsResponse = client.admin().indices().getSettings(getSettingsRequest).actionGet();
+            final String settingResponse = getSettingsResponse.getSetting(queriesIndexName, setting);
+
+            UserBehaviorInsightsPlugin.storeSettings.put(key, settingResponse);
+            value = settingResponse;
+
+        }
+
+        return value;
+
+    }
+
     private String getHeaderValue(final HeaderConstants header, final String defaultValue, final Task task) {
 
         final String value = task.getHeader(header.getHeader());
@@ -196,7 +222,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
      * @param queryRequest The {@link QueryRequest} that initiated the query.
      * @param queryResponse The {@link QueryResponse} that resulted from the query.
      */
-    public void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) {
+    private void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) {
 
         LOGGER.info("Writing query ID {} with response ID {}",
                 queryRequest.getQueryId(), queryResponse.getQueryResponseId());
