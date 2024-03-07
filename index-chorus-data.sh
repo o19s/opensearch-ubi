@@ -4,7 +4,7 @@ CHORUS_HOME=`realpath ../chorus-opensearch-edition`
 echo "Using CHORUS_HOME = ${CHORUS_HOME}"
 
 TEMP_FILE=`mktemp`
-head -n 100 ${CHORUS_HOME}/transformed_data.json > ${TEMP_FILE}
+head -n 50 ${CHORUS_HOME}/transformed_data.json > ${TEMP_FILE}
 
 echo "Deleting index"
 curl -s -X DELETE "localhost:9200/ecommerce"

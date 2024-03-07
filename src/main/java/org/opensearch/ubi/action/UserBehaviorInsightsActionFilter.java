@@ -107,7 +107,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                             // Add each hit to the list of query responses.
                             for (final SearchHit hit : searchResponse.getHits()) {
 
-                                if ("".equals(idField)) {
+                                if (idField == null || "".equals(idField) || idField.equals("null")) {
 
                                     // Use the _id since there is no id_field setting for this index.
                                     queryResponseHitIds.add(String.valueOf(hit.docId()));
