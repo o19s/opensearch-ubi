@@ -15,6 +15,9 @@ import org.opensearch.action.index.IndexRequest;
 import org.opensearch.client.Client;
 import org.opensearch.common.xcontent.XContentType;
 
+/**
+ * An event manager that inserts events into an OpenSearch index.
+ */
 public class OpenSearchEventManager extends AbstractEventManager {
 
     private static final Logger LOGGER = LogManager.getLogger(OpenSearchEventManager.class);
@@ -55,6 +58,11 @@ public class OpenSearchEventManager extends AbstractEventManager {
         eventQueue.add(event);
     }
 
+    /**
+     * Gets a singleton instance of the manager.
+     * @param client An OpenSearch {@link Client}.
+     * @return An instance of {@link OpenSearchEventManager}.
+     */
     public static OpenSearchEventManager getInstance(Client client) {
         if(openSearchEventManager == null) {
             openSearchEventManager = new OpenSearchEventManager(client);

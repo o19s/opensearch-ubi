@@ -15,20 +15,41 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * A utility class used by the plugin.
+ */
 public class UbiUtils {
 
+    /**
+     * This is a static utility class.
+     */
     private UbiUtils() {
 
     }
 
+    /**
+     * Gets the formatted name of the queries index.
+     * @param storeName The name of the UBI store.
+     * @return The formatted name of the queries index.
+     */
     public static String getQueriesIndexName(final String storeName) {
         return "." + storeName + "_queries";
     }
 
+    /**
+     * Gets the formatted name of the events index.
+     * @param storeName The name of the UBI store.
+     * @return The formatted name of the events index.
+     */
     public static String getEventsIndexName(final String storeName) {
         return "." + storeName + "_events";
     }
 
+    /**
+     * Gets the content of a resource file.
+     * @param fileName The file name to open and read.
+     * @return The content of the given filename.
+     */
     public static String getResourceFile(final String fileName) {
         try (InputStream is = UbiUtils.class.getResourceAsStream(fileName)) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();

@@ -8,11 +8,24 @@
 
 package org.opensearch.ubi.model;
 
+/**
+ * Settings constants used by the plugin.
+ */
 public class SettingsConstants {
 
+    /**
+     * The schema version.
+     */
     public static final String VERSION_SETTING = "index.ubi.version";
 
+    /**
+     * The name of the UBI store.
+     */
     public static final String INDEX = "index.ubi.store";
+
+    /**
+     * The field in an index's mapping that will be used as the unique identifier for a query result item.
+     */
     public static final String ID_FIELD = "index.ubi.id_field";
 
 }

@@ -44,6 +44,9 @@ import java.util.function.Supplier;
 
 import static java.util.Collections.singletonList;
 
+/**
+ * OpenSearch User Behavior Insights Plugin
+ */
 public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
 
     private static final Logger LOGGER = LogManager.getLogger(UserBehaviorInsightsPlugin.class);

@@ -33,6 +33,10 @@ import org.opensearch.ubi.utils.UbiUtils;
 
 import java.util.*;
 
+/**
+ * An implementation of {@link ActionFilter} that passively listens for OpenSearch
+ * queries and persists the queries to the UBI store.
+ */
 public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
     private static final Logger LOGGER = LogManager.getLogger(UserBehaviorInsightsActionFilter.class);
@@ -40,6 +44,11 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
     private final Client client;
     private final ThreadPool threadPool;
 
+    /**
+     * Creates a new filter.
+     * @param client An OpenSearch {@link Client}.
+     * @param threadPool The OpenSearch {@link ThreadPool}.
+     */
     public UserBehaviorInsightsActionFilter(Client client, ThreadPool threadPool) {
         this.client = client;
         this.threadPool = threadPool;
@@ -181,6 +190,12 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
     }
 
+    /**
+     * Persist the query to the UBI store.
+     * @param storeName The name of the UBI store.
+     * @param queryRequest The {@link QueryRequest} that initiated the query.
+     * @param queryResponse The {@link QueryResponse} that resulted from the query.
+     */
     public void persistQuery(final String storeName, final QueryRequest queryRequest, QueryResponse queryResponse) {
 
         LOGGER.info("Writing query ID {} with response ID {}",
