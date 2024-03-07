@@ -13,6 +13,9 @@ import org.opensearch.ubi.events.Event;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * An implementation of {@link EventQueue} that uses an in-memory list.
+ */
 public class InternalQueue implements EventQueue {
 
     private static final List<Event> indexRequests = new LinkedList<>();

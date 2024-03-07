@@ -38,13 +38,17 @@ import java.util.*;
 
 import static org.opensearch.rest.RestRequest.Method.*;
 
+/**
+ * The REST handler for User Behavior Insights. The handler provides the
+ * REST interface for interacting with UBI stores and for storing client-side events.
+ */
 public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
     private static final Logger LOGGER = LogManager.getLogger(UserBehaviorInsightsRestHandler.class);
 
     private static final String EVENTS_MAPPING_FILE = "/events-mapping.json";
     private static final String QUERIES_MAPPING_FILE = "/queries-mapping.json";
-    public static final int VERSION = 1;
+    private static final int VERSION = 1;
 
     @Override
     public String getName() {
