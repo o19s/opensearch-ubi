@@ -73,6 +73,7 @@ product_sort|625
 type_filter|613
 logout|408
 
+
 ## Sample Search Odyssy
 In the query log:
 ```sql
@@ -81,7 +82,7 @@ from .ubi_log_queries
 where query_id ='0b72b056-294c-4d3b-9a4b-1468b4e9cb93'
 order by timestamp
 ```
-(In this generated data, the `query` field is plain text; however in the real implementation the query will be in internal OS formatting of the query and parameters.)
+(In this generated data, the `query` field is plain text; however in the real implementation the query will be in the internal DSL of the query and parameters.)
 hits|query_response_id|query_id|user_id|query|session_id|timestamp
 ---|---|---|---|---|---|---
 {id=1377142}|14039d3e-b91d-4cf8-a11b-55d31d14d7ae|14039d3e-b91d-4cf8-a11b-55d31d14d7ae|172_073f163d-b2d0-401b-b7fa-b060834350ee|Virtual flexibility systematic|6044bc19-78da-40d5-8e7b-725d00dd2a78_1916|1.8079822E9
@@ -114,62 +115,63 @@ query_id|action_name|message_type|message|event_attributes.data.data_id| event_a
 ## User sessions
 ```sql
 select 
-	user_id, action_name, message_type, message
+	user_id, session_id, query_id, action_name, message_type, message, event_attributes.data.data_type, timestamp 
 from .ubi_log_events
-where query_id ='14039d3e-b91d-4cf8-a11b-55d31d14d7ae'
+where user_id ='17_a09194d2-6f28-4844-b38e-263b8435784a'
 order by timestamp
+
 ```
 
 * Note that each new session starts with a login.
 
-action_name|message_type|message|session_id
----|---|---|---|
-new_user_entry|ERROR|Profit-focused object-oriented pricing structure|a66d71cf-20f0-4e14-828c-4d15499b2776_1912
-login|PURCHASE|Pre-emptive global initiative|a66d71cf-20f0-4e14-828c-4d15499b2776_1912
-product_sort|INFO||a66d71cf-20f0-4e14-828c-4d15499b2776_1912
-type_filter|INFO||a66d71cf-20f0-4e14-828c-4d15499b2776_1912
-product_hover|INFO|Fundamental fault-tolerant superstructure|a66d71cf-20f0-4e14-828c-4d15499b2776_1912
-brand_filter|INFO|Optional client-server attitude|a66d71cf-20f0-4e14-828c-4d15499b2776_1912
-on_search|INFO|optimiza interfaces intuitivas|a66d71cf-20f0-4e14-828c-4d15499b2776_1912
-product_sort|PURCHASE|polÃ­tica holÃ­stica administrado|a66d71cf-20f0-4e14-828c-4d15499b2776_1912
-brand_filter|INFO||a66d71cf-20f0-4e14-828c-4d15499b2776_1912
-type_filter|REJECT||a66d71cf-20f0-4e14-828c-4d15499b2776_1912
-product_hover|INFO||a66d71cf-20f0-4e14-828c-4d15499b2776_1912
-product_hover|REJECT||a66d71cf-20f0-4e14-828c-4d15499b2776_1912
-logout|ERROR|Operative exuding algorithm|a66d71cf-20f0-4e14-828c-4d15499b2776_1912
-login|PURCHASE||9710f6d9-b0de-418c-bea0-92aec33f0143_1913
-product_hover|INFO|software tolerancia cero extendido|9710f6d9-b0de-418c-bea0-92aec33f0143_1913
-product_sort|PURCHASE|monitorizar 6ta generaciÃ³n de arquitectura abierta|9710f6d9-b0de-418c-bea0-92aec33f0143_1913
-product_sort|INFO||9710f6d9-b0de-418c-bea0-92aec33f0143_1913
-button_click|ERROR||9710f6d9-b0de-418c-bea0-92aec33f0143_1913
-login|PURCHASE|Distributed 3rdgeneration groupware|02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-on_search|INFO|monetiza servicios web revolucionarias|02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-brand_filter|WARN|Ergonomic systemic approach|02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-product_sort|INFO|array orientada a soluciones orgÃ¡nico|02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-type_filter|INFO|instalaciÃ³n estÃ¡tica diverso|02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-brand_filter|REJECT|codificar explÃ­cita universal|02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-product_hover|INFO||02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-product_hover|REJECT|conglomeraciÃ³n alto nivel con ingenierÃ­a inversa|02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-type_filter|INFO||02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-product_sort|INFO|Intuitive modular moderator|02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-product_hover|WARN|modelo no-volÃ¡til basado en objetos|02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-brand_filter|PURCHASE||02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-product_sort|ERROR||02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-product_sort|REJECT|Reactive methodical pricing structure|02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-type_filter|INFO||02bd54ab-a362-4ebb-a5bc-f083963dc3b5_1914
-login|REJECT||6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
-on_search|WARN|Consectetur enim sunt laborum adipisci occaecati reiciendis.|6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
-product_hover|WARN||6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
-brand_filter|INFO||6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
-brand_filter|INFO||6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
-type_filter|INFO||6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
-product_hover|INFO|migraciÃ³n tangible programable|6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
-type_filter|PURCHASE|Team-oriented tangible open system|6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
-product_hover|PURCHASE||6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
-product_hover|INFO||6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
-product_hover|WARN||6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
-on_search|PURCHASE|Virtual systematic flexibility|6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
-logout|ERROR||6e589ef6-817d-4b94-b3ba-502829b7aa8d_1915
+user_id|session_id|query_id|action_name|message_type|message|event_attributes.data.data_type|timestamp
+---|---|---|---|---|---|---|---
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160||new_user_entry|WARN|||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160||login|WARN|estructura de precios global balanceado||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160||product_sort|REJECT||product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160||product_purchase|PURCHASE|instalaciÃ³n neutral operativo|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160||product_purchase|PURCHASE||product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160||brand_filter|INFO|Persistent zero-defect standardization||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160||product_sort|PURCHASE|Cloned systemic groupware|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160||product_hover|PURCHASE|Vision-oriented dedicated ability|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160||product_sort|INQUERY|data-warehouse dedicada enfocado a la calidad|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160|1393718a-2b20-4187-b9cd-08bea8d98ab9|on_search|INFO|Optio id quis alias at.|query|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160|1393718a-2b20-4187-b9cd-08bea8d98ab9|product_purchase|INQUERY|superestructura optimizada progresivo|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160|1393718a-2b20-4187-b9cd-08bea8d98ab9|button_click|INFO|||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160|1393718a-2b20-4187-b9cd-08bea8d98ab9|product_purchase|PURCHASE||product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|728cf0da-6dc3-43ad-81bf-73c411555bbf_160|1393718a-2b20-4187-b9cd-08bea8d98ab9|logout|INFO|||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161||login|INFO|Secured tertiary access||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161||product_click|INQUERY|moderador innovadora preventivo|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161||brand_filter|ERROR|utilizaciÃ³n basado en contenido preventivo||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161||brand_filter|INFO|Devolved impactful hardware||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161|99336ca5-538d-4823-9c7a-3c438b0cfab6|on_search|WARN|w00t|query|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161|99336ca5-538d-4823-9c7a-3c438b0cfab6|brand_filter|WARN|||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161|99336ca5-538d-4823-9c7a-3c438b0cfab6|product_purchase|INQUERY|Centralized uniform alliance|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161|99336ca5-538d-4823-9c7a-3c438b0cfab6|button_click|INFO|Fully-configurable zero administration instruction set||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161|99336ca5-538d-4823-9c7a-3c438b0cfab6|button_click|INFO|||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161|99336ca5-538d-4823-9c7a-3c438b0cfab6|product_hover|PURCHASE||product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161|8ec9c322-bf44-4f72-954b-cc23ec7e0133|on_search|INFO|Consectetur enim sunt laborum adipisci occaecati reiciendis.|query|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161|7bff4fe6-3b27-470e-b664-da62e6a5c0dc|on_search|INFO|reinvent cutting-edge e-commerce|query|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161|7bff4fe6-3b27-470e-b664-da62e6a5c0dc|product_sort|INQUERY||product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161|7bff4fe6-3b27-470e-b664-da62e6a5c0dc|product_hover|INQUERY|Fundamental encompassing policy|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|a049e72c-cf15-4abf-bd7b-4a9a3da5c045_161|7bff4fe6-3b27-470e-b664-da62e6a5c0dc|type_filter|WARN|Proactive scalable customer loyalty||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162||login|WARN|||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162||product_sort|PURCHASE|infraestructura ejecutiva integrado|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162||product_hover|PURCHASE|conjunto regional de primera lÃ­nea|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162||brand_filter|WARN|||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162||product_sort|PURCHASE|funcionalidad innovadora enfocado a ganancias|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162||product_hover|REJECT|enfoque metÃ³dica balanceado|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162||product_hover|INQUERY||product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162||type_filter|INFO|||2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162|aa14a24d-0b17-4019-9804-05cf3f993bd1|on_search|INFO|utiliza portales de clase mundial|query|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162|5150a3b6-d13f-475f-9e52-5a2e5b95b5c2|on_search|WARN|agrega usuarios dinÃ¡micas|query|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162|5150a3b6-d13f-475f-9e52-5a2e5b95b5c2|product_hover|INQUERY||product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162|5150a3b6-d13f-475f-9e52-5a2e5b95b5c2|product_hover|REJECT||product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162|5150a3b6-d13f-475f-9e52-5a2e5b95b5c2|product_hover|INQUERY|actitud didÃ¡ctica proactivo|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162|5150a3b6-d13f-475f-9e52-5a2e5b95b5c2|product_sort|INQUERY|concepto 24/7 versÃ¡til|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162|5150a3b6-d13f-475f-9e52-5a2e5b95b5c2|product_click|INQUERY|Optional value-added methodology|product|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162|f2440592-bc96-4902-9b45-ce940044944f|on_search|INFO|Consectetur enim sunt laborum adipisci occaecati reiciendis.|query|2027-04-17 10:16:45
+17_a09194d2-6f28-4844-b38e-263b8435784a|58fc5768-2a8a-4a0a-b1b4-7d658b0a66a4_162|f2440592-bc96-4902-9b45-ce940044944f|logout|INFO|Optional reciprocal hub||2027-04-17 10:16:45
 
 ## List user sessions that logged out without any queries
 - This query denotes users without a query_id.  Note that this could happen if the client side is not passing the returned query to other events.
