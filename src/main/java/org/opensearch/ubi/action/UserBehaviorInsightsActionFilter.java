@@ -213,7 +213,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
         final String value = task.getHeader(header.getHeader());
 
-        if(value == null || value.trim().isEmpty()) {
+        if(value == null || value.trim().isEmpty() || value.equals("null")) {
             return defaultValue;
         } else {
             return value;
