@@ -6,12 +6,12 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi.events;
+package com.o19s.ubi.events;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.ubi.events.queues.EventQueue;
-import org.opensearch.ubi.events.queues.InternalQueue;
+import com.o19s.ubi.events.queues.EventQueue;
+import com.o19s.ubi.events.queues.InternalQueue;
 
 /**
  * Base class for managing client-side events.
