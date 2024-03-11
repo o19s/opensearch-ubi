@@ -1,5 +1,5 @@
 ---
-name: � Proposal
+name: Proposal
 about: Suggest an idea for a specific feature you wish to propose to the community for comment
 title: '[PROPOSAL]'
 labels: proposal
