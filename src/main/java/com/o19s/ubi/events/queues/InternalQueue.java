@@ -6,7 +6,9 @@
  * compatible open source license.
  */
 
-package com.o19s.ubi.model.events.queues;
+package com.o19s.ubi.events.queues;
+
+import com.o19s.ubi.model.events.queues.Queue;
 
 import java.util.LinkedList;
 import java.util.List;

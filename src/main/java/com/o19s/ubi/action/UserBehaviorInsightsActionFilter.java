@@ -9,6 +9,7 @@
 package com.o19s.ubi.action;
 
 import com.o19s.ubi.UserBehaviorInsightsPlugin;
+import com.o19s.ubi.events.EventManager;
 import com.o19s.ubi.model.HeaderConstants;
 import com.o19s.ubi.model.QueryRequest;
 import com.o19s.ubi.model.QueryResponse;
@@ -31,7 +32,6 @@ import org.opensearch.core.action.ActionResponse;
 import org.opensearch.search.SearchHit;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
-import com.o19s.ubi.model.events.EventManager;
 import com.o19s.ubi.OpenSearchEventManager;
 
 import java.util.*;
@@ -130,19 +130,13 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
                             }
 
-                            try {
+                            final QueryResponse queryResponse = new QueryResponse(queryId, queryResponseId, queryResponseHitIds);
+                            final QueryRequest queryRequest = new QueryRequest(storeName, queryId, query, userId, sessionId, queryResponse);
 
-                                final QueryResponse queryResponse = new QueryResponse(queryId, queryResponseId, queryResponseHitIds);
-                                final QueryRequest queryRequest = new QueryRequest(storeName, queryId, query, userId, sessionId, queryResponse);
+                            // Queue this for writing to the UBI store.
+                            eventManager.add(queryRequest);
 
-                                // Queue this for writing to the UBI store.
-                                eventManager.add(queryRequest);
-
-                            } catch (Exception ex) {
-                                // TODO: Handle this.
-                                LOGGER.error("Unable to persist query.", ex);
-                            }
-
+                            // Add the query_id to the response headers.
                             threadPool.getThreadContext().addResponseHeader("query_id", queryId);
 
                             final long elapsedTime = System.currentTimeMillis() - startTime;

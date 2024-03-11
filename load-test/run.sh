@@ -10,7 +10,7 @@ curl -X PUT "http://localhost:9200/_plugins/ubi/mystore?index=ecommerce"
 ../index-chorus-data.sh `realpath ../../chorus-opensearch-edition`
 
 # Insert events and queries.
-locust -f load-test.py --headless -u 1 -r 1 --run-time 30s --host http://localhost:9200
+locust -f load-test.py --headless -u 1 -r 1 --run-time 10s --host http://localhost:9200
 
 # Let events index.
 sleep 10

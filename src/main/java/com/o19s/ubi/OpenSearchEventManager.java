@@ -8,9 +8,9 @@
 
 package com.o19s.ubi;
 
+import com.o19s.ubi.events.Event;
+import com.o19s.ubi.events.EventManager;
 import com.o19s.ubi.model.QueryRequest;
-import com.o19s.ubi.model.events.Event;
-import com.o19s.ubi.model.events.EventManager;
 import com.o19s.ubi.utils.UbiUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,12 +58,12 @@ public class OpenSearchEventManager extends EventManager {
 
         }
 
-        if(queryRequestQueue.size() > 0) {
+        if(queryRequestsQueue.size() > 0) {
 
             final BulkRequest queryRequestsBulkRequest = new BulkRequest();
-            LOGGER.info("Bulk inserting " + queryRequestQueue.size() + " UBI queries");
+            LOGGER.info("Bulk inserting " + queryRequestsQueue.size() + " UBI queries");
 
-            for(final QueryRequest queryRequest : queryRequestQueue.get()) {
+            for(final QueryRequest queryRequest : queryRequestsQueue.get()) {
 
                 LOGGER.info("Writing query ID {} with response ID {}",
                         queryRequest.getQueryId(), queryRequest.getQueryResponse().getQueryResponseId());
@@ -89,7 +89,7 @@ public class OpenSearchEventManager extends EventManager {
 
             }
 
-            queryRequestQueue.clear();
+            queryRequestsQueue.clear();
             client.bulk(queryRequestsBulkRequest);
 
         }
@@ -103,7 +103,7 @@ public class OpenSearchEventManager extends EventManager {
 
     @Override
     public void add(final QueryRequest queryRequest) {
-        queryRequestQueue.add(queryRequest);
+        queryRequestsQueue.add(queryRequest);
     }
 
     /**

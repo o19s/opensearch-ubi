@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.o19s.ubi.UserBehaviorInsightsPlugin;
+import com.o19s.ubi.events.Event;
 import com.o19s.ubi.model.HeaderConstants;
 import com.o19s.ubi.model.SettingsConstants;
 import com.o19s.ubi.utils.UbiUtils;
@@ -31,7 +32,7 @@ import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
-import com.o19s.ubi.model.events.Event;
+
 import com.o19s.ubi.OpenSearchEventManager;
 
 import java.io.IOException;
