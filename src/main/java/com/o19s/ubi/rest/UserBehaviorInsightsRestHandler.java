@@ -209,44 +209,32 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
     private RestChannelConsumer post(final NodeClient nodeClient, final String storeName, final RestRequest restRequest) throws IOException {
 
-        if(storeName == null || storeName.isEmpty()) {
+        try {
+
+            final String eventJson = restRequest.content().utf8ToString();
+            final String eventJsonWithTimestamp = setEventTimestamp(eventJson);
+
+            LOGGER.info("Indexing UBI event into store {}", storeName);
+            final String eventsIndexName = UbiUtils.getEventsIndexName(storeName);
+
+            final Event event = new Event(eventsIndexName, eventJsonWithTimestamp);
+            OpenSearchEventManager.getInstance(nodeClient).add(event);
+
+        } catch (JsonProcessingException ex) {
+            LOGGER.error("Unable to get/set timestamp on UBI event.", ex);
 
             final XContentBuilder builder = XContentType.JSON.contentBuilder();
-            builder.startObject().field("error", "a store name is required");
+            builder.startObject().field("error", "unable to set event timestamp");
             builder.endObject();
 
             return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST, builder));
-
-        } else {
-
-            try {
-
-                final String eventJson = restRequest.content().utf8ToString();
-                final String eventJsonWithTimestamp = setEventTimestamp(eventJson);
-
-                LOGGER.info("Indexing UBI event into store {}", storeName);
-                final String eventsIndexName = UbiUtils.getEventsIndexName(storeName);
-
-                final Event event = new Event(eventsIndexName, eventJsonWithTimestamp);
-                OpenSearchEventManager.getInstance(nodeClient).add(event);
-
-            } catch (JsonProcessingException ex) {
-                LOGGER.error("Unable to get/set timestamp on UBI event.", ex);
-
-                final XContentBuilder builder = XContentType.JSON.contentBuilder();
-                builder.startObject().field("error", "unable to set event timestamp");
-                builder.endObject();
-
-                return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST, builder));
-            }
-
-            final XContentBuilder builder = XContentType.JSON.contentBuilder();
-            builder.startObject().field("status", "received");
-            builder.endObject();
-
-            return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
-
         }
+
+        final XContentBuilder builder = XContentType.JSON.contentBuilder();
+        builder.startObject().field("status", "received");
+        builder.endObject();
+
+        return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
 
     }
 
