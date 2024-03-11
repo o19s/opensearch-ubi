@@ -6,12 +6,16 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi.rest;
+package com.o19s.ubi.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.o19s.ubi.UserBehaviorInsightsPlugin;
+import com.o19s.ubi.events.Event;
+import com.o19s.ubi.model.HeaderConstants;
+import com.o19s.ubi.model.SettingsConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.admin.indices.create.CreateIndexRequest;
@@ -27,12 +31,8 @@ import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
-import org.opensearch.ubi.UserBehaviorInsightsPlugin;
-import org.opensearch.ubi.events.Event;
-import org.opensearch.ubi.events.OpenSearchEventManager;
-import org.opensearch.ubi.model.HeaderConstants;
-import org.opensearch.ubi.model.SettingsConstants;
-import org.opensearch.ubi.utils.UbiUtils;
+import com.o19s.ubi.events.OpenSearchEventManager;
+import com.o19s.ubi.utils.UbiUtils;
 
 import java.io.IOException;
 import java.util.HashSet;
