@@ -13,8 +13,7 @@ opensearchplugin {
 }
 
 group = 'org.opensearch'
-//version = "${ubiVersion}-os${opensearchVersion}"
-version = "${ubiVersion}"
+version = "${ubiVersion}-os${opensearchVersion}"
 
 // disabling some unnecessary validations for this plugin
 testingConventions.enabled = false
