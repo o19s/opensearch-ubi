@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi.model.events.queues;
+package com.o19s.ubi.model.events.queues;
 
 import java.util.LinkedList;
 import java.util.List;

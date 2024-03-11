@@ -6,16 +6,18 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi.model.events;
+package com.o19s.ubi;
 
+import com.o19s.ubi.model.QueryRequest;
+import com.o19s.ubi.model.events.Event;
+import com.o19s.ubi.model.events.EventManager;
+import com.o19s.ubi.utils.UbiUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.bulk.BulkRequest;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.client.Client;
 import org.opensearch.common.xcontent.XContentType;
-import org.opensearch.ubi.model.QueryRequest;
-import org.opensearch.ubi.utils.UbiUtils;
 
 import java.util.HashMap;
 import java.util.Map;

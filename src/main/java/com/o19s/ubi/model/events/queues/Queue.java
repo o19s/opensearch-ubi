@@ -6,9 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi.model.events.queues;
-
-import org.opensearch.ubi.model.events.Event;
+package com.o19s.ubi.model.events.queues;
 
 import java.util.List;
 
@@ -18,8 +16,8 @@ import java.util.List;
 public interface Queue<T> {
 
     /**
-     * Add an {@link Event event} to the queue.
-     * @param event The {@link Event event} to add to the queue.
+     * Add an object to the queue.
+     * @param event The object to add to the queue.
      */
     void add(T event);
 

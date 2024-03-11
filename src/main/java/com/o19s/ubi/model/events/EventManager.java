@@ -6,21 +6,16 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi.model.events;
+package com.o19s.ubi.model.events;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.opensearch.ubi.model.events.queues.Queue;
-import org.opensearch.ubi.model.events.queues.InternalQueue;
-import org.opensearch.ubi.model.QueryRequest;
+import com.o19s.ubi.model.QueryRequest;
+import com.o19s.ubi.model.events.queues.InternalQueue;
+import com.o19s.ubi.model.events.queues.Queue;
 
 /**
  * Base class for managing client-side events.
  */
 public abstract class EventManager {
-
-    @SuppressWarnings("unused")
-    private final Logger LOGGER = LogManager.getLogger(EventManager.class);
 
     /**
      * The {@link Queue queue} that stores the client-side events.

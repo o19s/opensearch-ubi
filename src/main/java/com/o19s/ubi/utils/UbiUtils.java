@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi.utils;
+package com.o19s.ubi.utils;
 
 import org.opensearch.common.util.io.Streams;
 

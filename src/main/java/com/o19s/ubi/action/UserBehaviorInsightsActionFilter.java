@@ -6,8 +6,14 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi.action;
+package com.o19s.ubi.action;
 
+import com.o19s.ubi.UserBehaviorInsightsPlugin;
+import com.o19s.ubi.model.HeaderConstants;
+import com.o19s.ubi.model.QueryRequest;
+import com.o19s.ubi.model.QueryResponse;
+import com.o19s.ubi.model.SettingsConstants;
+import com.o19s.ubi.utils.UbiUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionRequest;
@@ -25,21 +31,10 @@ import org.opensearch.core.action.ActionResponse;
 import org.opensearch.search.SearchHit;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.ubi.UserBehaviorInsightsPlugin;
-import org.opensearch.ubi.model.events.EventManager;
-import org.opensearch.ubi.model.events.OpenSearchEventManager;
-import org.opensearch.ubi.model.HeaderConstants;
-import org.opensearch.ubi.model.QueryRequest;
-import org.opensearch.ubi.model.QueryResponse;
-import org.opensearch.ubi.model.SettingsConstants;
-import org.opensearch.ubi.utils.UbiUtils;
+import com.o19s.ubi.model.events.EventManager;
+import com.o19s.ubi.OpenSearchEventManager;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * An implementation of {@link ActionFilter} that passively listens for OpenSearch
@@ -104,7 +99,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                         final String index = getStoreSettings(storeName, SettingsConstants.INDEX);
                         final String idField = getStoreSettings(storeName, SettingsConstants.ID_FIELD);
 
-                        LOGGER.info("Using id_field [{}] of index [{}] for UBI query.", idField, index);
+                        LOGGER.debug("Using id_field [{}] of index [{}] for UBI query.", idField, index);
 
                         // Only consider this search if the index being searched matches the store's index setting.
                         if (Arrays.asList(searchRequest.indices()).contains(index)) {
@@ -141,7 +136,6 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                                 final QueryRequest queryRequest = new QueryRequest(storeName, queryId, query, userId, sessionId, queryResponse);
 
                                 // Queue this for writing to the UBI store.
-                                LOGGER.info("Queueing query request");
                                 eventManager.add(queryRequest);
 
                             } catch (Exception ex) {
@@ -217,7 +211,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
         final String value = task.getHeader(header.getHeader());
 
-        if(value == null || value.trim().isEmpty()) {
+        if(value == null || value.trim().isEmpty() || value.equals("null")) {
             return defaultValue;
         } else {
             return value;
