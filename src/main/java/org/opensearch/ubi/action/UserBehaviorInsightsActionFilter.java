@@ -26,6 +26,8 @@ import org.opensearch.search.SearchHit;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.ubi.UserBehaviorInsightsPlugin;
+import org.opensearch.ubi.model.events.EventManager;
+import org.opensearch.ubi.model.events.OpenSearchEventManager;
 import org.opensearch.ubi.model.HeaderConstants;
 import org.opensearch.ubi.model.QueryRequest;
 import org.opensearch.ubi.model.QueryResponse;
@@ -49,6 +51,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
     private final Client client;
     private final ThreadPool threadPool;
+    private final EventManager eventManager;
 
     /**
      * Creates a new filter.
@@ -58,6 +61,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
     public UserBehaviorInsightsActionFilter(Client client, ThreadPool threadPool) {
         this.client = client;
         this.threadPool = threadPool;
+        this.eventManager = OpenSearchEventManager.getInstance(client);
     }
 
     @Override
@@ -90,15 +94,15 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
                     // Get info from the headers.
                     final String queryId = getHeaderValue(HeaderConstants.QUERY_ID_HEADER, UUID.randomUUID().toString(), task);
-                    final String eventStore = getHeaderValue(HeaderConstants.EVENT_STORE_HEADER, "", task);
+                    final String storeName = getHeaderValue(HeaderConstants.EVENT_STORE_HEADER, "", task);
                     final String userId = getHeaderValue(HeaderConstants.USER_ID_HEADER, "", task);
                     final String sessionId = getHeaderValue(HeaderConstants.SESSION_ID_HEADER, "", task);
 
                     // If there is no event store header, ignore this search.
-                    if(!"".equals(eventStore)) {
+                    if(!"".equals(storeName)) {
 
-                        final String index = getStoreSettings(eventStore, SettingsConstants.INDEX);
-                        final String idField = getStoreSettings(eventStore, SettingsConstants.ID_FIELD);
+                        final String index = getStoreSettings(storeName, SettingsConstants.INDEX);
+                        final String idField = getStoreSettings(storeName, SettingsConstants.ID_FIELD);
 
                         LOGGER.info("Using id_field [{}] of index [{}] for UBI query.", idField, index);
 
@@ -133,10 +137,12 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
                             try {
 
-                                // Persist the query to the backend.
-                                persistQuery(eventStore,
-                                        new QueryRequest(queryId, query, userId, sessionId),
-                                        new QueryResponse(queryId, queryResponseId, queryResponseHitIds));
+                                final QueryResponse queryResponse = new QueryResponse(queryId, queryResponseId, queryResponseHitIds);
+                                final QueryRequest queryRequest = new QueryRequest(storeName, queryId, query, userId, sessionId, queryResponse);
+
+                                // Queue this for writing to the UBI store.
+                                LOGGER.info("Queueing query request");
+                                eventManager.add(queryRequest);
 
                             } catch (Exception ex) {
                                 // TODO: Handle this.
@@ -145,24 +151,22 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
                             threadPool.getThreadContext().addResponseHeader("query_id", queryId);
 
-                            //}
-
                             final long elapsedTime = System.currentTimeMillis() - startTime;
                             LOGGER.info("UBI search request filter took {} ms", elapsedTime);
 
                         }
 
+                        LOGGER.info("Setting and exposing query_id {}", queryId);
+                        //HACK: this should be set in the OpenSearch config (to send to the client code just once),
+                        // and not on every single search response,
+                        // but that server setting doesn't appear to be exposed.
+                        threadPool.getThreadContext().addResponseHeader("Access-Control-Expose-Headers", "query_id");
+                        threadPool.getThreadContext().addResponseHeader("query_id", queryId);
+
+                        final long elapsedTime = System.currentTimeMillis() - startTime;
+                        LOGGER.info("UBI search request filter took {} ms", elapsedTime);
+
                     }
-
-                    LOGGER.info("Setting and exposing query_id {}", queryId);
-                    //HACK: this should be set in the OpenSearch config (to send to the client code just once),
-                    // and not on every single search response,
-                    // but that server setting doesn't appear to be exposed.
-                    threadPool.getThreadContext().addResponseHeader("Access-Control-Expose-Headers", "query_id");
-                    threadPool.getThreadContext().addResponseHeader("query_id", queryId);
-
-                    final long elapsedTime = System.currentTimeMillis() - startTime;
-                    LOGGER.info("UBI search request filter took {} ms", elapsedTime);
 
                 }
 

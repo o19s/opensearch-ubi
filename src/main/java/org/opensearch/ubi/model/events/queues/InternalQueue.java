@@ -6,22 +6,20 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi.events.queues;
-
-import org.opensearch.ubi.events.Event;
+package org.opensearch.ubi.model.events.queues;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * An implementation of {@link EventQueue} that uses an in-memory list.
+ * An implementation of {@link Queue} that uses an in-memory list.
  */
-public class InternalQueue implements EventQueue {
+public class InternalQueue<T> implements Queue<T> {
 
-    private static final List<Event> indexRequests = new LinkedList<>();
+    private final List<T> indexRequests = new LinkedList<>();
 
     @Override
-    public void add(Event event) {
+    public void add(T event) {
         indexRequests.add(event);
     }
 
@@ -31,7 +29,7 @@ public class InternalQueue implements EventQueue {
     }
 
     @Override
-    public List<Event> get() {
+    public List<T> get() {
         return indexRequests;
     }
 

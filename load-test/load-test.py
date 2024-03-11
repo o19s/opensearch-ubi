@@ -22,3 +22,12 @@ class OpenSearchUBIClient(HttpUser):
         }
 
         self.client.post("/_plugins/ubi/mystore", headers=headers, json=data)
+
+    @task
+    def queries_task(self):
+        headers = {
+            "Content-Type": "application/json",
+            "X-ubi-store": "mystore"
+        }
+
+        self.client.get("/ecommerce/_search", headers=headers)

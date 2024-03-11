@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-CHORUS_HOME=`realpath ../chorus-opensearch-edition`
+CHORUS_HOME=${1:-`realpath ../chorus-opensearch-edition`}
 echo "Using CHORUS_HOME = ${CHORUS_HOME}"
 
 TEMP_FILE=`mktemp`

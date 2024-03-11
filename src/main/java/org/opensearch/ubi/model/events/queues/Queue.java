@@ -6,22 +6,22 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi.events.queues;
+package org.opensearch.ubi.model.events.queues;
 
-import org.opensearch.ubi.events.Event;
+import org.opensearch.ubi.model.events.Event;
 
 import java.util.List;
 
 /**
  * A queue that stores events prior to being indexed.
  */
-public interface EventQueue {
+public interface Queue<T> {
 
     /**
      * Add an {@link Event event} to the queue.
      * @param event The {@link Event event} to add to the queue.
      */
-    void add(Event event);
+    void add(T event);
 
     /**
      * Remove all events from the queue.
@@ -32,7 +32,7 @@ public interface EventQueue {
      * Get a list of items in the queue.
      * @return A list of items in the queue.
      */
-    List<Event> get();
+    List<T> get();
 
     /**
      * Gets the count of items on the queue.

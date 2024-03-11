@@ -13,25 +13,40 @@ package org.opensearch.ubi.model;
  */
 public class QueryRequest {
 
+    private final String storeName;
     private final long timestamp;
     private final String queryId;
     private final String query;
     private final String userId;
     private final String sessionId;
+    private final QueryResponse queryResponse;
 
     /**
      * Creates a query request.
+     * @param storeName The name of the UBI store to hold this query request.
      * @param queryId The ID of the query.
      * @param query The query run by OpenSearch.
      * @param userId The ID of the user that initiated the query.
      * @param sessionId The ID of the session under which the query was run.
+     * @param queryResponse The {@link QueryResponse} for this query request.
      */
-    public QueryRequest(final String queryId, final String query, final String userId, final String sessionId) {
+    public QueryRequest(final String storeName, final String queryId, final String query,
+                        final String userId, final String sessionId, final QueryResponse queryResponse) {
+        this.storeName = storeName;
         this.timestamp = System.currentTimeMillis();
         this.queryId = queryId;
         this.query = query;
         this.userId = userId;
         this.sessionId = sessionId;
+        this.queryResponse = queryResponse;
+    }
+
+    /**
+     * Gets the name of the UBI store.
+     * @return The name of the UBI store.
+     */
+    public String getStoreName() {
+        return storeName;
     }
 
     /**
@@ -72,6 +87,14 @@ public class QueryRequest {
      */
     public String getSessionId() {
         return sessionId;
+    }
+
+    /**
+     * Gets the query response for this query request.
+     * @return The {@link QueryResponse} for this query request.
+     */
+    public QueryResponse getQueryResponse() {
+        return queryResponse;
     }
 
 }
