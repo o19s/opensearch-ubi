@@ -6,8 +6,14 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi.action;
+package com.o19s.ubi.action;
 
+import com.o19s.ubi.UserBehaviorInsightsPlugin;
+import com.o19s.ubi.model.HeaderConstants;
+import com.o19s.ubi.model.QueryRequest;
+import com.o19s.ubi.model.QueryResponse;
+import com.o19s.ubi.model.SettingsConstants;
+import com.o19s.ubi.utils.UbiUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionRequest;
@@ -25,12 +31,6 @@ import org.opensearch.core.action.ActionResponse;
 import org.opensearch.search.SearchHit;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.ubi.UserBehaviorInsightsPlugin;
-import org.opensearch.ubi.model.HeaderConstants;
-import org.opensearch.ubi.model.QueryRequest;
-import org.opensearch.ubi.model.QueryResponse;
-import org.opensearch.ubi.model.SettingsConstants;
-import org.opensearch.ubi.utils.UbiUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;

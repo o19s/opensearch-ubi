@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi;
+package com.o19s.ubi;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,11 +32,11 @@ import org.opensearch.rest.RestHandler;
 import org.opensearch.rest.RestHeaderDefinition;
 import org.opensearch.script.ScriptService;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.ubi.action.UserBehaviorInsightsActionFilter;
-import org.opensearch.ubi.rest.UserBehaviorInsightsRestHandler;
-import org.opensearch.ubi.events.OpenSearchEventManager;
-import org.opensearch.ubi.model.HeaderConstants;
-import org.opensearch.ubi.model.SettingsConstants;
+import com.o19s.ubi.action.UserBehaviorInsightsActionFilter;
+import com.o19s.ubi.rest.UserBehaviorInsightsRestHandler;
+import com.o19s.ubi.events.OpenSearchEventManager;
+import com.o19s.ubi.model.HeaderConstants;
+import com.o19s.ubi.model.SettingsConstants;
 import org.opensearch.watcher.ResourceWatcherService;
 
 import java.util.ArrayList;
@@ -59,6 +59,9 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
 
     private ActionFilter userBehaviorLoggingFilter;
 
+    /**
+     * A map that caches store settings to avoid round-trip calls to the index.
+     */
     public static final Map<String, String> storeSettings = new HashMap<>();
 
     @Override

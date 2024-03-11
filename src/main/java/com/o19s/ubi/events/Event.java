@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.ubi.events;
+package com.o19s.ubi.events;
 
 /**
  * A client-side event.
