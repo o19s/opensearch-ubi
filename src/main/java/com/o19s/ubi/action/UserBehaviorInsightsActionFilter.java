@@ -9,6 +9,7 @@
 package com.o19s.ubi.action;
 
 import com.o19s.ubi.UserBehaviorInsightsPlugin;
+import com.o19s.ubi.events.EventManager;
 import com.o19s.ubi.model.HeaderConstants;
 import com.o19s.ubi.model.QueryRequest;
 import com.o19s.ubi.model.QueryResponse;
@@ -31,13 +32,9 @@ import org.opensearch.core.action.ActionResponse;
 import org.opensearch.search.SearchHit;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
+import com.o19s.ubi.OpenSearchEventManager;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * An implementation of {@link ActionFilter} that passively listens for OpenSearch
@@ -49,6 +46,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
     private final Client client;
     private final ThreadPool threadPool;
+    private final EventManager eventManager;
 
     /**
      * Creates a new filter.
@@ -58,6 +56,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
     public UserBehaviorInsightsActionFilter(Client client, ThreadPool threadPool) {
         this.client = client;
         this.threadPool = threadPool;
+        this.eventManager = OpenSearchEventManager.getInstance(client);
     }
 
     @Override
@@ -90,17 +89,17 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
                     // Get info from the headers.
                     final String queryId = getHeaderValue(HeaderConstants.QUERY_ID_HEADER, UUID.randomUUID().toString(), task);
-                    final String eventStore = getHeaderValue(HeaderConstants.EVENT_STORE_HEADER, "", task);
+                    final String storeName = getHeaderValue(HeaderConstants.EVENT_STORE_HEADER, "", task);
                     final String userId = getHeaderValue(HeaderConstants.USER_ID_HEADER, "", task);
                     final String sessionId = getHeaderValue(HeaderConstants.SESSION_ID_HEADER, "", task);
 
                     // If there is no event store header, ignore this search.
-                    if(!"".equals(eventStore)) {
+                    if(!"".equals(storeName)) {
 
-                        final String index = getStoreSettings(eventStore, SettingsConstants.INDEX);
-                        final String idField = getStoreSettings(eventStore, SettingsConstants.ID_FIELD);
+                        final String index = getStoreSettings(storeName, SettingsConstants.INDEX);
+                        final String idField = getStoreSettings(storeName, SettingsConstants.ID_FIELD);
 
-                        LOGGER.info("Using id_field [{}] of index [{}] for UBI query.", idField, index);
+                        LOGGER.debug("Using id_field [{}] of index [{}] for UBI query.", idField, index);
 
                         // Only consider this search if the index being searched matches the store's index setting.
                         if (Arrays.asList(searchRequest.indices()).contains(index)) {
@@ -131,38 +130,31 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
                             }
 
-                            try {
+                            final QueryResponse queryResponse = new QueryResponse(queryId, queryResponseId, queryResponseHitIds);
+                            final QueryRequest queryRequest = new QueryRequest(storeName, queryId, query, userId, sessionId, queryResponse);
 
-                                // Persist the query to the backend.
-                                persistQuery(eventStore,
-                                        new QueryRequest(queryId, query, userId, sessionId),
-                                        new QueryResponse(queryId, queryResponseId, queryResponseHitIds));
+                            // Queue this for writing to the UBI store.
+                            eventManager.add(queryRequest);
 
-                            } catch (Exception ex) {
-                                // TODO: Handle this.
-                                LOGGER.error("Unable to persist query.", ex);
-                            }
-
+                            // Add the query_id to the response headers.
                             threadPool.getThreadContext().addResponseHeader("query_id", queryId);
-
-                            //}
 
                             final long elapsedTime = System.currentTimeMillis() - startTime;
                             LOGGER.info("UBI search request filter took {} ms", elapsedTime);
 
                         }
 
+                        LOGGER.info("Setting and exposing query_id {}", queryId);
+                        //HACK: this should be set in the OpenSearch config (to send to the client code just once),
+                        // and not on every single search response,
+                        // but that server setting doesn't appear to be exposed.
+                        threadPool.getThreadContext().addResponseHeader("Access-Control-Expose-Headers", "query_id");
+                        threadPool.getThreadContext().addResponseHeader("query_id", queryId);
+
+                        final long elapsedTime = System.currentTimeMillis() - startTime;
+                        LOGGER.info("UBI search request filter took {} ms", elapsedTime);
+
                     }
-
-                    LOGGER.info("Setting and exposing query_id {}", queryId);
-                    //HACK: this should be set in the OpenSearch config (to send to the client code just once),
-                    // and not on every single search response,
-                    // but that server setting doesn't appear to be exposed.
-                    threadPool.getThreadContext().addResponseHeader("Access-Control-Expose-Headers", "query_id");
-                    threadPool.getThreadContext().addResponseHeader("query_id", queryId);
-
-                    final long elapsedTime = System.currentTimeMillis() - startTime;
-                    LOGGER.info("UBI search request filter took {} ms", elapsedTime);
 
                 }
 

@@ -16,6 +16,7 @@ import com.o19s.ubi.UserBehaviorInsightsPlugin;
 import com.o19s.ubi.events.Event;
 import com.o19s.ubi.model.HeaderConstants;
 import com.o19s.ubi.model.SettingsConstants;
+import com.o19s.ubi.utils.UbiUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.admin.indices.create.CreateIndexRequest;
@@ -31,22 +32,13 @@ import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
-import com.o19s.ubi.events.OpenSearchEventManager;
-import com.o19s.ubi.utils.UbiUtils;
+
+import com.o19s.ubi.OpenSearchEventManager;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
-import static org.opensearch.rest.RestRequest.Method.DELETE;
-import static org.opensearch.rest.RestRequest.Method.GET;
-import static org.opensearch.rest.RestRequest.Method.POST;
-import static org.opensearch.rest.RestRequest.Method.PUT;
-import static org.opensearch.rest.RestRequest.Method.TRACE;
+import static org.opensearch.rest.RestRequest.Method.*;
 
 /**
  * The REST handler for User Behavior Insights. The handler provides the

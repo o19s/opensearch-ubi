@@ -6,22 +6,20 @@
  * compatible open source license.
  */
 
-package com.o19s.ubi.events.queues;
-
-import com.o19s.ubi.events.Event;
+package com.o19s.ubi.model.events.queues;
 
 import java.util.List;
 
 /**
  * A queue that stores events prior to being indexed.
  */
-public interface EventQueue {
+public interface Queue<T> {
 
     /**
-     * Add an {@link Event event} to the queue.
-     * @param event The {@link Event event} to add to the queue.
+     * Add an object to the queue.
+     * @param event The object to add to the queue.
      */
-    void add(Event event);
+    void add(T event);
 
     /**
      * Remove all events from the queue.
@@ -32,7 +30,7 @@ public interface EventQueue {
      * Get a list of items in the queue.
      * @return A list of items in the queue.
      */
-    List<Event> get();
+    List<T> get();
 
     /**
      * Gets the count of items on the queue.
