@@ -37,7 +37,7 @@ public class OpenSearchEventManager extends EventManager {
     }
 
     @Override
-    public void process() {
+    public void processEvents() {
 
         if(eventsQueue.size() > 0) {
 
@@ -57,6 +57,11 @@ public class OpenSearchEventManager extends EventManager {
             client.bulk(eventsBulkRequest);
 
         }
+
+    }
+
+    @Override
+    public void processQueries() {
 
         if(queryRequestsQueue.size() > 0) {
 
@@ -104,6 +109,7 @@ public class OpenSearchEventManager extends EventManager {
     @Override
     public void add(final QueryRequest queryRequest) {
         queryRequestsQueue.add(queryRequest);
+        LOGGER.info("Size of queryRequestsQueue " + queryRequestsQueue.size());
     }
 
     /**

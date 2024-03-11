@@ -41,9 +41,14 @@ public abstract class EventManager {
     }
 
     /**
-     * Process the items on the queue by writing them to persistent storage.
+     * Process the events on the queue by writing them to persistent storage.
      */
-    public abstract void process();
+    public abstract void processEvents();
+
+    /**
+     * Process the queries on the queue by writing them to persistent storage.
+     */
+    public abstract void processQueries();
 
     /**
      * Add an event to the queue.
