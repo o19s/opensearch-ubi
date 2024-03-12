@@ -120,13 +120,16 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
             Supplier<RepositoriesService> repositoriesServiceSupplier
     ) {
 
-        // TODO Only start this if an OpenSearch store is already initialized.
-        // Otherwise, start it when a store is initialized.
+        // TODO: Allow the parameters of the scheduled tasks to be configurable.
 
         LOGGER.info("Creating UBI scheduled task to persist events.");
-        // TODO: Allow these time parameters to be configurable.
-        threadPool.scheduler().scheduleAtFixedRate(() -> {
-            OpenSearchEventManager.getInstance(client).process();
+        threadPool.scheduler().scheduleWithFixedDelay(() -> {
+            OpenSearchEventManager.getInstance(client).processEvents();
+        }, 0, 2000, TimeUnit.MILLISECONDS);
+
+        LOGGER.info("Creating UBI scheduled task to persist queries.");
+        threadPool.scheduler().scheduleWithFixedDelay(() -> {
+            OpenSearchEventManager.getInstance(client).processQueries();
         }, 0, 2000, TimeUnit.MILLISECONDS);
 
         // Initialize the action filter.

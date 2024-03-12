@@ -134,6 +134,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                             final QueryRequest queryRequest = new QueryRequest(storeName, queryId, query, userId, sessionId, queryResponse);
 
                             // Queue this for writing to the UBI store.
+                            LOGGER.trace("Queueing queryRequest for write");
                             eventManager.add(queryRequest);
 
                             // Add the query_id to the response headers.
@@ -142,18 +143,21 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                             final long elapsedTime = System.currentTimeMillis() - startTime;
                             LOGGER.info("UBI search request filter took {} ms", elapsedTime);
 
-                        }
+                            LOGGER.debug("Setting and exposing query_id {}", queryId);
+                            //HACK: this should be set in the OpenSearch config (to send to the client code just once),
+                            // and not on every single search response,
+                            // but that server setting doesn't appear to be exposed.
+                            threadPool.getThreadContext().addResponseHeader("Access-Control-Expose-Headers", "query_id");
 
-                        LOGGER.info("Setting and exposing query_id {}", queryId);
-                        //HACK: this should be set in the OpenSearch config (to send to the client code just once),
-                        // and not on every single search response,
-                        // but that server setting doesn't appear to be exposed.
-                        threadPool.getThreadContext().addResponseHeader("Access-Control-Expose-Headers", "query_id");
-                        threadPool.getThreadContext().addResponseHeader("query_id", queryId);
+                        } else {
+                            LOGGER.trace("Discarding query for UBI due to index name mismatch.");
+                        }
 
                         final long elapsedTime = System.currentTimeMillis() - startTime;
                         LOGGER.info("UBI search request filter took {} ms", elapsedTime);
 
+                    } else {
+                        LOGGER.trace("Discarding query for UBI due to missing store name.");
                     }
 
                 }

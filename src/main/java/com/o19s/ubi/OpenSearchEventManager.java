@@ -37,12 +37,12 @@ public class OpenSearchEventManager extends EventManager {
     }
 
     @Override
-    public void process() {
+    public void processEvents() {
 
         if(eventsQueue.size() > 0) {
 
             final BulkRequest eventsBulkRequest = new BulkRequest();
-            LOGGER.info("Bulk inserting " + eventsQueue.size() + " UBI events");
+            LOGGER.debug("Bulk inserting " + eventsQueue.size() + " UBI events");
 
             for (final Event event : eventsQueue.get()) {
 
@@ -58,14 +58,19 @@ public class OpenSearchEventManager extends EventManager {
 
         }
 
+    }
+
+    @Override
+    public void processQueries() {
+
         if(queryRequestsQueue.size() > 0) {
 
             final BulkRequest queryRequestsBulkRequest = new BulkRequest();
-            LOGGER.info("Bulk inserting " + queryRequestsQueue.size() + " UBI queries");
+            LOGGER.debug("Bulk inserting " + queryRequestsQueue.size() + " UBI queries");
 
             for(final QueryRequest queryRequest : queryRequestsQueue.get()) {
 
-                LOGGER.info("Writing query ID {} with response ID {}",
+                LOGGER.debug("Writing query ID {} with response ID {}",
                         queryRequest.getQueryId(), queryRequest.getQueryResponse().getQueryResponseId());
 
                 // What will be indexed - adheres to the queries-mapping.json
