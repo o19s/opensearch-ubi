@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.o19s.ubi.OpenSearchEventManager;
 import com.o19s.ubi.UserBehaviorInsightsPlugin;
 import com.o19s.ubi.events.Event;
 import com.o19s.ubi.model.HeaderConstants;
@@ -32,13 +33,21 @@ import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest;
-
-import com.o19s.ubi.OpenSearchEventManager;
+import org.opensearch.rest.action.RestActionListener;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
-import static org.opensearch.rest.RestRequest.Method.*;
+import static org.opensearch.rest.RestRequest.Method.DELETE;
+import static org.opensearch.rest.RestRequest.Method.GET;
+import static org.opensearch.rest.RestRequest.Method.POST;
+import static org.opensearch.rest.RestRequest.Method.PUT;
+import static org.opensearch.rest.RestRequest.Method.TRACE;
 
 /**
  * The REST handler for User Behavior Insights. The handler provides the
@@ -70,16 +79,24 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
     @Override
     protected RestChannelConsumer prepareRequest(RestRequest restRequest, NodeClient nodeClient) throws IOException {
 
-        final String storeName = restRequest.param("store");
-
         if (restRequest.method() == PUT) {
+
+            final String storeName = restRequest.param("store");
             final String index = restRequest.param("index");
             final String idField = restRequest.param("id_field");
+
             return create(nodeClient, storeName, index, idField);
+
         } else if(restRequest.method() == DELETE) {
+
+            final String storeName = restRequest.param("store");
             return delete(nodeClient, storeName);
+
         } else if(restRequest.method() == POST) {
+
+            final String storeName = restRequest.param("store");
             return post(nodeClient, storeName, restRequest);
+
         } else if(restRequest.method() == TRACE) {
             return trace(nodeClient, restRequest);
         }
@@ -127,14 +144,27 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
         return (channel) -> {
 
             final GetIndexRequest getIndexRequest = new GetIndexRequest();
-            final GetIndexResponse getIndexResponse = nodeClient.admin().indices().getIndex(getIndexRequest).actionGet();
-            final Set<String> stores = getStoreNames(getIndexResponse.indices());
 
-            final XContentBuilder builder = XContentType.JSON.contentBuilder();
-            builder.startObject().field("stores", stores);
-            builder.endObject();
+            nodeClient.admin().indices().getIndex(getIndexRequest, new RestActionListener<>(channel) {
+                @Override
+                public void processResponse(final GetIndexResponse getIndexResponse) throws Exception {
 
-            channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
+                    final Set<String> stores = new HashSet<>();
+
+                    for(final String index : getIndexResponse.indices()) {
+                        if(index.startsWith(".") && index.endsWith("_events")) {
+                            stores.add(index.substring(1, index.length() - 7));
+                        }
+                    }
+
+                    final XContentBuilder builder = XContentType.JSON.contentBuilder();
+                    builder.startObject().field("stores", stores);
+                    builder.endObject();
+
+                    channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
+
+                }
+            });
 
         };
 

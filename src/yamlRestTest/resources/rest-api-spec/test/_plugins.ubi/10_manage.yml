@@ -9,19 +9,19 @@
       indices.exists:
         index: .mystore_events
 
-#  - match: { created }
-#
-#  - do:
-#      ubi.get_stores: {}
-#
-#  - match: { mystore }
-#
-#  - do:
-#      ubi.delete_store:
-#        store: mystore
-#
-#  - do:
-#      indices.exists:
-#        index: .mystore_events
-#
-#  - is_false: ''
+  - match: { created }
+
+  - do:
+      ubi.get_stores: {}
+
+  - match: { mystore }
+
+  - do:
+      ubi.delete_store:
+        store: mystore
+
+  - do:
+      indices.exists:
+        index: .mystore_events
+
+  - is_false: ''
