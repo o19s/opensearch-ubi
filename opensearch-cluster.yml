@@ -1,0 +1,8 @@
+cluster.name: os-cluster
+network.host: 0.0.0.0
+
+bootstrap.memory_lock: "true" # along with the memlock settings below, disables swapping
+
+cluster.routing.allocation.disk.threshold_enabled: true
+cluster.routing.allocation.disk.watermark.low: 93%
+cluster.routing.allocation.disk.watermark.high: 95%
