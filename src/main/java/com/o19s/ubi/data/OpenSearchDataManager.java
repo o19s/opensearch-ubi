@@ -20,6 +20,8 @@ import org.opensearch.common.xcontent.XContentType;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * An event manager that inserts events into an OpenSearch index.
@@ -32,8 +34,21 @@ public class OpenSearchDataManager extends DataManager {
     private final int max_items_batch = 1000;
     private static OpenSearchDataManager openSearchEventManager;
 
+    /**
+     * The queue that stores the client-side events.
+     */
+    protected final BlockingQueue<Event> eventsQueue;
+
+    /**
+     * The queue that stores the query requests.
+     */
+    protected final BlockingQueue<QueryRequest> queryRequestsQueue;
+
+
     private OpenSearchDataManager(Client client) {
         this.client = client;
+        this.eventsQueue = new LinkedBlockingQueue<>();
+        this.queryRequestsQueue = new LinkedBlockingQueue<>();
     }
 
     @Override
@@ -67,7 +82,7 @@ public class OpenSearchDataManager extends DataManager {
 
             final QueryRequest queryRequest = queryRequestsQueue.remove();
 
-            LOGGER.trace("Writing query ID {} with response ID {}",
+            LOGGER.info("Writing query ID {} with response ID {}",
                     queryRequest.getQueryId(), queryRequest.getQueryResponse().getQueryResponseId());
 
             // What will be indexed - adheres to the queries-mapping.json
@@ -83,6 +98,8 @@ public class OpenSearchDataManager extends DataManager {
             // Get the name of the queries.
             final String queriesIndexName = UbiUtils.getQueriesIndexName(queryRequest.getStoreName());
 
+            LOGGER.info("Going to index into " + queriesIndexName);
+
             // Build the index request.
             final IndexRequest indexRequest = new IndexRequest(queriesIndexName)
                     .source(source, XContentType.JSON);
@@ -91,9 +108,13 @@ public class OpenSearchDataManager extends DataManager {
 
         }
 
+        LOGGER.info("Indexing " + queryRequestsBulkRequest.numberOfActions() + " queries");
+
         if(queryRequestsBulkRequest.numberOfActions() > 0) {
             client.bulk(queryRequestsBulkRequest);
         }
+
+        LOGGER.info("Done processing queries");
 
     }
 
@@ -104,6 +125,7 @@ public class OpenSearchDataManager extends DataManager {
 
     @Override
     public void add(final QueryRequest queryRequest) {
+        LOGGER.info("Adding query request to queue: " + queryRequestsQueue.size());
         queryRequestsQueue.add(queryRequest);
     }
 
