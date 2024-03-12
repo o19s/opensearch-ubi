@@ -6,39 +6,20 @@
  * compatible open source license.
  */
 
-package com.o19s.ubi.events;
+package com.o19s.ubi.data;
 
+import com.o19s.ubi.model.Event;
 import com.o19s.ubi.model.QueryRequest;
-import com.o19s.ubi.model.events.queues.Queue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.o19s.ubi.events.queues.InternalQueue;
 
 /**
- * Base class for managing client-side events.
+ * Base class for managing client-side events and queries.
  */
-public abstract class EventManager {
+public abstract class DataManager {
 
     @SuppressWarnings("unused")
-    private final Logger LOGGER = LogManager.getLogger(EventManager.class);
-
-    /**
-     * The {@link Queue queue} that stores the client-side events.
-     */
-    protected final Queue<Event> eventsQueue;
-
-    /**
-     * The {@link Queue queue} that stores the query reqeusts.
-     */
-    protected final Queue<QueryRequest> queryRequestsQueue;
-
-    /**
-     * Initialize the base client-side event manager.
-     */
-    public EventManager() {
-        this.eventsQueue = new InternalQueue<>();
-        this.queryRequestsQueue = new InternalQueue<>();
-    }
+    private final Logger LOGGER = LogManager.getLogger(DataManager.class);
 
     /**
      * Process the events on the queue by writing them to persistent storage.

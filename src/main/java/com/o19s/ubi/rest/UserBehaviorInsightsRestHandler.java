@@ -12,9 +12,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.o19s.ubi.OpenSearchEventManager;
+import com.o19s.ubi.data.OpenSearchDataManager;
 import com.o19s.ubi.UserBehaviorInsightsPlugin;
-import com.o19s.ubi.events.Event;
+import com.o19s.ubi.model.Event;
 import com.o19s.ubi.model.HeaderConstants;
 import com.o19s.ubi.model.SettingsConstants;
 import com.o19s.ubi.utils.UbiUtils;
@@ -214,11 +214,11 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
             final String eventJson = restRequest.content().utf8ToString();
             final String eventJsonWithTimestamp = setEventTimestamp(eventJson);
 
-            LOGGER.info("Indexing UBI event into store {}", storeName);
+            LOGGER.trace("Indexing UBI event into store {}", storeName);
             final String eventsIndexName = UbiUtils.getEventsIndexName(storeName);
 
             final Event event = new Event(eventsIndexName, eventJsonWithTimestamp);
-            OpenSearchEventManager.getInstance(nodeClient).add(event);
+            OpenSearchDataManager.getInstance(nodeClient).add(event);
 
         } catch (JsonProcessingException ex) {
             LOGGER.error("Unable to get/set timestamp on UBI event.", ex);
