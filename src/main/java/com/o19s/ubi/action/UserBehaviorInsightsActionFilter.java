@@ -134,7 +134,6 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                             final QueryRequest queryRequest = new QueryRequest(storeName, queryId, query, userId, sessionId, queryResponse);
 
                             // Queue this for writing to the UBI store.
-                            LOGGER.info("Queuing queryrequest");
                             dataManager.add(queryRequest);
 
                             // Add the query_id to the response headers.
