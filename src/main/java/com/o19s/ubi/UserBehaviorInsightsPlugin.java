@@ -9,6 +9,7 @@
 package com.o19s.ubi;
 
 import com.o19s.ubi.action.UserBehaviorInsightsActionFilter;
+import com.o19s.ubi.data.OpenSearchDataManager;
 import com.o19s.ubi.model.HeaderConstants;
 import com.o19s.ubi.model.SettingsConstants;
 import com.o19s.ubi.rest.UserBehaviorInsightsRestHandler;
@@ -122,14 +123,14 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
 
         // TODO: Allow the parameters of the scheduled tasks to be configurable.
 
-        LOGGER.info("Creating UBI scheduled task to persist events.");
+        LOGGER.info("Starting UBI scheduled task to persist events.");
         threadPool.scheduler().scheduleWithFixedDelay(() -> {
-            OpenSearchEventManager.getInstance(client).processEvents();
+            OpenSearchDataManager.getInstance(client).processEvents();
         }, 0, 2000, TimeUnit.MILLISECONDS);
 
-        LOGGER.info("Creating UBI scheduled task to persist queries.");
+        LOGGER.info("Starting UBI scheduled task to persist queries.");
         threadPool.scheduler().scheduleWithFixedDelay(() -> {
-            OpenSearchEventManager.getInstance(client).processQueries();
+            OpenSearchDataManager.getInstance(client).processQueries();
         }, 0, 2000, TimeUnit.MILLISECONDS);
 
         // Initialize the action filter.

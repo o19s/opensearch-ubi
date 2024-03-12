@@ -9,7 +9,7 @@
 package com.o19s.ubi.action;
 
 import com.o19s.ubi.UserBehaviorInsightsPlugin;
-import com.o19s.ubi.events.EventManager;
+import com.o19s.ubi.data.DataManager;
 import com.o19s.ubi.model.HeaderConstants;
 import com.o19s.ubi.model.QueryRequest;
 import com.o19s.ubi.model.QueryResponse;
@@ -32,7 +32,7 @@ import org.opensearch.core.action.ActionResponse;
 import org.opensearch.search.SearchHit;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
-import com.o19s.ubi.OpenSearchEventManager;
+import com.o19s.ubi.data.OpenSearchDataManager;
 
 import java.util.*;
 
@@ -46,7 +46,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
     private final Client client;
     private final ThreadPool threadPool;
-    private final EventManager eventManager;
+    private final DataManager dataManager;
 
     /**
      * Creates a new filter.
@@ -56,7 +56,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
     public UserBehaviorInsightsActionFilter(Client client, ThreadPool threadPool) {
         this.client = client;
         this.threadPool = threadPool;
-        this.eventManager = OpenSearchEventManager.getInstance(client);
+        this.dataManager = OpenSearchDataManager.getInstance(client);
     }
 
     @Override
@@ -134,16 +134,11 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                             final QueryRequest queryRequest = new QueryRequest(storeName, queryId, query, userId, sessionId, queryResponse);
 
                             // Queue this for writing to the UBI store.
-                            LOGGER.trace("Queueing queryRequest for write");
-                            eventManager.add(queryRequest);
+                            dataManager.add(queryRequest);
 
                             // Add the query_id to the response headers.
                             threadPool.getThreadContext().addResponseHeader("query_id", queryId);
 
-                            final long elapsedTime = System.currentTimeMillis() - startTime;
-                            LOGGER.info("UBI search request filter took {} ms", elapsedTime);
-
-                            LOGGER.debug("Setting and exposing query_id {}", queryId);
                             //HACK: this should be set in the OpenSearch config (to send to the client code just once),
                             // and not on every single search response,
                             // but that server setting doesn't appear to be exposed.
@@ -154,7 +149,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                         }
 
                         final long elapsedTime = System.currentTimeMillis() - startTime;
-                        LOGGER.info("UBI search request filter took {} ms", elapsedTime);
+                        LOGGER.trace("UBI search request filter took {} ms", elapsedTime);
 
                     } else {
                         LOGGER.trace("Discarding query for UBI due to missing store name.");

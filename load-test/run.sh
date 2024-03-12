@@ -10,10 +10,10 @@ curl -X PUT "http://localhost:9200/_plugins/ubi/mystore?index=ecommerce"
 ../index-chorus-data.sh `realpath ../../chorus-opensearch-edition`
 
 # Insert events and queries.
-locust -f load-test.py --headless -u 1 -r 1 --run-time 600s --host http://localhost:9200
+locust -f load-test.py --headless -u 50 -r 10 --run-time 300s --host http://localhost:9200
 
 # Let events index.
-sleep 10
+sleep 30
 
 # Get count of indexed events.
 EVENTS=`curl -s http://localhost:9200/.mystore_events/_count | jq .count`

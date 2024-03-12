@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package com.o19s.ubi.events;
+package com.o19s.ubi.model;
 
 /**
  * A client-side event.
