@@ -44,6 +44,17 @@ public class OpenSearchDataManager extends DataManager {
      */
     protected final BlockingQueue<QueryRequest> queryRequestsQueue;
 
+    /**
+     * Gets a singleton instance of the manager.
+     * @param client An OpenSearch {@link Client}.
+     * @return An instance of {@link OpenSearchDataManager}.
+     */
+    public static OpenSearchDataManager getInstance(Client client) {
+        if(openSearchEventManager == null) {
+            openSearchEventManager = new OpenSearchDataManager(client);
+        }
+        return openSearchEventManager;
+    }
 
     private OpenSearchDataManager(Client client) {
         this.client = client;
@@ -82,7 +93,7 @@ public class OpenSearchDataManager extends DataManager {
 
             final QueryRequest queryRequest = queryRequestsQueue.remove();
 
-            LOGGER.info("Writing query ID {} with response ID {}",
+            LOGGER.trace("Writing query ID {} with response ID {}",
                     queryRequest.getQueryId(), queryRequest.getQueryResponse().getQueryResponseId());
 
             // What will be indexed - adheres to the queries-mapping.json
@@ -98,8 +109,6 @@ public class OpenSearchDataManager extends DataManager {
             // Get the name of the queries.
             final String queriesIndexName = UbiUtils.getQueriesIndexName(queryRequest.getStoreName());
 
-            LOGGER.info("Going to index into " + queriesIndexName);
-
             // Build the index request.
             final IndexRequest indexRequest = new IndexRequest(queriesIndexName)
                     .source(source, XContentType.JSON);
@@ -108,13 +117,11 @@ public class OpenSearchDataManager extends DataManager {
 
         }
 
-        LOGGER.info("Indexing " + queryRequestsBulkRequest.numberOfActions() + " queries");
+        LOGGER.trace("Indexing " + queryRequestsBulkRequest.numberOfActions() + " queries");
 
         if(queryRequestsBulkRequest.numberOfActions() > 0) {
             client.bulk(queryRequestsBulkRequest);
         }
-
-        LOGGER.info("Done processing queries");
 
     }
 
@@ -125,20 +132,7 @@ public class OpenSearchDataManager extends DataManager {
 
     @Override
     public void add(final QueryRequest queryRequest) {
-        LOGGER.info("Adding query request to queue: " + queryRequestsQueue.size());
         queryRequestsQueue.add(queryRequest);
-    }
-
-    /**
-     * Gets a singleton instance of the manager.
-     * @param client An OpenSearch {@link Client}.
-     * @return An instance of {@link OpenSearchDataManager}.
-     */
-    public static OpenSearchDataManager getInstance(Client client) {
-        if(openSearchEventManager == null) {
-            openSearchEventManager = new OpenSearchDataManager(client);
-        }
-        return openSearchEventManager;
     }
 
 }

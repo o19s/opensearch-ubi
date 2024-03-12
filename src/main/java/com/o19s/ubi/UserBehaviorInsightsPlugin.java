@@ -126,12 +126,12 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
         LOGGER.info("Starting UBI scheduled task to persist events.");
         threadPool.scheduler().scheduleWithFixedDelay(() -> {
             OpenSearchDataManager.getInstance(client).processEvents();
-        }, 0, 2000, TimeUnit.MILLISECONDS);
+        }, 5000, 2000, TimeUnit.MILLISECONDS);
 
         LOGGER.info("Starting UBI scheduled task to persist queries.");
         threadPool.scheduler().scheduleWithFixedDelay(() -> {
             OpenSearchDataManager.getInstance(client).processQueries();
-        }, 0, 2000, TimeUnit.MILLISECONDS);
+        }, 5000, 2000, TimeUnit.MILLISECONDS);
 
         // Initialize the action filter.
         this.userBehaviorLoggingFilter = new UserBehaviorInsightsActionFilter(client, threadPool);
