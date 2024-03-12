@@ -1,9 +1,9 @@
 version: '3'
 
 services:
-  opensearch:
+  ubi-dev-os:
     build: ./
-    container_name: opensearch_ubi 
+    container_name: ubi-dev-os 
     environment:
       discovery.type: single-node
       node.name: opensearch
@@ -32,25 +32,23 @@ services:
       - 9200
       - 9600
     networks:
-      - opensearch-net
+      - ubi-dev-os-net
 
-  # opensearch-dashboards:
-  #   build: ./dashboard-plugin/
-  #   container_name: opensearch-dashboards
-  #   ports:
-  #     - 5601:5601
-  #   expose:
-  #     - 5601
-  #   environment:
-  #     OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
-  #   networks:
-  #     - opensearch-net
-  #   depends_on:
-  #     - opensearch
-
-volumes:
-  opensearch-data:
+  ubi-dev-os-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.12.0
+    container_name: ubi-dev-os-dashboards
+    ports:
+      - 5601:5601
+    expose:
+      - 5601
+    environment:
+      OPENSEARCH_HOSTS: '["http://ubi-dev-os:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+    depends_on:
+      - ubi-dev-os
+    networks:
+      - ubi-dev-os-net      
 
 networks:
-  opensearch-net:
+  ubi-dev-os-net:
     driver: bridge
