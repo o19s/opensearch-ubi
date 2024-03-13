@@ -87,3 +87,7 @@ Found 8 indexed
 ```
 
 This shows 8 total requests made by locust, and 8 events are in the index. The idea being we can assert that the number of events sent matches the events stored in the index.
+
+## Starting up a Multi Node Cluster
+
+To start up a three node cluster run `docker compose -f Dockerfile.prod up`
