@@ -22,12 +22,12 @@ index is used to store events, and the other index is for storing queries.
 Schema for events:
 
 **Primary fields include:**
-- `action_name` - any name you want to call your event
+- `action_name` - (size 100)- any name you want to call your event
 - `timestamp` - should be set automatically
-- `user_id`. `session_id`, `page_id` - are id's largely at the calling client's discretion for tracking users, sessions and pages
-- `query_id` - ID for some query.  Note that it could be a unique search string, or it could represent a cluster of related searches (i.e.: *dress*, *red dress*, *long dress* could all have the same `query_id`).  Either the client could control these, or the `query_id` could be retrieved from the API's response headers as it keeps track of queries on the node
-- `message_type` - originally thought of in terms of ERROR, INFO, WARN...but could be anything useful such as `QUERY` or `PURCHASE`
-- `message` - optional text for the log entry
+- `user_id`. `session_id`, `page_id` - (size 100) - are id's largely at the calling client's discretion for tracking users, sessions and pages
+- `query_id` - (size 100) - ID for some query.  Note that it could be a unique search string, or it could represent a cluster of related searches (i.e.: *dress*, *red dress*, *long dress* could all have the same `query_id`).  Either the client could control these, or the `query_id` could be retrieved from the API's response headers as it keeps track of queries on the node
+- `message_type` - (size 100) - originally thought of in terms of ERROR, INFO, WARN...but could be anything useful such as `QUERY` or `PURCHASE`
+- `message` - (size 256) - optional text for the log entry
 
 **Other fields & data objects**
 - `event_attributes` - contains various, common attributes associated with many user events
@@ -38,6 +38,10 @@ Schema for events:
 - `event_attributes.data.transaction_id` - optionally points to a unique id representing a successful transaction
 - `event_attributes.data.to_user_id` - optionally points to another user, if they are the recipient of this object
 - `event_attributes.data.data_detail` - optional data object/map of further data details
+- 
+*Other mapped fields in the schema are intended to be optional placeholders for common attributes like `city`, `state`, `price`
+
+**the users can dynamically add any further fields to the event mapping
 
 ## Plugin API
 
@@ -98,12 +102,12 @@ To make this association, queries need to have a header value that indicates the
 
 #### Required Headers
 
-|Header|Purpose|Required?|
-|---|---|---|
-|`X-ubi-store`|Tells the plugin which store this query should be persisted to.|Required|
-|`X-ubi-user-id`|Allow for associating client-side user events with the query|Required|
-|`X-ubi-query-id`|The client can provide a query ID. If not provided, the plugin will generate a random query ID. The purpose of the query ID is to uniquely identify the query.|No|
-|`X-ubi-session-id`|A session ID to associate with the query.|No|
+|Header|Purpose|Required?|Detail|
+|---|---|---|---|
+|`X-ubi-store`|Tells the plugin which store this query should be persisted to.|Required||
+|`X-ubi-user-id`|Allow for associating client-side user events with the query|Required||
+|`X-ubi-query-id`|The client can provide a query ID. If not provided, the plugin will generate a random query ID. The purpose of the query ID is to uniquely identify the query.|No|[query_id](./query_id.md)|
+|`X-ubi-session-id`|A session ID to associate with the query.|No||
 
 ### Example Queries
 
@@ -114,3 +118,5 @@ curl http://localhost:9200/ecommerce/_search -H "X-ubi-store: mystore" -H "X-ubi
 ```
 
 With this query, when the plugin sees a query, the plugin will be able to associate the query with an individual user and know to persist the query in the UBI store `mystore`.
+
+[Sample SQL queries](getting-started\queries\sql_queries.md)
