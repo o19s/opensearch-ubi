@@ -6,7 +6,7 @@ from opensearchpy.helpers import bulk
 
 
 
-zip_name = './sample_data/log_events.zip'
+zip_name = './sample-data/log_events.zip'
 host = 'localhost'
 port = 9200
 

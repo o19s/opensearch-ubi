@@ -109,7 +109,7 @@ Find a search in the query log:
 ```sql
 select *
 from .ubi_log_queries
-where query_id ='1065c70f-d46a-442f-8ce4-0b5e7a71a892'
+where query_id ='029cc418-348e-4f71-96ae-c716a098c8af'
 order by timestamp
 ```
 (In this generated data, the `query` field is plain text; however in the real implementation the query will be in the internal DSL of the query and parameters.)
@@ -123,7 +123,7 @@ Search for the events that correspond to the query above, `1065c70f-d46a-442f-8c
 select 
   query_id, action_name, message_type, message, event_attributes.data.data_id, event_attributes.data.description, session_id, user_id
 from .ubi_log_events
-where query_id = '1065c70f-d46a-442f-8ce4-0b5e7a71a892'
+where query_id = '029cc418-348e-4f71-96ae-c716a098c8af'
 order by timestamp
 ```
 query_id|action_name|message_type|message|event_attributes.data.data_id|event_attributes.data.description|session_id|user_id
@@ -143,12 +143,12 @@ query_id|action_name|message_type|message|event_attributes.data.data_id|event_at
 1065c70f-d46a-442f-8ce4-0b5e7a71a892|button_click|WARN||||fa6e3b1c-3212-44d2-b16b-690b4aeddbba_1975|155_7e3471ff-14c8-45cb-bc49-83a056c37192
 
 ## User sessions
-To look at more sessions from the same user above, `155_7e3471ff-14c8-45cb-bc49-83a056c37192`. 
+To look at more sessions from the same user above, `36_5f7091e2-fbae-4ba9-b59f-c0ec8750efc9`. 
 ```sql
 select 
 	user_id, session_id, query_id, action_name, message_type, message, event_attributes.data.data_type, timestamp 
 from .ubi_log_events
-where user_id ='155_7e3471ff-14c8-45cb-bc49-83a056c37192'
+where user_id ='36_5f7091e2-fbae-4ba9-b59f-c0ec8750efc9'
 order by timestamp
 ```
 Results are truncated to a few sessions:
