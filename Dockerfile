@@ -1,5 +1,5 @@
 FROM opensearchproject/opensearch:2.12.0
 
-COPY ./build/distributions/opensearch-ubi-0.0.9-os2.12.0.zip /tmp/
+COPY ./build/distributions/opensearch-ubi-0.0.10-os2.12.0.zip /tmp/
 
-RUN /usr/share/opensearch/bin/opensearch-plugin install file:/tmp/opensearch-ubi-0.0.9-os2.12.0.zip
+RUN /usr/share/opensearch/bin/opensearch-plugin install file:/tmp/opensearch-ubi-0.0.10-os2.12.0.zip
