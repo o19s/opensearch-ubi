@@ -21,7 +21,7 @@ Start the container:
 Or to start a three-node OpenSearch cluster:
 
 ```
-To start up a three node cluster run `docker compose -f docker-compose-cluster.yaml up`
+docker compose -f docker-compose-cluster.yaml up
 ```
 
 Initialize the `awesome` UBI store:
