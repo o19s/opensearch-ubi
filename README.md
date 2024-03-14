@@ -14,9 +14,15 @@ Build the OpenSearch docker image and add the plugin:
 
 `docker compose build`
 
-Start the containers:
+Start the container:
 
 `docker compose up`
+
+Or to start a three-node OpenSearch cluster:
+
+```
+To start up a three node cluster run `docker compose -f docker-compose-cluster.yaml up`
+```
 
 Initialize the `awesome` UBI store:
 
@@ -87,7 +93,3 @@ Found 8 indexed
 ```
 
 This shows 8 total requests made by locust, and 8 events are in the index. The idea being we can assert that the number of events sent matches the events stored in the index.
-
-## Starting up a Multi Node Cluster
-
-To start up a three node cluster run `docker compose -f Dockerfile.prod up`
