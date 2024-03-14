@@ -33,17 +33,22 @@ curl -X PUT "http://localhost:9200/_plugins/ubi/awesome?index=ecommerce&id_field
 Send an event to the `awesome` store:
 
 ```
-curl -X POST http://localhost:9200/_plugins/ubi/awesome -H "Content-Type: application/json" -d @./scripts/instant-search.json
+curl -X POST http://localhost:9200/_plugins/ubi/awesome -H "Content-Type: application/json" -d '
+{
+  "type": "search",
+  "keywords": "khgkj",
+  "timestamp": 1705596607509,
+  "url": "http://some-url.com/test.html",
+  "lang": "en-US",
+  "session": "npckcy4",
+  "query": ""
+}'
 ```
 
 Get events:
 
 ```
 curl -s http://localhost:9200/.awesome_events/_search | jq
-```
-
-```
-curl -s http://localhost:9200/.awesome_events/_search -H 'Content-Type: application/json' -d '{"query": {"term": {"type": "instant-search"}}}' | jq
 ```
 
 Do a search of the `ecommerce` index:
