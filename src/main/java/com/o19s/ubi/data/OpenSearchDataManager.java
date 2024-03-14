@@ -72,16 +72,10 @@ public class OpenSearchDataManager extends DataManager {
             final BulkRequest eventsBulkRequest = new BulkRequest();
 
             final Collection<Event> events = new LinkedList<>();
-            eventsQueue.drainTo(events, max_items_batch);
-
-            for(final Event event : events) {
-
-                final IndexRequest indexRequest = new IndexRequest(event.getIndexName())
-                        .source(event.getEvent(), XContentType.JSON);
-
-                eventsBulkRequest.add(indexRequest);
-
-            }
+            this.eventsQueue.drainTo(events, max_items_batch);
+            events.stream()
+                    .map(event -> new IndexRequest(event.getIndexName()).source(event.getEvent(), XContentType.JSON))
+                    .forEach(eventsBulkRequest::add);
 
             if(eventsBulkRequest.numberOfActions() > 0) {
                 client.bulk(eventsBulkRequest);
@@ -103,31 +97,10 @@ public class OpenSearchDataManager extends DataManager {
             final Collection<QueryRequest> queryRequests = new LinkedList<>();
             queryRequestsQueue.drainTo(queryRequests, max_items_batch);
 
-            for (final QueryRequest queryRequest : queryRequests) {
-
-                LOGGER.trace("Writing query ID {} with response ID {}",
-                        queryRequest.getQueryId(), queryRequest.getQueryResponse().getQueryResponseId());
-
-                // What will be indexed - adheres to the queries-mapping.json
-                final Map<String, Object> source = new HashMap<>();
-                source.put("timestamp", queryRequest.getTimestamp());
-                source.put("query_id", queryRequest.getQueryId());
-                source.put("query", queryRequest.getQuery());
-                source.put("query_response_id", queryRequest.getQueryResponse().getQueryResponseId());
-                source.put("query_response_hit_ids", queryRequest.getQueryResponse().getQueryResponseHitIds());
-                source.put("user_id", queryRequest.getUserId());
-                source.put("session_id", queryRequest.getSessionId());
-
-                // Get the name of the queries.
-                final String queriesIndexName = UbiUtils.getQueriesIndexName(queryRequest.getStoreName());
-
-                // Build the index request.
-                final IndexRequest indexRequest = new IndexRequest(queriesIndexName)
-                        .source(source, XContentType.JSON);
-
-                queryRequestsBulkRequest.add(indexRequest);
-
-            }
+            queryRequests.stream()
+                    .map(queryRequest -> new IndexRequest(UbiUtils.getQueriesIndexName(queryRequest.getStoreName()))
+                            .source(buildQueryRequestMap(queryRequest), XContentType.JSON))
+                    .forEach(queryRequestsBulkRequest::add);
 
             LOGGER.trace("Indexing " + queryRequestsBulkRequest.numberOfActions() + " queries");
 
@@ -138,6 +111,25 @@ public class OpenSearchDataManager extends DataManager {
         } catch (Exception ex) {
             LOGGER.error("Error processing the UBI query requests queue.", ex);
         }
+
+    }
+
+    private Map<String, Object> buildQueryRequestMap(final QueryRequest queryRequest) {
+
+        LOGGER.trace("Writing query ID {} with response ID {}",
+                queryRequest.getQueryId(), queryRequest.getQueryResponse().getQueryResponseId());
+
+        // What will be indexed - adheres to the queries-mapping.json
+        final Map<String, Object> source = new HashMap<>();
+        source.put("timestamp", queryRequest.getTimestamp());
+        source.put("query_id", queryRequest.getQueryId());
+        source.put("query", queryRequest.getQuery());
+        source.put("query_response_id", queryRequest.getQueryResponse().getQueryResponseId());
+        source.put("query_response_hit_ids", queryRequest.getQueryResponse().getQueryResponseHitIds());
+        source.put("user_id", queryRequest.getUserId());
+        source.put("session_id", queryRequest.getSessionId());
+
+        return source;
 
     }
 
