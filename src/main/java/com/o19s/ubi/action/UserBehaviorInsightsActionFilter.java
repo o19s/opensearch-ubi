@@ -10,6 +10,7 @@ package com.o19s.ubi.action;
 
 import com.o19s.ubi.UserBehaviorInsightsPlugin;
 import com.o19s.ubi.data.DataManager;
+import com.o19s.ubi.data.OpenSearchDataManager;
 import com.o19s.ubi.model.HeaderConstants;
 import com.o19s.ubi.model.QueryRequest;
 import com.o19s.ubi.model.QueryResponse;
@@ -29,12 +30,17 @@ import org.opensearch.client.Client;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
+import org.opensearch.index.IndexNotFoundException;
 import org.opensearch.search.SearchHit;
 import org.opensearch.tasks.Task;
 import org.opensearch.threadpool.ThreadPool;
-import com.o19s.ubi.data.OpenSearchDataManager;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * An implementation of {@link ActionFilter} that passively listens for OpenSearch
@@ -173,30 +179,35 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
     private String getStoreSettings(final String storeName, final String setting) {
 
         final String key = storeName + "." + setting;
-        final String value;
+        String settingValue = "";
 
         if(UserBehaviorInsightsPlugin.storeSettings.containsKey(key)) {
 
             LOGGER.debug("Getting setting " + setting + " for store " + storeName + " from the cache.");
-            value = UserBehaviorInsightsPlugin.storeSettings.get(key);
+            settingValue = UserBehaviorInsightsPlugin.storeSettings.get(key);
 
         } else{
 
             LOGGER.debug("Getting setting " + setting + " for store " + storeName + " from the index.");
 
-            // Get the id_field to use for each result's unique identifier.
             final String queriesIndexName = UbiUtils.getQueriesIndexName(storeName);
             final GetSettingsRequest getSettingsRequest = new GetSettingsRequest().indices(queriesIndexName);
 
-            final GetSettingsResponse getSettingsResponse = client.admin().indices().getSettings(getSettingsRequest).actionGet();
-            final String settingResponse = getSettingsResponse.getSetting(queriesIndexName, setting);
+            try {
 
-            UserBehaviorInsightsPlugin.storeSettings.put(key, settingResponse);
-            value = settingResponse;
+                final GetSettingsResponse getSettingsResponse = client.admin().indices().getSettings(getSettingsRequest).actionGet();
+                final String settingResponse = getSettingsResponse.getSetting(queriesIndexName, setting);
+
+                UserBehaviorInsightsPlugin.storeSettings.put(key, settingResponse);
+                settingValue = settingResponse;
+
+            } catch (IndexNotFoundException ex) {
+                LOGGER.warn("Unable to get UBI settings for UBI store {} from index {}", storeName, queriesIndexName, ex);
+            }
 
         }
 
-        return value;
+        return settingValue;
 
     }
 
