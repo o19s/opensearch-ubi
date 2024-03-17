@@ -85,6 +85,8 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
             final String index = restRequest.param("index");
             final String idField = restRequest.param("id_field");
 
+            LOGGER.info("Received PUT for store {}", storeName);
+
             return create(nodeClient, storeName, index, idField);
 
         } else if(restRequest.method() == DELETE) {
@@ -172,7 +174,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
     private RestChannelConsumer create(final NodeClient nodeClient, final String storeName, final String index, final String idField) throws IOException {
 
-        LOGGER.info("Creating UBI store [{}] for index [{}] using field [{}]", storeName, index, idField);
+        LOGGER.debug("Creating UBI store [{}] for index [{}] using field [{}]", storeName, index, idField);
 
         final Settings indexSettings = Settings.builder()
                 .put(IndexMetadata.INDEX_NUMBER_OF_SHARDS_SETTING.getKey(), 1)

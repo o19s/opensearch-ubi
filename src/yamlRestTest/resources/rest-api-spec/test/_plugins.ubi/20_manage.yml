@@ -1,0 +1,48 @@
+---
+"Create and delete a store":
+  - do:
+      ubi.create_store:
+        store: mystore
+        index: ecommerce
+
+  - do:
+      cluster.health:
+        index: [.mystore_events, .mystore_queries]
+        wait_for_no_initializing_shards: true
+
+  - do:
+      indices.exists:
+        index: .mystore_events
+
+  - is_true: ''
+
+  - do:
+      indices.exists:
+        index: .mystore_queries
+
+  - is_true: ''
+
+  - do:
+      ubi.get_stores: {}
+
+  - match: { mystore }
+
+  - do:
+      ubi.delete_store:
+        store: mystore
+
+  - do:
+      cluster.health:
+        wait_for_status: yellow
+
+  - do:
+      cluster.health:
+        index: [.mystore_events, .mystore_queries]
+        wait_for_no_initializing_shards: true
+
+  - do:
+      indices.get:
+        index: .mystore_events, .mystore_queries
+        ignore_unavailable: true
+  - is_false: .mystore_events
+  - is_false: .mystore_queries

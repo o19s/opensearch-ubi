@@ -1,0 +1,89 @@
+---
+setup:
+  - skip:
+      features: headers
+
+---
+"Search":
+
+  - do:
+      indices.create:
+        index: ecommerce
+
+  - do:
+      index:
+        index: ecommerce
+        id: "1"
+        body: { foo: bar }
+
+  - do:
+      ubi.create_store:
+        store: mystore
+        index: ecommerce
+
+  - do:
+      cluster.health:
+        index: [.mystore_events, .mystore_queries]
+        wait_for_no_initializing_shards: true
+
+  - do:
+      indices.exists:
+        index: .mystore_events
+
+  - is_true: ''
+
+  - do:
+      indices.exists:
+        index: .mystore_queries
+
+  - is_true: ''
+
+  - do:
+      headers:
+        X-ubi-store: "mystore"
+      search:
+        rest_total_hits_as_int: true
+        index: ecommerce
+        body: "{ \"query\": { \"match_all\": {} } }"
+
+  - gte: { took: 0 }
+  - gte: { hits.total: 0 }
+  - is_false: _clusters
+  - is_true: _shards.total
+
+  - do:
+      search:
+        rest_total_hits_as_int: true
+        index: .mystore_queries
+        body: "{ \"query\": { \"match_all\": {} } }"
+
+  - gte: { took: 0 }
+  - gte: { hits.total: 0 }
+  - is_false: _clusters
+  - is_true: _shards.total
+
+---
+"Search against invalid UBI store":
+
+  - do:
+      indices.create:
+        index: ecommerce
+
+  - do:
+      index:
+        index: ecommerce
+        id: "1"
+        body: { foo: bar }
+
+  - do:
+      headers:
+        X-ubi-store: "invalid"
+      search:
+        rest_total_hits_as_int: true
+        index: ecommerce
+        body: "{ \"query\": { \"match_all\": {} } }"
+
+  - gte: { took: 0 }
+  - gte: { hits.total: 0 }
+  - is_false: _clusters
+  - is_true: _shards.total
