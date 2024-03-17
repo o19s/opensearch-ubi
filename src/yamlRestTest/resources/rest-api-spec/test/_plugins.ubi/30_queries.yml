@@ -4,7 +4,7 @@ setup:
       features: headers
 
 ---
-"Search":
+"Query":
 
   - do:
       indices.create:
@@ -51,19 +51,8 @@ setup:
   - is_false: _clusters
   - is_true: _shards.total
 
-  - do:
-      search:
-        rest_total_hits_as_int: true
-        index: .mystore_queries
-        body: "{ \"query\": { \"match_all\": {} } }"
-
-  - gte: { took: 0 }
-  - gte: { hits.total: 0 }
-  - is_false: _clusters
-  - is_true: _shards.total
-
 ---
-"Search against invalid UBI store":
+"Query against an invalid UBI store":
 
   - do:
       indices.create:

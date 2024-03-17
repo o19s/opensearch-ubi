@@ -1,9 +1,10 @@
 ---
-"Create and delete a store":
+"Create and delete a UBI store":
   - do:
       ubi.create_store:
         store: mystore
         index: ecommerce
+        id_field: name
 
   - do:
       cluster.health:
@@ -33,10 +34,6 @@
 
   - do:
       cluster.health:
-        wait_for_status: yellow
-
-  - do:
-      cluster.health:
         index: [.mystore_events, .mystore_queries]
         wait_for_no_initializing_shards: true
 
@@ -46,3 +43,23 @@
         ignore_unavailable: true
   - is_false: .mystore_events
   - is_false: .mystore_queries
+
+---
+"Create a store without specifying an index":
+# An index is required to associate a UBI store with the index.
+
+  - do:
+      catch: bad_request
+      ubi.create_store:
+        store: some_store
+        index: ""
+
+---
+"Create a store without specifying an id_field":
+# A missing id_field is allowed - the doc ID will be used instead.
+
+  - do:
+      ubi.create_store:
+        store: invalid_store
+        index: some_index
+        id_field: ""

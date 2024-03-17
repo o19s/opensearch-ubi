@@ -87,6 +87,15 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
             LOGGER.info("Received PUT for store {}", storeName);
 
+            if("".equals(index) || index == null) {
+                return (channel) -> {
+                    final XContentBuilder builder = XContentType.JSON.contentBuilder();
+                    builder.startObject().field("error", "missing index name");
+                    builder.endObject();
+                    channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST, builder));
+                };
+            }
+
             return create(nodeClient, storeName, index, idField);
 
         } else if(restRequest.method() == DELETE) {
@@ -211,32 +220,36 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
     private RestChannelConsumer post(final NodeClient nodeClient, final String storeName, final RestRequest restRequest) throws IOException {
 
-        try {
+        return (channel) -> {
 
-            final String eventJson = restRequest.content().utf8ToString();
-            final String eventJsonWithTimestamp = setEventTimestamp(eventJson);
+            try {
 
-            LOGGER.trace("Indexing UBI event into store {}", storeName);
-            final String eventsIndexName = UbiUtils.getEventsIndexName(storeName);
+                final String eventJson = restRequest.content().utf8ToString();
+                final String eventJsonWithTimestamp = setEventTimestamp(eventJson);
 
-            final Event event = new Event(eventsIndexName, eventJsonWithTimestamp);
-            OpenSearchDataManager.getInstance(nodeClient).add(event);
+                LOGGER.trace("Indexing UBI event into store {}", storeName);
+                final String eventsIndexName = UbiUtils.getEventsIndexName(storeName);
 
-        } catch (JsonProcessingException ex) {
-            LOGGER.error("Unable to get/set timestamp on UBI event.", ex);
+                final Event event = new Event(eventsIndexName, eventJsonWithTimestamp);
+                OpenSearchDataManager.getInstance(nodeClient).add(event);
 
-            final XContentBuilder builder = XContentType.JSON.contentBuilder();
-            builder.startObject().field("error", "unable to set event timestamp");
-            builder.endObject();
+                final XContentBuilder builder = XContentType.JSON.contentBuilder();
+                builder.startObject().field("status", "received");
+                builder.endObject();
 
-            return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST, builder));
-        }
+                channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
 
-        final XContentBuilder builder = XContentType.JSON.contentBuilder();
-        builder.startObject().field("status", "received");
-        builder.endObject();
+            } catch (JsonProcessingException ex) {
+                LOGGER.error("Unable to get/set timestamp on UBI event.", ex);
 
-        return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
+                final XContentBuilder builder = XContentType.JSON.contentBuilder();
+                builder.startObject().field("error", "unable to set event timestamp");
+                builder.endObject();
+
+                channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST, builder));
+            }
+
+        };
 
     }
 
@@ -262,6 +275,8 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
     }
 
     private String setEventTimestamp(final String eventJson) throws JsonProcessingException {
+
+        LOGGER.info("event json: " + eventJson);
 
         final JsonNode rootNode = new ObjectMapper().readTree(eventJson);
 

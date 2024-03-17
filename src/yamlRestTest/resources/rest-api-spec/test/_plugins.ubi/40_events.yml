@@ -1,0 +1,32 @@
+---
+setup:
+  - skip:
+      features: headers
+
+---
+"Events":
+
+  - do:
+      ubi.create_store:
+        store: mystore2
+        index: ecommerce
+
+#  - do:
+#      cluster.health:
+#        index: [.mystore2_events, .mystore2_queries]
+#        wait_for_no_initializing_shards: true
+
+  - do:
+      headers:
+        query_id: "8075dcab-eb65-4fba-a23b-ffab060d477c"
+        content-type: application/json
+        accept: application/json
+      ubi.post_event:
+        store: mystore2
+        body: { "user_id": "2f355788-36a8-47f5-bc04-29b5d33faf36", "event": "query", "timestamp": "" }
+
+#  - do:
+#      catch: bad_request
+#      ubi.post_event:
+#        store: "mystore2"
+#        body:   { "user_id": "2f355788-36a8-47f5-bc04-29b5d33faf36", "event": "query", "timestamp:", "" }
