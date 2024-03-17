@@ -1,5 +1,7 @@
 ---
 "Create and delete a UBI store":
+# Create a UBI store, verify the indexes exist, then delete the store.
+
   - do:
       ubi.create_store:
         store: mystore
