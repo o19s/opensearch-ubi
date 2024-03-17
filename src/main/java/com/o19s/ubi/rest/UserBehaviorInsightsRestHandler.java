@@ -255,20 +255,18 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
     private RestChannelConsumer delete(final NodeClient nodeClient, final String storeName) throws IOException {
 
-        // Delete the events index.
-        final DeleteIndexRequest deleteEventsIndexRequest = new DeleteIndexRequest(UbiUtils.getEventsIndexName(storeName));
+        final DeleteIndexRequest deleteEventsIndexRequest = new DeleteIndexRequest(
+                UbiUtils.getEventsIndexName(storeName),
+                UbiUtils.getQueriesIndexName(storeName));
+
         nodeClient.admin().indices().delete(deleteEventsIndexRequest);
 
-        // Delete the queries index.
-        final DeleteIndexRequest deleteQueriesIndexRequest = new DeleteIndexRequest(UbiUtils.getQueriesIndexName(storeName));
-        nodeClient.admin().indices().delete(deleteQueriesIndexRequest);
+        // Remove this store's settings from the settings map.
+        UserBehaviorInsightsPlugin.storeSettings.entrySet().removeIf(entry -> entry.getKey().startsWith(storeName + "."));
 
         final XContentBuilder builder = XContentType.JSON.contentBuilder();
         builder.startObject().field("status", "deleted");
         builder.endObject();
-
-        // Remove this store's settings from the settings map.
-        UserBehaviorInsightsPlugin.storeSettings.entrySet().removeIf(entry -> entry.getKey().startsWith(storeName + "."));
 
         return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
 
