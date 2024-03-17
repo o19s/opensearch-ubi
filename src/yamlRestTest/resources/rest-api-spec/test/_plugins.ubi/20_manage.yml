@@ -63,3 +63,36 @@
         store: invalid_store
         index: some_index
         id_field: ""
+
+---
+"Delete a store that does not exist":
+# Deleting a store that does not exist does not throw an exception.
+
+  - do:
+      ubi.delete_store:
+        store: invalid_store
+
+  - match: { status: deleted }
+
+---
+"Create a store that already exists":
+# Creating a store that already exists does not throw an exception.
+
+  - do:
+      ubi.create_store:
+        store: mystore
+        index: ecommerce
+        id_field: name
+
+  - do:
+      cluster.health:
+        index: [.mystore_events, .mystore_queries]
+        wait_for_no_initializing_shards: true
+
+  - do:
+      ubi.create_store:
+        store: mystore
+        index: ecommerce
+        id_field: name
+
+  - match: { status: initialized }
