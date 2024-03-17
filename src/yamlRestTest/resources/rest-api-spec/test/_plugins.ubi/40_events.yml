@@ -73,13 +73,3 @@ setup:
         body: { "user_id": "2f355788-36a8-47f5-bc04-29b5d33faf36", "event": "query" }
 
   - match: { status: received }
-
-#  - do:
-#      headers:
-#        query_id: ""
-#        Content-Type: application/json
-#        Accept: application/json
-#      ubi.post_event:
-#        store: mystore2
-#        body: { "user_id": "2f355788-36a8-47f5-bc04-29b5d33faf36", "event": "query" }
-

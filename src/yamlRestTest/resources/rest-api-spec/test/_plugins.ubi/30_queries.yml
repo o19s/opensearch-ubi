@@ -52,8 +52,6 @@ setup:
   - gte: { hits.total: 0 }
   - is_false: _clusters
   - is_true: _shards.total
-  #- is_true: header.query_id
-  #- match: { header.query_id: 5b646b32-6c5a-4ffb-b9dc-1b321ef9b8c9 }
 
   # Search without a query ID
   - do:
@@ -68,8 +66,6 @@ setup:
   - gte: { hits.total: 0 }
   - is_false: _clusters
   - is_true: _shards.total
-  #- is_true: header.query_id
-  #- match: { header.query_id: 5b646b32-6c5a-4ffb-b9dc-1b321ef9b8c9 }
 
 ---
 "Query against an invalid UBI store":
