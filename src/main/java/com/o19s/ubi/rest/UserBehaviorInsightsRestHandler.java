@@ -24,6 +24,7 @@ import org.opensearch.action.admin.indices.create.CreateIndexRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.opensearch.action.admin.indices.get.GetIndexRequest;
 import org.opensearch.action.admin.indices.get.GetIndexResponse;
+import org.opensearch.action.support.master.AcknowledgedResponse;
 import org.opensearch.client.node.NodeClient;
 import org.opensearch.cluster.metadata.IndexMetadata;
 import org.opensearch.common.settings.Settings;
@@ -259,16 +260,27 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
                 UbiUtils.getEventsIndexName(storeName),
                 UbiUtils.getQueriesIndexName(storeName));
 
-        nodeClient.admin().indices().delete(deleteEventsIndexRequest);
+        return (channel) -> {
 
-        // Remove this store's settings from the settings map.
-        UserBehaviorInsightsPlugin.storeSettings.entrySet().removeIf(entry -> entry.getKey().startsWith(storeName + "."));
+            nodeClient.admin().indices().delete(deleteEventsIndexRequest, new RestActionListener<>(channel) {
 
-        final XContentBuilder builder = XContentType.JSON.contentBuilder();
-        builder.startObject().field("status", "deleted");
-        builder.endObject();
+                @Override
+                protected void processResponse(AcknowledgedResponse acknowledgedResponse) throws Exception {
 
-        return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
+                    // Remove this store's settings from the settings map.
+                    UserBehaviorInsightsPlugin.storeSettings.entrySet().removeIf(entry -> entry.getKey().startsWith(storeName + "."));
+
+                    final XContentBuilder builder = XContentType.JSON.contentBuilder();
+                    builder.startObject().field("status", "deleted");
+                    builder.endObject();
+
+                    channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
+
+                }
+
+            });
+
+        };
 
     }
 

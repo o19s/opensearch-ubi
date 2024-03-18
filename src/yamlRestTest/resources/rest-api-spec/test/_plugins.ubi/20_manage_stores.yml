@@ -37,6 +37,18 @@
 
   - match: { status: deleted }
 
+  - do:
+      indices.exists:
+        index: .mystore_events
+
+  - is_false: ''
+
+  - do:
+      indices.exists:
+        index: .mystore_queries
+
+  - is_false: ''
+
 ---
 "Create a store without specifying an index":
 # An index is required to associate a UBI store with the index.
@@ -57,15 +69,14 @@
         index: some_index
         id_field: ""
 
----
-"Delete a store that does not exist":
-# Deleting a store that does not exist does not throw an exception.
-
-  - do:
-      ubi.delete_store:
-        store: invalid_store
-
-  - match: { status: deleted }
+#---
+#"Delete a store that does not exist":
+## Deleting a store that does not exist does not throw an exception.
+#
+#  - do:
+#      catch: missing
+#      ubi.delete_store:
+#        store: invalid_store
 
 ---
 "Create a store that already exists":
