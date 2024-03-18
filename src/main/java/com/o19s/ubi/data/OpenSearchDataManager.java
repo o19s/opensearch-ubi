@@ -18,7 +18,9 @@ import org.opensearch.action.index.IndexRequest;
 import org.opensearch.client.Client;
 import org.opensearch.common.xcontent.XContentType;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -65,21 +67,22 @@ public class OpenSearchDataManager extends DataManager {
     @Override
     public void processEvents() {
 
-        final BulkRequest eventsBulkRequest = new BulkRequest();
+        try {
 
-        while(eventsQueue.peek() != null && eventsBulkRequest.numberOfActions() <= max_items_batch) {
+            final BulkRequest eventsBulkRequest = new BulkRequest();
 
-            final Event event = eventsQueue.remove();
+            final Collection<Event> events = new LinkedList<>();
+            this.eventsQueue.drainTo(events, max_items_batch);
+            events.stream()
+                    .map(event -> new IndexRequest(event.getIndexName()).source(event.getEvent(), XContentType.JSON))
+                    .forEach(eventsBulkRequest::add);
 
-            final IndexRequest indexRequest = new IndexRequest(event.getIndexName())
-                    .source(event.getEvent(), XContentType.JSON);
+            if(eventsBulkRequest.numberOfActions() > 0) {
+                client.bulk(eventsBulkRequest);
+            }
 
-            eventsBulkRequest.add(indexRequest);
-
-        }
-
-        if(eventsBulkRequest.numberOfActions() > 0) {
-            client.bulk(eventsBulkRequest);
+        } catch (Exception ex) {
+            LOGGER.error("Error processing the UBI events queue.", ex);
         }
 
     }
@@ -87,41 +90,46 @@ public class OpenSearchDataManager extends DataManager {
     @Override
     public void processQueries() {
 
-        final BulkRequest queryRequestsBulkRequest = new BulkRequest();
+        try {
 
-        while(queryRequestsQueue.peek() != null && queryRequestsBulkRequest.numberOfActions() <= max_items_batch) {
+            final BulkRequest queryRequestsBulkRequest = new BulkRequest();
 
-            final QueryRequest queryRequest = queryRequestsQueue.remove();
+            final Collection<QueryRequest> queryRequests = new LinkedList<>();
+            queryRequestsQueue.drainTo(queryRequests, max_items_batch);
 
-            LOGGER.trace("Writing query ID {} with response ID {}",
-                    queryRequest.getQueryId(), queryRequest.getQueryResponse().getQueryResponseId());
+            queryRequests.stream()
+                    .map(queryRequest -> new IndexRequest(UbiUtils.getQueriesIndexName(queryRequest.getStoreName()))
+                            .source(buildQueryRequestMap(queryRequest), XContentType.JSON))
+                    .forEach(queryRequestsBulkRequest::add);
 
-            // What will be indexed - adheres to the queries-mapping.json
-            final Map<String, Object> source = new HashMap<>();
-            source.put("timestamp", queryRequest.getTimestamp());
-            source.put("query_id", queryRequest.getQueryId());
-            source.put("query", queryRequest.getQuery());
-            source.put("query_response_id", queryRequest.getQueryResponse().getQueryResponseId());
-            source.put("query_response_hit_ids", queryRequest.getQueryResponse().getQueryResponseHitIds());
-            source.put("user_id", queryRequest.getUserId());
-            source.put("session_id", queryRequest.getSessionId());
+            LOGGER.trace("Indexing " + queryRequestsBulkRequest.numberOfActions() + " queries");
 
-            // Get the name of the queries.
-            final String queriesIndexName = UbiUtils.getQueriesIndexName(queryRequest.getStoreName());
+            if (queryRequestsBulkRequest.numberOfActions() > 0) {
+                client.bulk(queryRequestsBulkRequest);
+            }
 
-            // Build the index request.
-            final IndexRequest indexRequest = new IndexRequest(queriesIndexName)
-                    .source(source, XContentType.JSON);
-
-            queryRequestsBulkRequest.add(indexRequest);
-
+        } catch (Exception ex) {
+            LOGGER.error("Error processing the UBI query requests queue.", ex);
         }
 
-        LOGGER.trace("Indexing " + queryRequestsBulkRequest.numberOfActions() + " queries");
+    }
 
-        if(queryRequestsBulkRequest.numberOfActions() > 0) {
-            client.bulk(queryRequestsBulkRequest);
-        }
+    private Map<String, Object> buildQueryRequestMap(final QueryRequest queryRequest) {
+
+        LOGGER.trace("Writing query ID {} with response ID {}",
+                queryRequest.getQueryId(), queryRequest.getQueryResponse().getQueryResponseId());
+
+        // What will be indexed - adheres to the queries-mapping.json
+        final Map<String, Object> source = new HashMap<>();
+        source.put("timestamp", queryRequest.getTimestamp());
+        source.put("query_id", queryRequest.getQueryId());
+        source.put("query", queryRequest.getQuery());
+        source.put("query_response_id", queryRequest.getQueryResponse().getQueryResponseId());
+        source.put("query_response_hit_ids", queryRequest.getQueryResponse().getQueryResponseHitIds());
+        source.put("user_id", queryRequest.getUserId());
+        source.put("session_id", queryRequest.getSessionId());
+
+        return source;
 
     }
 
