@@ -12,7 +12,7 @@ This `Backend` is implemented as an interface to potentially allow other backend
 ### OpenSearch Backend Store
 
 The backend has a concept of a "store", which is a logical collection of the events and queries. In OpenSearch, a store consists of two indices. One
-index is used to store events, and the other index is for storing quericd es.
+index is used to store events, and the other index is for storing queries.
 
 #### OpenSearch Data Mappings
 
