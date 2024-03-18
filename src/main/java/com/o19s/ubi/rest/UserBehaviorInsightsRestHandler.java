@@ -12,8 +12,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.o19s.ubi.data.OpenSearchDataManager;
 import com.o19s.ubi.UserBehaviorInsightsPlugin;
+import com.o19s.ubi.data.OpenSearchDataManager;
 import com.o19s.ubi.model.Event;
 import com.o19s.ubi.model.HeaderConstants;
 import com.o19s.ubi.model.SettingsConstants;
@@ -24,6 +24,7 @@ import org.opensearch.action.admin.indices.create.CreateIndexRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.opensearch.action.admin.indices.get.GetIndexRequest;
 import org.opensearch.action.admin.indices.get.GetIndexResponse;
+import org.opensearch.action.support.master.AcknowledgedResponse;
 import org.opensearch.client.node.NodeClient;
 import org.opensearch.cluster.metadata.IndexMetadata;
 import org.opensearch.common.settings.Settings;
@@ -84,6 +85,17 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
             final String storeName = restRequest.param("store");
             final String index = restRequest.param("index");
             final String idField = restRequest.param("id_field");
+
+            LOGGER.info("Received PUT for store {}", storeName);
+
+            if("".equals(index) || index == null) {
+                return (channel) -> {
+                    final XContentBuilder builder = XContentType.JSON.contentBuilder();
+                    builder.startObject().field("error", "missing index name");
+                    builder.endObject();
+                    channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST, builder));
+                };
+            }
 
             return create(nodeClient, storeName, index, idField);
 
@@ -172,7 +184,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
     private RestChannelConsumer create(final NodeClient nodeClient, final String storeName, final String index, final String idField) throws IOException {
 
-        LOGGER.info("Creating UBI store [{}] for index [{}] using field [{}]", storeName, index, idField);
+        LOGGER.debug("Creating UBI store [{}] for index [{}] using field [{}]", storeName, index, idField);
 
         final Settings indexSettings = Settings.builder()
                 .put(IndexMetadata.INDEX_NUMBER_OF_SHARDS_SETTING.getKey(), 1)
@@ -209,57 +221,72 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
     private RestChannelConsumer post(final NodeClient nodeClient, final String storeName, final RestRequest restRequest) throws IOException {
 
-        try {
+        return (channel) -> {
 
-            final String eventJson = restRequest.content().utf8ToString();
-            final String eventJsonWithTimestamp = setEventTimestamp(eventJson);
+            try {
 
-            LOGGER.trace("Indexing UBI event into store {}", storeName);
-            final String eventsIndexName = UbiUtils.getEventsIndexName(storeName);
+                final String eventJson = restRequest.content().utf8ToString();
+                final String eventJsonWithTimestamp = setEventTimestamp(eventJson);
 
-            final Event event = new Event(eventsIndexName, eventJsonWithTimestamp);
-            OpenSearchDataManager.getInstance(nodeClient).add(event);
+                LOGGER.trace("Indexing UBI event into store {}", storeName);
+                final String eventsIndexName = UbiUtils.getEventsIndexName(storeName);
 
-        } catch (JsonProcessingException ex) {
-            LOGGER.error("Unable to get/set timestamp on UBI event.", ex);
+                final Event event = new Event(eventsIndexName, eventJsonWithTimestamp);
+                OpenSearchDataManager.getInstance(nodeClient).add(event);
 
-            final XContentBuilder builder = XContentType.JSON.contentBuilder();
-            builder.startObject().field("error", "unable to set event timestamp");
-            builder.endObject();
+                final XContentBuilder builder = XContentType.JSON.contentBuilder();
+                builder.startObject().field("status", "received");
+                builder.endObject();
 
-            return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST, builder));
-        }
+                channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
 
-        final XContentBuilder builder = XContentType.JSON.contentBuilder();
-        builder.startObject().field("status", "received");
-        builder.endObject();
+            } catch (JsonProcessingException ex) {
+                LOGGER.error("Unable to get/set timestamp on UBI event.", ex);
 
-        return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
+                final XContentBuilder builder = XContentType.JSON.contentBuilder();
+                builder.startObject().field("error", "unable to set event timestamp");
+                builder.endObject();
+
+                channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST, builder));
+            }
+
+        };
 
     }
 
-    private RestChannelConsumer delete(final NodeClient nodeClient, final String storeName) throws IOException {
+    private RestChannelConsumer delete(final NodeClient nodeClient, final String storeName) {
 
-        // Delete the events index.
-        final DeleteIndexRequest deleteEventsIndexRequest = new DeleteIndexRequest(UbiUtils.getEventsIndexName(storeName));
-        nodeClient.admin().indices().delete(deleteEventsIndexRequest);
+        final DeleteIndexRequest deleteEventsIndexRequest = new DeleteIndexRequest(
+                UbiUtils.getEventsIndexName(storeName),
+                UbiUtils.getQueriesIndexName(storeName));
 
-        // Delete the queries index.
-        final DeleteIndexRequest deleteQueriesIndexRequest = new DeleteIndexRequest(UbiUtils.getQueriesIndexName(storeName));
-        nodeClient.admin().indices().delete(deleteQueriesIndexRequest);
+        return (channel) -> {
 
-        final XContentBuilder builder = XContentType.JSON.contentBuilder();
-        builder.startObject().field("status", "deleted");
-        builder.endObject();
+            nodeClient.admin().indices().delete(deleteEventsIndexRequest, new RestActionListener<>(channel) {
 
-        // Remove this store's settings from the settings map.
-        UserBehaviorInsightsPlugin.storeSettings.entrySet().removeIf(entry -> entry.getKey().startsWith(storeName + "."));
+                @Override
+                protected void processResponse(AcknowledgedResponse acknowledgedResponse) throws Exception {
 
-        return (channel) -> channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
+                    // Remove this store's settings from the settings map.
+                    UserBehaviorInsightsPlugin.storeSettings.entrySet().removeIf(entry -> entry.getKey().startsWith(storeName + "."));
+
+                    final XContentBuilder builder = XContentType.JSON.contentBuilder();
+                    builder.startObject().field("status", "deleted");
+                    builder.endObject();
+
+                    channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
+
+                }
+
+            });
+
+        };
 
     }
 
     private String setEventTimestamp(final String eventJson) throws JsonProcessingException {
+
+        LOGGER.info("event json: " + eventJson);
 
         final JsonNode rootNode = new ObjectMapper().readTree(eventJson);
 

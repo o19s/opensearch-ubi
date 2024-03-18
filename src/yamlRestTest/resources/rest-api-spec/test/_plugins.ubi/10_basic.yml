@@ -1,4 +1,4 @@
-"Test that the plugin is loaded in OpenSearch":
+"Test that the plugin is loaded":
   - do:
       cat.plugins:
         local: true
