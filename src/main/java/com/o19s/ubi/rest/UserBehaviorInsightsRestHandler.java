@@ -12,8 +12,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.o19s.ubi.data.OpenSearchDataManager;
 import com.o19s.ubi.UserBehaviorInsightsPlugin;
+import com.o19s.ubi.data.OpenSearchDataManager;
 import com.o19s.ubi.model.Event;
 import com.o19s.ubi.model.HeaderConstants;
 import com.o19s.ubi.model.SettingsConstants;
@@ -254,7 +254,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
     }
 
-    private RestChannelConsumer delete(final NodeClient nodeClient, final String storeName) throws IOException {
+    private RestChannelConsumer delete(final NodeClient nodeClient, final String storeName) {
 
         final DeleteIndexRequest deleteEventsIndexRequest = new DeleteIndexRequest(
                 UbiUtils.getEventsIndexName(storeName),
