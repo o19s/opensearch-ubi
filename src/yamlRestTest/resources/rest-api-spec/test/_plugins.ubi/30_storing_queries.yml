@@ -14,7 +14,7 @@ setup:
       index:
         index: ecommerce
         id: "1"
-        body: { foo: bar }
+        body: { name: ProductA }
 
   - do:
       ubi.create_store:
@@ -78,7 +78,7 @@ setup:
       index:
         index: ecommerce
         id: "1"
-        body: { foo: bar }
+        body: { name: ProductA }
 
   - do:
       headers:

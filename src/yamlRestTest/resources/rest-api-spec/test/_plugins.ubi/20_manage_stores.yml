@@ -69,14 +69,14 @@
         index: some_index
         id_field: ""
 
-#---
-#"Delete a store that does not exist":
-## Deleting a store that does not exist does not throw an exception.
-#
-#  - do:
-#      catch: missing
-#      ubi.delete_store:
-#        store: invalid_store
+---
+"Delete a store that does not exist":
+# Deleting a store that does not exist does not throw an exception.
+
+  - do:
+      catch: missing
+      ubi.delete_store:
+        store: invalid_store
 
 ---
 "Create a store that already exists":
