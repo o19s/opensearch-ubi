@@ -12,7 +12,7 @@ This `Backend` is implemented as an interface to potentially allow other backend
 ### OpenSearch Backend Store
 
 The backend has a concept of a "store", which is a logical collection of the events and queries. In OpenSearch, a store consists of two indices. One
-index is used to store events, and the other index is for storing queries.
+index is used to store events, and the other index is for storing quericd es.
 
 #### OpenSearch Data Mappings
 
@@ -31,15 +31,20 @@ Schema for events:
 
 **Other fields & data objects**
 - `event_attributes` - contains various, common attributes associated with many user events
-- `event_attributes.data` - contains an associated JSONified data object (i.e. products, user info, etc) if there are any
-- `event_attributes.data.data_type` - indicates the type/class of object
-- `event_attributes.data.data_id` - points to a unique id representing and instance of that object
-- `event_attributes.data.description` - optional description of the object
-- `event_attributes.data.transaction_id` - optionally points to a unique id representing a successful transaction
-- `event_attributes.data.to_user_id` - optionally points to another user, if they are the recipient of this object
-- `event_attributes.data.data_detail` - optional data object/map of further data details
-- 
-*Other mapped fields in the schema are intended to be optional placeholders for common attributes like `city`, `state`, `price`
+- `event_attributes.position` - nested object to track user events to the location of the event origins
+  - `event_attributes.position.ordinal` - tracks the nth item within a list that a user could select, click
+  - `event_attributes.position.{x,y}` - tracks x and y values, that the client defines
+  - `event_attributes.position.page_depth` - tracks page depth
+  - `event_attributes.position.scroll_depth` - tracks scroll depth
+  - `event_attributes.position.trail` - text field for tracking the path/trail that a user took to get to this location
+- `event_attributes.object` - contains an associated JSONified data object (i.e. books, products, user info, etc) if there are any
+  - `event_attributes.object.object_type` - indicates the type/class of object
+  - `event_attributes.object.object_id` - points to a unique id representing and instance of that object
+  - `event_attributes.object.description` - optional description of the object
+  - `event_attributes.object.transaction_id` - optionally points to a unique id representing a successful transaction
+  - `event_attributes.object.to_user_id` - optionally points to another user, if they are the recipient of this object
+  - `event_attributes.object.object_detail` - optional data object/map of further data details
+*Other mapped fields in the schema are intended to be optional placeholders for common attributes like `user_name`, `email`, `price`
 
 **the users can dynamically add any further fields to the event mapping
 
