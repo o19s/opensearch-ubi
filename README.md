@@ -1,100 +1,23 @@
 # OpenSearch User Behavior Insights
 
-OpenSearch RFC - https://github.com/opensearch-project/OpenSearch/issues/12084
-
 This project is the OpenSearch plugin for storing and managing search requests and responses along with events produced client-side.
 
-## Building and Usage
+Related Links:
+* OpenSearch UBI RFC - https://github.com/opensearch-project/OpenSearch/issues/12084
 
-Build the plugin.  Note that you will have to match up the JDK 11 on your system to java home in the `gradle.properties` file:
+## Building the Plugin
 
-`./gradlew build`
-
-Build the OpenSearch docker image and add the plugin:
-
-`docker compose build`
-
-Start the container:
-
-`docker compose up`
-
-Or to start a three-node OpenSearch cluster:
+Build the plugin
 
 ```
-docker compose -f docker-compose-cluster.yaml up
+./gradlew build
 ```
 
-Initialize the `awesome` UBI store:
+Build the OpenSearch docker image and add the plugin, then start the containers:
 
 ```
-curl -X PUT "http://localhost:9200/_plugins/ubi/awesome?index=ecommerce&id_field=name"
+docker compose build
+docker compose up
 ```
 
-Send an event to the `awesome` store:
-
-```
-curl -X POST http://localhost:9200/_plugins/ubi/awesome -H "Content-Type: application/json" -d '
-{
-  "type": "search",
-  "keywords": "khgkj",
-  "timestamp": 1705596607509,
-  "url": "http://some-url.com/test.html",
-  "lang": "en-US",
-  "session": "npckcy4",
-  "query": ""
-}'
-```
-
-Get events:
-
-```
-curl -s http://localhost:9200/.awesome_events/_search | jq
-```
-
-Do a search of the `ecommerce` index:
-
-```
-curl -s http://localhost:9200/ecommerce/_search -H "X-ubi-store: awesome" | jq
-```
-
-Get queries:
-
-```
-curl -s http://localhost:9200/.awesome_queries/_search | jq
-```
-
-Delete the store:
-
-```
-curl -X DELETE http://localhost:9200/_plugins/ubi/awesome
-```
-
-Get the stores:
-
-```
-curl http://localhost:9200/_plugins/ubi
-```
-
-## Load Test
-
-The `load-test` directory contains a basic load testing example. The purpose of the files under `load-test` are to provide a means of testing the plugin's ability to receive and store a large number of events over time. To use the load test, first start OpenSearch on `localhost:9200`, and then:
-
-```
-cd load-test
-source ./venv/bin/activate
-./run.sh
-```
-
-The test will run for 10 seconds. The number of events sent will be shown along with the `_count` of events in the store:
-
-```
-Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
---------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-POST     /_plugins/ubi/mystore                                                              8     0(0.00%) |      8       6       9      8 |    0.81        0.00
---------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-         Aggregated                                                                         8     0(0.00%) |      8       6       9      8 |    0.81        0.00
-
-Found 8 indexed
-```
-
-This shows 8 total requests made by locust, and 8 events are in the index. The idea being we can assert that the number of events sent matches the events stored in the index.
+See the [Quick Start](documentation/documentation.md#quick-start) section in the documentation for a complete example of how to initialize the plugin and store events and queries. 
