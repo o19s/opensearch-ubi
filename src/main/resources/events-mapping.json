@@ -15,9 +15,6 @@
       "properties": {
         "user_name": { "type": "keyword", "ignore_above": 256 },
         "user_id": { "type": "keyword", "ignore_above": 100 },
-        "city": { "type": "keyword", "ignore_above": 256 },
-        "state": { "type": "keyword", "ignore_above": 100 },
-        "zip": { "type": "keyword", "ignore_above": 100 },
         "email": { "type": "keyword" },
         "price": { "type": "float" },
         "ip": {
@@ -27,16 +24,27 @@
         "browser": {
           "type": "text",
           "fields": {
-            "keyword": {
-              "type": "keyword",
-              "ignore_above": 256
-            }
+            "keyword": { "type": "keyword", "ignore_above": 256 }
           }
         },
-        "data": {
+        "position": {
           "properties": {
-            "data_id": { "type": "keyword", "ignore_above": 256 },
-            "data_type": { "type": "keyword", "ignore_above": 100 },
+            "ordinal": { "type": "integer"},
+            "x": { "type": "integer"},
+            "y": { "type": "integer"},
+            "page_depth": { "type": "integer"},
+            "scroll_depth": { "type": "integer"},
+            "trail": {
+              "type": "text",
+              "fields": {
+                "keyword": { "type": "keyword", "ignore_above": 256 }
+              }
+            }
+        },
+        "object": {
+          "properties": {
+            "object_id": { "type": "keyword", "ignore_above": 256 },
+            "object_type": { "type": "keyword", "ignore_above": 100 },
             "transaction_id": { "type": "keyword", "ignore_above": 100 },
             "description": {
               "type": "text",
@@ -48,7 +56,7 @@
               }
             },
             "to_user_id": { "type": "keyword", "ignore_above": 100 },
-            "data_detail": {
+            "object_detail": {
               "type": "object"
             }
           }
