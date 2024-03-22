@@ -81,7 +81,7 @@ The current event mappings file can be found [here](https://github.com/o19s/open
 - `timestamp` - unix epoch time. if not set, will be set by the plugin when the event is received
 - `user_id`. `session_id`, `page_id` - (size 100) - are id's largely at the calling client's discretion for tracking users, sessions and pages
 - `query_id` - (size 100) - ID for some query.  Note that it could be a unique search string, or it could represent a cluster of related searches (i.e.: *dress*, *red dress*, *long dress* could all have the same `query_id`).  Either the client could control these, or the `query_id` could be retrieved from the API's response headers as it keeps track of queries on the node
-- `message_type` - (size 100) - originally thought of in terms of ERROR, INFO, WARN...but could be anything useful such as `QUERY` or `PURCHASE`
+- `message_type` - (size 100) - originally thought of in terms of ERROR, INFO, WARN, but could be anything useful such as `QUERY` or `CONVERSION`.  Use to group `action_name` together.
 - `message` - (size 256) - optional text for the log entry
 
 **Other fields & data objects**
@@ -191,4 +191,5 @@ curl http://localhost:9200/ecommerce/_search -H "X-ubi-store: mystore" -H "X-ubi
 
 With this query, when the plugin sees a query, the plugin will be able to associate the query with an individual user and know to persist the query in the UBI store `mystore`.
 
-[Sample SQL queries](getting-started\queries\sql_queries.md)
+[Sample SQL queries](documentation\queries\sql_queries.md)
+[Sample OpenSearch queries](documentation\queries\dsl_queries.md)
