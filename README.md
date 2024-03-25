@@ -21,3 +21,7 @@ docker compose up
 ```
 
 See the [Quick Start](documentation/documentation.md#quick-start) section in the documentation for a complete example of how to initialize the plugin and store events and queries. 
+
+## Releasing
+
+Run `tag-and-release.sh` to create and push a tag to GitHub. The tag will kick off the GitHub Action to build the release. After running `tag-and-release.sh`, update the version numbers in `gradle.properties` and the `Dockerfile`.
