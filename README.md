@@ -24,4 +24,4 @@ See the [Quick Start](documentation/documentation.md#quick-start) section in the
 
 ## Releasing
 
-Run `tag-and-release.sh` to create and push a tag to GitHub. The tag will kick off the GitHub Action to build the release. After running `tag-and-release.sh`, update the version numbers in `gradle.properties` and the `Dockerfile`.
+Run `tag-and-release.sh` to create and push a tag to GitHub. The tag will kick off the GitHub Action to build the release. After running `tag-and-release.sh`, update the version numbers in `gradle.properties` and the `Dockerfile` and commit the changes.
