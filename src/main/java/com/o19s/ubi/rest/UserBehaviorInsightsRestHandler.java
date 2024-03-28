@@ -286,7 +286,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
     private String setEventTimestamp(final String eventJson) throws JsonProcessingException {
 
-        LOGGER.info("event json: " + eventJson);
+        LOGGER.trace("Received UBI event json: " + eventJson);
 
         final JsonNode rootNode = new ObjectMapper().readTree(eventJson);
 
