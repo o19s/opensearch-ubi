@@ -106,6 +106,10 @@
               "type": "keyword",
               "ignore_above": 100
             },
+            "name": {
+              "type": "keyword",
+              "ignore_above": 256
+            },
             "description": {
               "type": "text",
               "fields": {
