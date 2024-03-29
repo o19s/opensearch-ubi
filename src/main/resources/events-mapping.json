@@ -91,6 +91,9 @@
         },
         "object": {
           "properties": {
+            "key_value": {
+              "type": "keyword"
+            },
             "object_id": {
               "type": "keyword",
               "ignore_above": 256
