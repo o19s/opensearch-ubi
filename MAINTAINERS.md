@@ -8,5 +8,4 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 |----------------|----------------------------------------------|-----------------------------|
 | Jeff Zemerick  | [jzonthemtn](https://github.com/jzonthemtn)  | OpenSource Connections      |
 | Jason Robinson | [rasonj](https://github.com/rasonj)          | OpenSource Connections      |
-| Eric Pugh      | [epugh](https://github.com/epugh) | OpenSource Connections      |
-
+| Eric Pugh      | [epugh](https://github.com/epugh)            | OpenSource Connections      |
