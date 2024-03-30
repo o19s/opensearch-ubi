@@ -33,7 +33,7 @@ curl -X PUT "http://localhost:9200/_plugins/ubi/awesome?index=ecommerce&id_field
 Send an event to the `awesome` store:
 
 ```
-curl -X POST http://localhost:9200/_plugins/ubi/mystore -H "Content-Type: application/json" -d '
+curl -X POST http://localhost:9200/_plugins/ubi/awesome -H "Content-Type: application/json" -d '
 {
   "action_name": "search",
   "user_id": "98fcf189-4fa8-4322-b6f5-63fbb6b556c9",
@@ -44,7 +44,7 @@ curl -X POST http://localhost:9200/_plugins/ubi/mystore -H "Content-Type: applic
 Get events:
 
 ```
-curl -s http://localhost:9200/.awesome_events/_search | jq
+curl -s http://localhost:9200/ubi_awesome_events/_search | jq
 ```
 
 Do a search of the `ecommerce` index:
@@ -56,7 +56,7 @@ curl -s http://localhost:9200/ecommerce/_search -H "X-ubi-store: awesome" | jq
 Get queries:
 
 ```
-curl -s http://localhost:9200/.awesome_queries/_search | jq
+curl -s http://localhost:9200/ubi_awesome_queries/_search | jq
 ```
 
 Delete the store:
@@ -130,7 +130,7 @@ The plugin exposes a REST API for managing UBI stores and persisting events.
 
 ### Creating a UBI Store
 
-To create a UBI store to contain events and queries, send a `PUT` request:
+To create a UBI store to contain events and queries, send a `PUT` request. The following request creates a store called `mystore`.
 
 ```
 curl -X PUT http://localhost:9200/_plugins/ubi/mystore?index=ecommerce
