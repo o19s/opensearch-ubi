@@ -6,7 +6,7 @@
       ubi.create_store:
         store: mystore
         index: ecommerce
-        id_field: name
+        key_field: name
 
   - do:
       cluster.health:
@@ -60,14 +60,14 @@
         index: ""
 
 ---
-"Create a store without specifying an id_field":
-# A missing id_field is allowed - the doc ID will be used instead.
+"Create a store without specifying an key_field":
+# A missing key_field is allowed - the doc ID will be used instead.
 
   - do:
       ubi.create_store:
         store: invalid_store
         index: some_index
-        id_field: ""
+        key_field: ""
 
 ---
 "Delete a store that does not exist":
@@ -86,7 +86,7 @@
       ubi.create_store:
         store: mystore
         index: ecommerce
-        id_field: name
+        key_field: name
 
   - do:
       cluster.health:
@@ -97,6 +97,6 @@
       ubi.create_store:
         store: mystore
         index: ecommerce
-        id_field: name
+        key_field: name
 
   - match: { status: initialized }

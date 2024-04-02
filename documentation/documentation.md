@@ -27,7 +27,7 @@ docker compose -f docker-compose-cluster.yaml up
 Initialize the `awesome` UBI store:
 
 ```
-curl -X PUT "http://localhost:9200/_plugins/ubi/awesome?index=ecommerce&id_field=id"
+curl -X PUT "http://localhost:9200/_plugins/ubi/awesome?index=ecommerce&key_field=id"
 ```
 
 Send an event to the `awesome` store:
@@ -111,7 +111,7 @@ The current event mappings file can be found [here](https://github.com/o19s/open
 - `event_attributes.object` - contains an associated JSONified data object (i.e. books, products, user info, etc) if there are any
   - `event_attributes.object.object_id` - points to a unique, internal, id representing and instance of that object
   - `event_attributes.object.key_value` - points to a unique, external key, matching the item that the user searched for, found and acted upon (i.e. sku, isbn, ean, etc.). 
-    **This field value should match the value in for the object's value in the `id_field` [below](#id_field) from the search store**
+    **This field value should match the value in for the object's value in the `key_field` [below](#key_field) from the search store**
      It is possible that the `object_id` and `key_value` match if the same id is used both internally for indexing and externally for the users. 
   - `event_attributes.object.object_type` - indicates the type/class of object
   - `event_attributes.object.description` - optional description of the object
@@ -145,7 +145,7 @@ The plugin exposes a REST API for managing UBI stores and persisting events.
 
 | Method | Endpoint                                                  | Purpose                                                                                                                                                                                                                                   |
 |--------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `PUT`    | `/_plugins/ubi/{store}?index={index}&id_field={id_field}` | <p id="id_field">Initialize a new UBI store for the given index. The `id_field` is optional and allows for providing the name of a field in the `index`'s schema to be used as the unique result/item ID for each search result. If not provided, the `_id` field is used. </p>|
+| `PUT`    | `/_plugins/ubi/{store}?index={index}&key_field={key_field}` | <p id="key_field">Initialize a new UBI store for the given index. The `key_field` is optional and allows for providing the name of a field in the `index`'s schema to be used as the unique result/item ID for each search result. If not provided, the `_id` field is used. </p>|
 | `DELETE` | `/_plugins/ubi/{store}`                                   | Delete a UBI store                                                                                                                                                                                                                        |
 | `GET` | `/_plugins/ubi`                                           | Get a list of all UBI stores                                                                                                                                                                                                              |
 | `POST` | `/_plugins/ubi/{store}`                                   | Index an event into the UBI store                                                                                                                                                                                                         |
