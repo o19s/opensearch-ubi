@@ -65,6 +65,20 @@ Delete the store:
 curl -X DELETE http://localhost:9200/_plugins/ubi/awesome
 ```
 
+## What does the OpenSearch UBI plugin do?
+
+The UBI plugin:
+
+* Provides a REST interface for initializing, listing, and deleting UBI stores.
+* Provides a REST interface for receiving and persisting client-side events in OpenSearch (via an abstraction for extensibility).
+* Passively listens for OpenSearch queries and persists queries with a corresponding UBI store.
+* Generates a `query_id` for queries when required (when not provided by the client).
+* Sets timestamps for received client-side events when required.
+* Validates format and syntax of received client-side events and UBI store parameters.
+* Provides a standard set of schemas for indexing client-side events and OpenSearch queries.
+* Allows the user to set a `key_field` to be used as a document's unique id instead of the document's `_id` field.
+* Manages user-configurable settings (`index` name, `key_field`, and others) of UBI stores.
+
 ## UBI Store
 
 The plugin has a concept of a "store", which is a logical collection of the events and queries. A store consists of two indices. One
