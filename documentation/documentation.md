@@ -71,7 +71,7 @@ The UBI plugin:
 
 * Provides a REST interface for initializing, listing, and deleting UBI stores.
 * Provides a REST interface for receiving and persisting client-side events in OpenSearch (via an abstraction for extensibility).
-* Passively listens for OpenSearch queries and persists queries with a corresponding UBI store.
+* Passively listens for OpenSearch queries and persists queries run on an OpenSearch index with a corresponding UBI store.
 * Generates a `query_id` for queries when required (when not provided by the client).
 * Sets timestamps for received client-side events when required.
 * Validates format and syntax of received client-side events and UBI store parameters.
