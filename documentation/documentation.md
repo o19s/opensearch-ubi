@@ -69,6 +69,8 @@ curl -X DELETE http://localhost:9200/_plugins/ubi/awesome
 
 The OpenSearch plugin architecture was chosen for UBI due to its maturity, community support, and wide usage by other OpenSearch and community projects. The OpenSearch plugin architecture allows for creating and extensively testing custom OpenSearch API endpoints and interacting with OpenSearch (creating indexes, indexing data, etc.) using the native OpenSearch client. Other considerations for utilizing a plugin for UBI was for control over the UBI release cycle, providing simultaneous compatibility with multiple OpenSearch versions, and extensibility that does not lock UBI into any specific design choices. For instance, UBI stores client-side events and queries in OpenSearch indexes but this could be extended to use a different backend store.
 
+With these capabilities of the plugin architecture, UBI can offer a REST interface for initializing and managing stores, persisting client-side events and queries, and coordinating the correlation between client-side events and queries.
+
 The UBI plugin:
 
 * Provides a REST interface for initializing, listing, and deleting UBI stores.
