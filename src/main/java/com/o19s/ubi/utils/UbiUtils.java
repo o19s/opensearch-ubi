@@ -33,7 +33,7 @@ public class UbiUtils {
      * @return The formatted name of the queries index.
      */
     public static String getQueriesIndexName(final String storeName) {
-        return "." + storeName + "_queries";
+        return "ubi_" + storeName + "_queries";
     }
 
     /**
@@ -42,7 +42,7 @@ public class UbiUtils {
      * @return The formatted name of the events index.
      */
     public static String getEventsIndexName(final String storeName) {
-        return "." + storeName + "_events";
+        return "ubi_" + storeName + "_events";
     }
 
     /**

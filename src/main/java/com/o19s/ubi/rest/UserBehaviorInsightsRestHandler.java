@@ -161,13 +161,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
                 @Override
                 public void processResponse(final GetIndexResponse getIndexResponse) throws Exception {
 
-                    final Set<String> stores = new HashSet<>();
-
-                    for(final String index : getIndexResponse.indices()) {
-                        if(index.startsWith(".") && index.endsWith("_events")) {
-                            stores.add(index.substring(1, index.length() - 7));
-                        }
-                    }
+                    final Set<String> stores = getStoreNames(getIndexResponse.indices());
 
                     final XContentBuilder builder = XContentType.JSON.contentBuilder();
                     builder.startObject().field("stores", stores);
@@ -304,8 +298,8 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
     private Set<String> getStoreNames(String[] indices) {
         final Set<String> stores = new HashSet<>();
         for (final String index : indices) {
-            if (index.startsWith(".") && index.endsWith("_events")) {
-                stores.add(index.substring(1, index.length() - 7));
+            if (index.startsWith("ubi_") && index.endsWith("_events")) {
+                stores.add(index.substring(4, index.length() - 7));
             }
         }
         return stores;

@@ -13,7 +13,7 @@ setup:
 
   - do:
       cluster.health:
-        index: [.mystore2_events, .mystore2_queries]
+        index: [ubi_mystore2_events, ubi_mystore2_queries]
         wait_for_no_initializing_shards: true
 
   # With an empty timestamp

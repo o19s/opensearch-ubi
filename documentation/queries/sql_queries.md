@@ -17,7 +17,7 @@ order by user_id
 ```sql
 select 
 	count(0)
-from .ubi_log_events
+from ubi_log_events
 where action_name='on_search' and  event_attributes.data.data_detail.query_data.query_response_hit_ids is null
 order by timestamp
 ```
@@ -30,7 +30,7 @@ Both client and server-side queries should return the same number.
 ```sql
 select 
 	message, count(0) Total  
-from .ubi_log_events 
+from ubi_log_events 
 where 
 	action_name='on_search' 
 group by message 
@@ -66,7 +66,7 @@ To make a pie chart like widget on all the most common events:
 ```sql
 select 
 	action_name, count(0) Total  
-from .ubi_log_events 
+from ubi_log_events 
 group by action_name
 order by Total desc
 ```
@@ -88,7 +88,7 @@ To make a pie chart like widget on the most common events preceded by a query:
 ```sql
 select 
 	action_name, count(0) Total  
-from .ubi_log_events
+from ubi_log_events
 where query_id is not null
 group by action_name
 order by Total desc
@@ -122,7 +122,7 @@ Search for the events that correspond to the query above, `1065c70f-d46a-442f-8c
 ```sql
 select 
   query_id, action_name, message_type, message, event_attributes.data.data_id, event_attributes.data.description, session_id, user_id
-from .ubi_log_events
+from ubi_log_events
 where query_id = '1065c70f-d46a-442f-8ce4-0b5e7a71a892'
 order by timestamp
 ```
@@ -147,7 +147,7 @@ To look at more sessions from the same user above, `155_7e3471ff-14c8-45cb-bc49-
 ```sql
 select 
 	user_id, session_id, query_id, action_name, message_type, message, event_attributes.data.data_type, timestamp 
-from .ubi_log_events
+from ubi_log_events
 where user_id ='155_7e3471ff-14c8-45cb-bc49-83a056c37192'
 order by timestamp
 ```
@@ -250,7 +250,7 @@ user_id|session_id|query_id|action_name|message_type|message|event_attributes.da
 ```sql
 select 
     user_id, session_id, count(0) EventTotal
-from .ubi_log_events
+from ubi_log_events
 where action_name='logout' and query_id is null
 group by user_id, session_id
 order by EventTotal desc
@@ -281,7 +281,7 @@ Since some of these query-less logouts repeat with some users, here is a query t
 ```sql
 select 
     user_id, count(0) EventTotal
-from .ubi_log_events
+from ubi_log_events
 where action_name='logout' and query_id is null
 group by user_id
 order by EventTotal desc
