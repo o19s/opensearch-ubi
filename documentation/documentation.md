@@ -65,6 +65,29 @@ Delete the store:
 curl -X DELETE http://localhost:9200/_plugins/ubi/awesome
 ```
 
+## What does the OpenSearch UBI plugin do?
+
+The OpenSearch plugin architecture was chosen for UBI due to its maturity, community support, and wide usage by other OpenSearch and community projects. The OpenSearch plugin architecture allows for creating and extensively testing custom OpenSearch API endpoints and interacting with OpenSearch (creating indexes, indexing data, etc.) using the native OpenSearch client. Other considerations for utilizing a plugin for UBI was for control over the UBI release cycle, providing simultaneous compatibility with multiple OpenSearch versions, and extensibility that does not lock UBI into any specific design choices. For instance, UBI stores client-side events and queries in OpenSearch indexes but this could be extended to use a different backend store.
+
+With these capabilities of the plugin architecture, UBI can offer a REST interface for initializing and managing stores, persisting client-side events and queries, and coordinating the correlation between client-side events and queries.
+
+The UBI plugin:
+
+* Provides a REST interface for initializing, listing, and deleting UBI stores.
+* Provides a REST interface for receiving and persisting client-side events in OpenSearch (via an abstraction for extensibility).
+* Passively listens for OpenSearch queries and persists queries run on an OpenSearch index with a corresponding UBI store.
+* Generates a `query_id` for queries when required (when not provided by the client).
+* Sets timestamps for received client-side events when required.
+* Validates format and syntax of received client-side events and UBI store parameters.
+* Provides a standard set of schemas for indexing client-side events and OpenSearch queries.
+* Allows the user to set a `key_field` to be used as a document's unique id instead of the document's `_id` field.
+* Manages user-configurable settings (`index` name, `key_field`, and others) of UBI stores.
+
+Things the plugin does not currently do but are goals of the plugin:
+
+* Provide the ability to dump UBI data to a format common for data analysis.
+* Facilitate a method of bulk importing of historical data from a non-UBI source.
+
 ## UBI Store
 
 The plugin has a concept of a "store", which is a logical collection of the events and queries. A store consists of two indices. One
