@@ -79,6 +79,11 @@ The UBI plugin:
 * Allows the user to set a `key_field` to be used as a document's unique id instead of the document's `_id` field.
 * Manages user-configurable settings (`index` name, `key_field`, and others) of UBI stores.
 
+Things the plugin does not currently do but are goals of the plugin:
+
+* Provide the ability to dump UBI data to a format common for data analysis.
+* Facilitate a method of bulk importing of historical data from a non-UBI source.
+
 ## UBI Store
 
 The plugin has a concept of a "store", which is a logical collection of the events and queries. A store consists of two indices. One
