@@ -66,7 +66,7 @@ services:
         hard: 65536
 
   os-dashboards:
-    image: opensearchproject/opensearch-dashboards:2.12.0
+    image: opensearchproject/opensearch-dashboards:2.13.0
     container_name: opensearch-dashboards
     ports:
       - 5601:5601

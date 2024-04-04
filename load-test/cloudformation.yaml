@@ -19,12 +19,12 @@ Parameters:
 
   OpenSearchVersion:
     Type: String
-    Default: 2.12.0
+    Default: 2.13.0
     Description: The version of OpenSearch to deploy.
 
   UbiPluginVersion:
     Type: String
-    Default: 0.0.9
+    Default: 1.0.0
     Description: The version of the UBI plugin to deploy.
 
 Resources:
