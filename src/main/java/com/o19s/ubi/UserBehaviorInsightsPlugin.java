@@ -95,7 +95,7 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin {
 
         settings.add(Setting.intSetting(SettingsConstants.VERSION_SETTING, 1, -1, Integer.MAX_VALUE, Setting.Property.IndexScope));
         settings.add(Setting.simpleString(SettingsConstants.INDEX, "", Setting.Property.IndexScope));
-        settings.add(Setting.simpleString(SettingsConstants.ID_FIELD, "", Setting.Property.IndexScope));
+        settings.add(Setting.simpleString(SettingsConstants.KEY_FIELD, "", Setting.Property.IndexScope));
 
         return settings;
 

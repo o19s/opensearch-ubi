@@ -1,7 +1,7 @@
 
 
 ```json
-GET .ubi_log_events/_search
+GET ubi_log_events/_search
 {
   "size":0, 
   "aggs":{ 

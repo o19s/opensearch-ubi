@@ -84,7 +84,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
             final String storeName = restRequest.param("store");
             final String index = restRequest.param("index");
-            final String idField = restRequest.param("id_field");
+            final String idField = restRequest.param("key_field");
 
             LOGGER.info("Received PUT for store {}", storeName);
 
@@ -161,13 +161,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
                 @Override
                 public void processResponse(final GetIndexResponse getIndexResponse) throws Exception {
 
-                    final Set<String> stores = new HashSet<>();
-
-                    for(final String index : getIndexResponse.indices()) {
-                        if(index.startsWith(".") && index.endsWith("_events")) {
-                            stores.add(index.substring(1, index.length() - 7));
-                        }
-                    }
+                    final Set<String> stores = getStoreNames(getIndexResponse.indices());
 
                     final XContentBuilder builder = XContentType.JSON.contentBuilder();
                     builder.startObject().field("stores", stores);
@@ -191,7 +185,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
                 .put(IndexMetadata.INDEX_AUTO_EXPAND_REPLICAS_SETTING.getKey(), "0-2")
                 .put(IndexMetadata.SETTING_PRIORITY, Integer.MAX_VALUE)
                 .put(SettingsConstants.INDEX, index)
-                .put(SettingsConstants.ID_FIELD, idField)
+                .put(SettingsConstants.KEY_FIELD, idField)
                 .put(SettingsConstants.VERSION_SETTING, VERSION)
                 .build();
 
@@ -304,8 +298,8 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
     private Set<String> getStoreNames(String[] indices) {
         final Set<String> stores = new HashSet<>();
         for (final String index : indices) {
-            if (index.startsWith(".") && index.endsWith("_events")) {
-                stores.add(index.substring(1, index.length() - 7));
+            if (index.startsWith("ubi_") && index.endsWith("_events")) {
+                stores.add(index.substring(4, index.length() - 7));
             }
         }
         return stores;

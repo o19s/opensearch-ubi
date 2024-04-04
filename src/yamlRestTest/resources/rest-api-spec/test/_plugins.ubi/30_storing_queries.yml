@@ -23,18 +23,18 @@ setup:
 
   - do:
       cluster.health:
-        index: [.mystore_events, .mystore_queries]
+        index: [ubi_mystore_events, ubi_mystore_queries]
         wait_for_no_initializing_shards: true
 
   - do:
       indices.exists:
-        index: .mystore_events
+        index: ubi_mystore_events
 
   - is_true: ''
 
   - do:
       indices.exists:
-        index: .mystore_queries
+        index: ubi_mystore_queries
 
   - is_true: ''
 

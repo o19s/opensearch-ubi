@@ -16,9 +16,9 @@ locust -f load-test.py --headless -u 50 -r 10 --run-time 300s --host http://loca
 sleep 30
 
 # Get count of indexed events.
-EVENTS=`curl -s http://localhost:9200/.mystore_events/_count | jq .count`
+EVENTS=`curl -s http://localhost:9200/ubi_mystore_events/_count | jq .count`
 echo "Found $EVENTS events"
 
 # Get count of indexed queries.
-QUERIES=`curl -s http://localhost:9200/.mystore_queries/_count | jq .count`
+QUERIES=`curl -s http://localhost:9200/ubi_mystore_queries/_count | jq .count`
 echo "Found $QUERIES queries"

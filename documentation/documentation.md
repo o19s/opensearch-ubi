@@ -27,13 +27,13 @@ docker compose -f docker-compose-cluster.yaml up
 Initialize the `awesome` UBI store:
 
 ```
-curl -X PUT "http://localhost:9200/_plugins/ubi/awesome?index=ecommerce&id_field=id"
+curl -X PUT "http://localhost:9200/_plugins/ubi/awesome?index=ecommerce&key_field=id"
 ```
 
 Send an event to the `awesome` store:
 
 ```
-curl -X POST http://localhost:9200/_plugins/ubi/mystore -H "Content-Type: application/json" -d '
+curl -X POST http://localhost:9200/_plugins/ubi/awesome -H "Content-Type: application/json" -d '
 {
   "action_name": "search",
   "user_id": "98fcf189-4fa8-4322-b6f5-63fbb6b556c9",
@@ -44,7 +44,7 @@ curl -X POST http://localhost:9200/_plugins/ubi/mystore -H "Content-Type: applic
 Get events:
 
 ```
-curl -s http://localhost:9200/.awesome_events/_search | jq
+curl -s http://localhost:9200/ubi_awesome_events/_search | jq
 ```
 
 Do a search of the `ecommerce` index:
@@ -56,7 +56,7 @@ curl -s http://localhost:9200/ecommerce/_search -H "X-ubi-store: awesome" | jq
 Get queries:
 
 ```
-curl -s http://localhost:9200/.awesome_queries/_search | jq
+curl -s http://localhost:9200/ubi_awesome_queries/_search | jq
 ```
 
 Delete the store:
@@ -64,6 +64,29 @@ Delete the store:
 ```
 curl -X DELETE http://localhost:9200/_plugins/ubi/awesome
 ```
+
+## What does the OpenSearch UBI plugin do?
+
+The OpenSearch plugin architecture was chosen for UBI due to its maturity, community support, and wide usage by other OpenSearch and community projects. The OpenSearch plugin architecture allows for creating and extensively testing custom OpenSearch API endpoints and interacting with OpenSearch (creating indexes, indexing data, etc.) using the native OpenSearch client. Other considerations for utilizing a plugin for UBI was for control over the UBI release cycle, providing simultaneous compatibility with multiple OpenSearch versions, and extensibility that does not lock UBI into any specific design choices. For instance, UBI stores client-side events and queries in OpenSearch indexes but this could be extended to use a different backend store.
+
+With these capabilities of the plugin architecture, UBI can offer a REST interface for initializing and managing stores, persisting client-side events and queries, and coordinating the correlation between client-side events and queries.
+
+The UBI plugin:
+
+* Provides a REST interface for initializing, listing, and deleting UBI stores.
+* Provides a REST interface for receiving and persisting client-side events in OpenSearch (via an abstraction for extensibility).
+* Passively listens for OpenSearch queries and persists queries run on an OpenSearch index with a corresponding UBI store.
+* Generates a `query_id` for queries when required (when not provided by the client).
+* Sets timestamps for received client-side events when required.
+* Validates format and syntax of received client-side events and UBI store parameters.
+* Provides a standard set of schemas for indexing client-side events and OpenSearch queries.
+* Allows the user to set a `key_field` to be used as a document's unique id instead of the document's `_id` field.
+* Manages user-configurable settings (`index` name, `key_field`, and others) of UBI stores.
+
+Things the plugin does not currently do but are goals of the plugin:
+
+* Provide the ability to dump UBI data to a format common for data analysis.
+* Facilitate a method of bulk importing of historical data from a non-UBI source.
 
 ## UBI Store
 
@@ -88,7 +111,7 @@ The current event mappings file can be found [here](https://github.com/o19s/open
 - `event_attributes.object` - contains an associated JSONified data object (i.e. books, products, user info, etc) if there are any
   - `event_attributes.object.object_id` - points to a unique, internal, id representing and instance of that object
   - `event_attributes.object.key_value` - points to a unique, external key, matching the item that the user searched for, found and acted upon (i.e. sku, isbn, ean, etc.). 
-    **This field value should match the value in for the object's value in the `id_field` [below](#id_field) from the search store**
+    **This field value should match the value in for the object's value in the `key_field` [below](#key_field) from the search store**
      It is possible that the `object_id` and `key_value` match if the same id is used both internally for indexing and externally for the users. 
   - `event_attributes.object.object_type` - indicates the type/class of object
   - `event_attributes.object.description` - optional description of the object
@@ -122,7 +145,7 @@ The plugin exposes a REST API for managing UBI stores and persisting events.
 
 | Method | Endpoint                                                  | Purpose                                                                                                                                                                                                                                   |
 |--------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `PUT`    | `/_plugins/ubi/{store}?index={index}&id_field={id_field}` | <p id="id_field">Initialize a new UBI store for the given index. The `id_field` is optional and allows for providing the name of a field in the `index`'s schema to be used as the unique result/item ID for each search result. If not provided, the `_id` field is used. </p>|
+| `PUT`    | `/_plugins/ubi/{store}?index={index}&key_field={key_field}` | <p id="key_field">Initialize a new UBI store for the given index. The `key_field` is optional and allows for providing the name of a field in the `index`'s schema to be used as the unique result/item ID for each search result. If not provided, the `_id` field is used. </p>|
 | `DELETE` | `/_plugins/ubi/{store}`                                   | Delete a UBI store                                                                                                                                                                                                                        |
 | `GET` | `/_plugins/ubi`                                           | Get a list of all UBI stores                                                                                                                                                                                                              |
 | `POST` | `/_plugins/ubi/{store}`                                   | Index an event into the UBI store                                                                                                                                                                                                         |
@@ -130,7 +153,7 @@ The plugin exposes a REST API for managing UBI stores and persisting events.
 
 ### Creating a UBI Store
 
-To create a UBI store to contain events and queries, send a `PUT` request:
+To create a UBI store to contain events and queries, send a `PUT` request. The following request creates a store called `mystore`.
 
 ```
 curl -X PUT http://localhost:9200/_plugins/ubi/mystore?index=ecommerce
