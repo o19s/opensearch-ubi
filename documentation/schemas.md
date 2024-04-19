@@ -18,8 +18,7 @@ When UBI is turned on, a *search client* will get a `query_id` back from OpenSea
 # TODO: `key_field` rename?
 The `object` structure has two ways to refer to the object:
 - `event_attributes.object.object_id` is the unique id that OpenSearch can use internally to index the object.
-- `event_attributes.object.catalog_id` is the id that a user could look up the object in a *catelog*
-
+- `event_attributes.object.catalog_id` is the id that a user could look up the object in a *catalog*
 
  Therefore, the `query_id` signals the beginning of a user's *Search Journey*,
 `action_name` tells us how the user is interacting with the query results within the application, 
@@ -67,7 +66,9 @@ The current event mappings file can be found [here](../src/main/resources/events
   - `event_attributes.object.to_user_id`  \
 	&ensp; optionally points to another user, if they are the recipient of this object, perhaps as a gift, from the user's `user_id`
   - `event_attributes.object.object_detail`  \
-	&ensp; optional data object/map of further data details
+	&ensp; optional text for further data object details
+	  - `event_attributes.object.object_detail.json`  \
+	&ensp; if the user has a json object representing what was acted upon, it can be stored here; however, note that that could lead to index bloat if the json objects are large.
 - `event_attributes.position`  \
 	&ensp; nested object to track user events to the location of the event origins
   - `event_attributes.position.ordinal`  \
