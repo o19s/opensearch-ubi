@@ -26,6 +26,6 @@ public class SettingsConstants {
     /**
      * The field in an index's mapping that will be used as the unique identifier for a query result item.
      */
-    public static final String ID_FIELD = "index.ubi.id_field";
+    public static final String object_id = "index.ubi.object_id";
 
 }

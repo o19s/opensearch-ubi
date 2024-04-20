@@ -84,7 +84,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
 
             final String storeName = restRequest.param("store");
             final String index = restRequest.param("index");
-            final String idField = restRequest.param("id_field");
+            final String idField = restRequest.param("object_id");
 
             LOGGER.info("Received PUT for store {}", storeName);
 
@@ -191,7 +191,7 @@ public class UserBehaviorInsightsRestHandler extends BaseRestHandler {
                 .put(IndexMetadata.INDEX_AUTO_EXPAND_REPLICAS_SETTING.getKey(), "0-2")
                 .put(IndexMetadata.SETTING_PRIORITY, Integer.MAX_VALUE)
                 .put(SettingsConstants.INDEX, index)
-                .put(SettingsConstants.ID_FIELD, idField)
+                .put(SettingsConstants.object_id, idField)
                 .put(SettingsConstants.VERSION_SETTING, VERSION)
                 .build();
 

@@ -31,8 +31,8 @@
         },
         "object": {
           "properties": {
-            "catalog_id": { "type": "keyword" },
-            "object_id": { "type": "keyword", "ignore_above": 256 },
+            "internal_id": { "type": "keyword", "ignore_above": 256 },
+            "object_id": { "type": "keyword" },
             "object_type": { "type": "keyword", "ignore_above": 100 },
             "transaction_id": { "type": "keyword", "ignore_above": 100 },
             "name": { "type": "keyword", "ignore_above": 256 },
