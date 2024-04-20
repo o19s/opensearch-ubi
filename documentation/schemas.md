@@ -11,6 +11,7 @@
 
 ```mermaid
 graph LR
+
 style L fill:none
 subgraph L["`*Legend*`"]
     style ss height:150px
@@ -64,10 +65,10 @@ subgraph "`*client-side*`"
 end
 
 Search--2) search string-->Docs 
-Docs -- 6) query_id & objects--->Search ;
-Search --results--> User
-Search-.7)  query_id.->U;
+Docs -- 5) query_id & objects--->Search ;
+Search-.6)  query_id.->U;
 User -.8) selects object_id:123.->U;
+Search --7) results--> User
 U-."9) index event:{query_id, onClick, object_id:123}".->E;
 
 linkStyle 2,3,5,0 stroke-width:2px,fill:none,stroke:#0A1CCF
