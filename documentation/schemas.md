@@ -8,7 +8,27 @@
 - **Ubi Logging Client**: is in charge of indexing user events, such as onClick, in the **event store** along with the `query_id` that links to the underlying, technical query DSL and the results' `object_id`'s.
 
 *Note:* We break out the roles of "search" and "Ubi logging" here, but many implementations will likely use the same OpenSearch client instance for both roles of searching and index writing.
-  
+
+```mermaid
+graph TB
+style L fill:none
+subgraph L["`*Legend*`"]
+    subgraph ss[Standard Search]
+      direction LR
+      style ln1a fill:blue
+      ln1a[ ]--->ln1b[ ];
+    end
+    subgraph Ubi flow
+      direction LR
+      ln2a[ ].->|new|ln2b[ ];
+      style ln1c fill:red
+      ln1c[ ]-->|query_id|ln1d[ ];
+    end
+end
+linkStyle 0 stroke-width:2px,stroke:#0A1CCF
+
+```
+
 ```mermaid
 %%{init: {
     "flowchart": {"htmlLabels": false},
@@ -17,14 +37,14 @@
 }%%
 graph TB
 
- style OS stroke-width:2px, stroke:#0A1CCF, fill:#62affb, opacity:.5
+style OS stroke-width:2px, stroke:#0A1CCF, fill:#62affb, opacity:.5
 subgraph OS[OpenSearch Cluster fa:fa-database]
     E[(&emsp;Ubi Events&emsp;)]
     Docs[(Document Index)] --3)  DSL & object_id's--> Q[(&emsp;Ubi Queries&emsp;)];  
-    Q -."4) query_id".-> Docs ; 
-      
- end
- style *client-side* stroke-width:2px, stroke:#EC6363
+    Q -."4) query_id".-> Docs ;   
+end
+
+style *client-side* stroke-width:2px, stroke:#EC6363
 subgraph "`*client-side*`"
     style User stroke-width:4px, stroke:#EC636
     User["`*User*`" fa:fa-user]
@@ -32,28 +52,27 @@ subgraph "`*client-side*`"
     Search
     U
     style App fill:#EC6363,opacity:.5
-    subgraph App[UserApp fa:fa-store]
+    subgraph App[&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;UserApp fa:fa-store]
         Search(&emsp;Search Client&emsp;)
         U(&emsp;Ubi Client&emsp;)
     end
-    User--1) raw search string-->Search;
-    
+    User--1) raw search string-->Search;    
 end
 
 Search--2) search string-->Docs 
-
-Docs -. 6) query_id & objects...->Search ;
+Docs -- 6) query_id & objects--->Search ;
 Search --results--> User
 Search-.7)  query_id.->U;
-
-User--8) selects
- object_id:123-->U;
+User -.8) selects object_id:123.->U;
 U-."9) index event:{query_id, onClick, object_id:123}".->E;
 
-linkStyle 3,0,5 stroke-width:2px,fill:none,stroke:#0A1CCF
+linkStyle 2,3,5,0 stroke-width:2px,fill:none,stroke:#0A1CCF
 linkStyle 1,4,6,8 stroke-width:2px,fill:none,stroke:red
 ```
 
+
+
+linkStyle 2,4,6,8,10 stroke-width:2px,fill:none,stroke:red
 
 
 Although the named fields below follow a schema which lends to easier analytics, the schema is dynamic and allows for users to add new dynamic fields where there is need.
