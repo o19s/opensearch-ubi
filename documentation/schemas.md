@@ -13,13 +13,16 @@
 graph LR
 style L fill:none
 subgraph L["`*Legend*`"]
-    subgraph ss[Standard Search]
+    style ss height:150px
+    subgraph ss["Standard Search"]
       direction LR
+        
       style ln1a fill:blue
       ln1a[ ]--->ln1b[ ];
     end
     subgraph Ubi data flow
       direction LR
+      
       ln2a[ ].->|Ubi interaction|ln2b[ ];
       style ln1c fill:red
       ln1c[ ]-->|query_id passing|ln1d[ ];
