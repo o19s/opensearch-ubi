@@ -10,7 +10,7 @@
 *Note:* We break out the roles of "search" and "Ubi logging" here, but many implementations will likely use the same OpenSearch client instance for both roles of searching and index writing.
 
 ```mermaid
-graph TB
+graph LR
 style L fill:none
 subgraph L["`*Legend*`"]
     subgraph ss[Standard Search]
@@ -18,14 +18,15 @@ subgraph L["`*Legend*`"]
       style ln1a fill:blue
       ln1a[ ]--->ln1b[ ];
     end
-    subgraph Ubi flow
+    subgraph Ubi data flow
       direction LR
-      ln2a[ ].->|new|ln2b[ ];
+      ln2a[ ].->|Ubi interaction|ln2b[ ];
       style ln1c fill:red
-      ln1c[ ]-->|query_id|ln1d[ ];
+      ln1c[ ]-->|query_id passing|ln1d[ ];
     end
 end
 linkStyle 0 stroke-width:2px,stroke:#0A1CCF
+linkStyle 2 stroke-width:2px,stroke:red
 
 ```
 
