@@ -7,7 +7,7 @@ Ubi is not functional unless the links between the following are consistently ma
 - [`user_id`](#user_id) represents a unique user.  
 - [`object_id`](#object_id) represents an id for whatever item the user is searching for, such as *epc*, *isbn*, *ssn*, *handle*, etc.
 - [`query_id`](#query_id) is a unique id for the raw query language executed and the resultant `object_id`'s that the query returned.
-- [`action_name`](#action_name), though not technically an *id*, the `action_name` tells us what exact action was taken (or not) with this `object_id`
+- [`action_name`](#action_name), though not technically an *id*, the `action_name` tells us what exact action (such as `click` or `add_to_cart`) was taken (or not) with this `object_id`.
 
 To summarize: the `query_id` signals the beginning of a `user_id`'s *Search Journey*, the `action_name` tells us how the user is interacting with the query results within the application, and [`event_attributes.object.object_id`](#object_id) is referring to the precise query result that the user interacts with.
 
