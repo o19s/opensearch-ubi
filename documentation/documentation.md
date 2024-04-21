@@ -71,50 +71,10 @@ The plugin has a concept of a "store", which is a logical collection of the even
 index is used to store events, and the other index is for storing queries.
 
 ### OpenSearch Data Mappings
-
-#### Schema for events:
-
-The current event mappings file can be found [here](https://github.com/o19s/opensearch-ubi/blob/main/src/main/resources/events-mapping.json).
-
-**Primary fields include:**
-- `action_name` - (size 100) - any name you want to call your event
-- `timestamp` - unix epoch time. if not set, will be set by the plugin when the event is received
-- `user_id`. `session_id`, `page_id` - (size 100) - are id's largely at the calling client's discretion for tracking users, sessions and pages
-- `query_id` - (size 100) - ID for some query.  Note that it could be a unique search string, or it could represent a cluster of related searches (i.e.: *dress*, *red dress*, *long dress* could all have the same `query_id`).  Either the client could control these, or the `query_id` could be retrieved from the API's response headers as it keeps track of queries on the node
-- `message_type` - (size 100) - originally thought of in terms of ERROR, INFO, WARN, but could be anything useful such as `QUERY` or `CONVERSION`.  Use to group `action_name` together.
-- `message` - (size 256) - optional text for the log entry
-
-**Other fields & data objects**
-- `event_attributes.object` - contains an associated JSONified data object (i.e. books, products, user info, etc) if there are any
-  - `event_attributes.object.object_id` - points to a unique, internal, id representing and instance of that object
-  - `event_attributes.object.key_value` - points to a unique, external key, matching the item that the user searched for, found and acted upon (i.e. sku, isbn, ean, etc.). 
-    **This field value should match the value in for the object's value in the `object_id` [below](#object_id) from the search store**
-     It is possible that the `object_id` and `key_value` match if the same id is used both internally for indexing and externally for the users. 
-  - `event_attributes.object.object_type` - indicates the type/class of object
-  - `event_attributes.object.description` - optional description of the object
-  - `event_attributes.object.transaction_id` - optionally points to a unique id representing a successful transaction
-  - `event_attributes.object.to_user_id` - optionally points to another user, if they are the recipient of this object
-  - `event_attributes.object.object_detail` - optional data object/map of further data details
-- `event_attributes.position` - nested object to track user events to the location of the event origins
-  - `event_attributes.position.ordinal` - tracks the nth item within a list that a user could select, click
-  - `event_attributes.position.{x,y}` - tracks x and y values, that the client defines
-  - `event_attributes.position.page_depth` - tracks page depth
-  - `event_attributes.position.scroll_depth` - tracks scroll depth
-  - `event_attributes.position.trail` - text field for tracking the path/trail that a user took to get to this location
-
-* Other mapped fields in the schema are intended to be optional placeholders for common attributes like `user_name`, `email`, `price`
-
-**the users can dynamically add any further fields to the event mapping
-
-####  Schema for queries:
-
-The current query mappings file can be found [here](https://github.com/o19s/opensearch-ubi/blob/main/src/main/resources/queries-mapping.json).
-
-- `timestamp` - A unix timestamp of when the query was received
-- `query_id` - A unique ID of the query provided by the client or generated automatically by the plugin
-- `query_response_id` - A unique ID for the collection of results for the query
-- `user_id` - A user ID provided by the client
-- `session_id` - An optional session ID provided by the client
+Ubi has 2 primary indices:
+- **UBi Queries** stores all queries and results.
+- **UBi Events** store that the Ubi client writes events to.
+*Please follow the [schema deep dive](./schemas.md) to understand how these two indices make Ubi into a causal framework for search.*
 
 ## Plugin API
 
