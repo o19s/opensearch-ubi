@@ -1,0 +1,15 @@
+node_modules
+dist
+js
+# intellij files
+.idea/
+*.iml
+*.ipr
+*.iws
+build-idea/
+out/
+
+venv/
+__pycache__/
+
+stack.properties
