@@ -160,7 +160,7 @@ public class OpenSearchDataManager extends DataManager {
         source.put("query_id", queryRequest.getQueryId());
         source.put("query", queryRequest.getQuery());
         source.put("query_response_id", queryRequest.getQueryResponse().getQueryResponseId());
-        source.put("query_response_hit_ids", queryRequest.getQueryResponse().getQueryResponseHitIds());
+        source.put("query_response_objects_ids", queryRequest.getQueryResponse().getQueryResponseHitIds());
         source.put("user_id", queryRequest.getUserId());
         source.put("session_id", queryRequest.getSessionId());
 

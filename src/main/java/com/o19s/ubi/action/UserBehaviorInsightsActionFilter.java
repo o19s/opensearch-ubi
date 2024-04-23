@@ -103,9 +103,9 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
                     if(!"".equals(storeName)) {
 
                         final String index = getStoreSettings(storeName, SettingsConstants.INDEX);
-                        final String idField = getStoreSettings(storeName, SettingsConstants.ID_FIELD);
+                        final String idField = getStoreSettings(storeName, SettingsConstants.object_id);
 
-                        LOGGER.debug("Using id_field [{}] of index [{}] for UBI query.", idField, index);
+                        LOGGER.debug("Using object_id [{}] of index [{}] for UBI query.", idField, index);
 
                         // Only consider this search if the index being searched matches the store's index setting.
                         if (Arrays.asList(searchRequest.indices()).contains(index)) {
@@ -124,7 +124,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
 
                                 if (idField == null || "".equals(idField) || idField.equals("null")) {
 
-                                    // Use the _id since there is no id_field setting for this index.
+                                    // Use the _id since there is no object_id setting for this index.
                                     queryResponseHitIds.add(String.valueOf(hit.docId()));
 
                                 } else {
@@ -240,7 +240,7 @@ public class UserBehaviorInsightsActionFilter implements ActionFilter {
         source.put("query_id", queryRequest.getQueryId());
         source.put("query", queryRequest.getQuery());
         source.put("query_response_id", queryResponse.getQueryResponseId());
-        source.put("query_response_hit_ids", queryResponse.getQueryResponseHitIds());
+        source.put("query_response_objects_ids", queryResponse.getQueryResponseHitIds());
         source.put("user_id", queryRequest.getUserId());
         source.put("session_id", queryRequest.getSessionId());
 

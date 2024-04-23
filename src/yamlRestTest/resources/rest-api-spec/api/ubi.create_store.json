@@ -24,7 +24,7 @@
         "type": "string",
         "description": "The name of the index being searched"
       },
-      "id_field": {
+      "object_id": {
         "required": false,
         "type": "string",
         "description": "The name of the field to use for the doc ID field"
