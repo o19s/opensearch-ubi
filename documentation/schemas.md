@@ -6,7 +6,7 @@ Ubi is not functional unless the links between the following are consistently ma
 
 - [`user_id`](#user_id) represents a unique user.  
 - [`object_id`](#object_id) represents an id for whatever item the user is searching for, such as *epc*, *isbn*, *ssn*, *handle*, etc.
-- [`query_id`](#query_id) is a unique id for the raw query language executed and the resultant `object_id`'s that the query returned.
+- [`query_id`](#query_id) is a unique id for the raw query language executed and the resultant `object_id`'s that the query returned.   \
 - [`action_name`](#action_name), though not technically an *id*, the `action_name` tells us what exact action (such as `click` or `add_to_cart`) was taken (or not) with this `object_id`.
 
 To summarize: the `query_id` signals the beginning of a `user_id`'s *Search Journey*, the `action_name` tells us how the user is interacting with the query results within the application, and [`event_attributes.object.object_id`](#object_id) is referring to the precise query result that the user interacts with.
@@ -109,15 +109,17 @@ Since Ubi manages the **Ubi Queries** store, the developer should never have to 
 
 - `query_id`  	
 	&ensp; A unique ID of the query provided by the client or generated automatically.  The same query text issued multiple times would generate different `query_id`.  
-
-- `query_response_objects_ids`  	
-	&ensp; This is an array of the `object_id`'s.   
-
-- `user_id`    
-	&ensp; A user ID provided by the client
+	
+	- `user_id`    
+		&ensp; A user ID provided by the client
 
 - `session_id`    
-	&ensp; An optional session ID provided by the client
+		&ensp; An optional session ID provided by the client.   _This is currently under review of if we keep this_.
+
+- `query_response_objects_ids`  	
+	&ensp; This is an array of the `object_id`'s.   This *could* be the same id as the `_id` but is meant to be the externally valid id of document/item/product.
+
+
 
 ### 2) **Ubi Events**
 This is the event store that the client side directly indexes events to, linking the event [`action_name`](#action_name), [`object_id`](#object_id)'s and [`query_id`](#query_id)'s together with any other important event information.
@@ -129,7 +131,7 @@ Since this schema is dynamic, the developer can add any new fields and structure
 - `action_name` 
   <p id="action_name">
 	
-  &ensp; (size 100) - any name you want to call your event.  For example, with *javascript* events, you could include  `on_click`, `logon`, `add_to_cart`, `page_scroll`....
+  &ensp; (size 100) - any name you want to call your event.  For example, with *javascript* events, you could include  `on_click`, `logon`, `add_to_cart`, `page_scroll`....   _This should be formalized.  A list of standard ones and then custom ones._   
 
 - `query_id`  
   <p id="query_id">
@@ -146,7 +148,7 @@ Since this schema is dynamic, the developer can add any new fields and structure
 - `message_type`  
   
 	&ensp; (size 100) - originally thought of in terms of ERROR, INFO, WARN, but could be anything useful such as `QUERY` or `CONVERSION`.  
-	Can be used to group `action_name` together in logical bins.
+	Can be used to group `action_name` together in logical bins.   _Thinking this should be backend logic in analysis_
 
 - `message`  
   
@@ -184,12 +186,12 @@ Since this schema is dynamic, the developer can add any new fields and structure
     
         - `event_attributes.object.internal_id` is a unique id that OpenSearch can use to internally to index the object, think the `_id` field in the indices.
         - `event_attributes.object.object_id` 
-        &ensp; is the id that a user could look up amd find the object instance within the **document index**.  Examples include: *ssn*, *isbn*, *primary_ean*, etc.
+        &ensp; is the id that a user could look up amd find the object instance within the **document corpus**.  Examples include: *ssn*, *isbn*, *primary_ean*, etc.   Variants need to be incorporated in the `object_id`, so for a t-shirt that is red, you would need SKU level as the `object_id`.
         Initializing Ubi requires mapping from the **Document Index**'s primary key to this `object_id`
 
       - `event_attributes.object.object_type`
       
-    	&ensp; indicates the type/class of object
+    	&ensp; indicates the type/class of object.   
 
       - `event_attributes.object.description`  
       
@@ -209,13 +211,4 @@ Since this schema is dynamic, the developer can add any new fields and structure
     	  - `event_attributes.object.object_detail.json`  
       
     	&ensp; if the user has a json object representing what was acted upon, it can be stored here; however, note that that could lead to index bloat if the json objects are large.
-- *dynamic fields*: any new fields by any other names in the json objects that one indexes will dynamically expand this schema to that use-case.
-  
-
-
-
-
-
-
-
-
+- *extensible fields*: any new fields by any other names in the json objects that one indexes will dynamically expand this schema to that use-case.
