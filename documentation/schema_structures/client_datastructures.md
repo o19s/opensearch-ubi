@@ -41,21 +41,21 @@ Typescript versions of these classes can be found in [ts/UbiEvent.ts](./ts/UbiEv
 
 Example javascript code:
 ```js
-	//basic message format
+    //basic message format
     let e = new UbiEvent('add_to_cart', user_id, query_id);
     e.message_type = 'PURCHASE';
     e.message = item.title + ' (' + item.primary_ean + ')';
     e.session_id = session_id;
     e.page_id = window.location.pathname;
 
-	// adding custom data fields
-	e.event_attributes['user_info'] = {user_name:'TheJackal', phone:'555-555-1234'}
+    // adding custom data fields
+    e.event_attributes['user_info'] = {user_name:'TheJackal', phone:'555-555-1234'}
 
-	// associate the object added to the cart
+    // associate the object added to the cart
     e.event_attributes.object = new UbiObject('product', item.primary_ean, item.title, item);
 
 	// save any click info
-	e.event_attributes.position = new UbiPosition({x:event.clientX, y:event.clientY});
+    e.event_attributes.position = new UbiPosition({x:event.clientX, y:event.clientY});
     
 	// index here
     console.log(e.toJson());
