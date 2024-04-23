@@ -1,4 +1,4 @@
-The datastructures that we use for indexing events adhere to the following nested structure that aligns with the [schemas](.././schemas.md):
+The datastructures that we use for indexing events adhere to the following nested structure that aligns with the Ubi schemas.  See the [schemas](.././schemas.md) for descriptions and examples of the following fields.
 
 `struct UbiEvent {`
 - application
@@ -9,7 +9,7 @@ The datastructures that we use for indexing events adhere to the following neste
 - page_id
 - message_type
 - timestamp
-- <details open>
+- <details>
 	<summary>event_attributes {</summary>
 	<p>
 
@@ -36,3 +36,28 @@ The datastructures that we use for indexing events adhere to the following neste
 	}
   </details>}
 `}`
+
+Typescript versions of these classes can be found in [ts/UbiEvent.ts](./ts/UbiEvent.ts).
+
+Example javascript code:
+```js
+	//basic message format
+    let e = new UbiEvent('add_to_cart', user_id, query_id);
+    e.message_type = 'PURCHASE';
+    e.message = item.title + ' (' + item.primary_ean + ')';
+    e.session_id = session_id;
+    e.page_id = window.location.pathname;
+
+	// adding custom data fields
+	e.event_attributes['user_info'] = {user_name:'TheJackal', phone:'555-555-1234'}
+
+	// associate the object added to the cart
+    e.event_attributes.object = new UbiObject('product', item.primary_ean, item.title, item);
+
+	// save any click info
+	e.event_attributes.position = new UbiPosition({x:event.clientX, y:event.clientY});
+    
+	// index here
+    console.log(e.toJson());
+
+```
