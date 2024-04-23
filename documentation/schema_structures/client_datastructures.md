@@ -41,7 +41,7 @@ Typescript versions of these classes can be found in [ts/UbiEvent.ts](./ts/UbiEv
 
 Example javascript code:
 ```js
-    //basic message format
+    // basic message format
     let e = new UbiEvent('add_to_cart', user_id, query_id);
     e.message_type = 'PURCHASE';
     e.message = item.title + ' (' + item.primary_ean + ')';
@@ -54,10 +54,10 @@ Example javascript code:
     // associate the object added to the cart
     e.event_attributes.object = new UbiObject('product', item.primary_ean, item.title, item);
 
-	// save any click info
+    // save any click info
     e.event_attributes.position = new UbiPosition({x:event.clientX, y:event.clientY});
     
-	// index here
+    // index here
     console.log(e.toJson());
 
 ```
