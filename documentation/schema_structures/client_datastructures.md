@@ -42,7 +42,7 @@ Typescript versions of these classes can be found in [ts/UbiEvent.ts](./ts/UbiEv
 Example javascript code:
 ```js
     // basic message format
-    let e = new UbiEvent('add_to_cart', user_id, query_id);
+    let e = new UbiEvent('chorus', 'add_to_cart', user_id, query_id);
     e.message_type = 'PURCHASE';
     e.message = item.title + ' (' + item.primary_ean + ')';
     e.session_id = session_id;
@@ -59,5 +59,27 @@ Example javascript code:
     
     // index here
     console.log(e.toJson());
+```
 
+With very similar [python data structures](./py/ubi.py):
+```python
+if __name__ == '__main__':
+	e = UbiEvent(application='chorus', action_name='add_to_cart', 
+              user_id='USER-' + guuid(), query_id='QUERY-ID-'+ guuid(), session_id='SESSION-' + guuid(),
+              # object added to the cart
+              object= UbiObject(
+                  		object_type='product', 
+                    	object_id='ISBN-' + guuid(), 
+                      description='a very nice book', details={'product_data':'random product data'}              
+            )
+	)
+	e.message_type = 'PURCHASE'
+	
+	# adding custom attribute fields
+	e.event_attributes['user_info'] = {'user_name':'TheJackal', 'phone':'555-555-1234'}
+ 
+ 	# product position information
+	e.event_attributes.position = UbiPosition(ordinal=3, x=250, y=400)
+
+	print(e.to_json())
 ```
