@@ -1,49 +1,110 @@
 {
   "properties": {
-    "application": { "type": "keyword", "ignore_above": 100 },
-    "action_name": { "type": "keyword", "ignore_above": 100 },
-    "query_id": { "type": "keyword", "ignore_above": 100 },
-    "user_id": { "type": "keyword", "ignore_above": 100 },
-    "session_id": { "type": "keyword", "ignore_above": 100 },
-    "source_id": { "type": "keyword", "ignore_above": 256 },
-    "message": { "type": "keyword", "ignore_above": 256 },
-    "message_type": { "type": "keyword", "ignore_above": 100 },
-    "timestamp": { "type": "date", "doc_values": true },
+    "action_name": {
+      "type": "keyword"
+    },
+    "user_id": {
+      "type": "keyword"
+    },
+    "query_id": {
+      "type": "keyword"
+    },
+    "page_id": {
+      "type": "keyword"
+    },
+    "message": {
+      "type": "keyword"
+    },
+    "message_type": {
+      "type": "keyword"
+    },
+    "timestamp": {
+      "type": "date",
+      "doc_values": true
+    },
     "event_attributes": {
       "properties": {
-        "ip": { "type": "ip", "ignore_malformed": true },
-        "browser": { "type": "text",
-          "fields": 
-            { "keyword": { "type": "keyword", "ignore_above": 256 } }
+        "user_name": {
+          "type": "keyword"
+        },
+        "user_id": {
+          "type": "keyword"
+        },
+        "email": {
+          "type": "keyword"
+        },
+        "price": {
+          "type": "float"
+        },
+        "ip": {
+          "type": "ip",
+          "ignore_malformed": true
+        },
+        "browser": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
         },
         "position": {
           "properties": {
-            "ordinal": { "type": "integer" },
-            "x": { "type": "integer" },
-            "y": { "type": "integer" },
-            "page_depth": { "type": "integer" },
-            "scroll_depth": { "type": "integer" },
-            "trail": { "type": "text",
-              "fields": 
-              { "keyword": { "type": "keyword", "ignore_above": 256 } }
+            "ordinal": {
+              "type": "integer"
+            },
+            "x": {
+              "type": "integer"
+            },
+            "y": {
+              "type": "integer"
+            },
+            "page_depth": {
+              "type": "integer"
+            },
+            "scroll_depth": {
+              "type": "integer"
+            },
+            "trail": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword"
+                }
+              }
             }
           }
         },
         "object": {
           "properties": {
-            "internal_id": { "type": "keyword", "ignore_above": 256 },
-            "object_id": { "type": "keyword" },
-            "object_type": { "type": "keyword", "ignore_above": 100 },
-            "transaction_id": { "type": "keyword", "ignore_above": 100 },
-            "name": { "type": "keyword", "ignore_above": 256 },
-            "description": { "type": "text",
-              "fields": {
-                "keyword": { "type": "keyword", "ignore_above": 256 } }
+            "key_value": {
+              "type": "keyword"
             },
-            "to_user_id": { "type": "keyword", "ignore_above": 100 },
-            "object_details": { "type": "text",
-              "fields": 
-                { "json": { "type": "object"} }
+            "object_id": {
+              "type": "keyword"
+            },
+            "object_type": {
+              "type": "keyword"
+            },
+            "transaction_id": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "description": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "to_user_id": {
+              "type": "keyword"
+            },
+            "object_detail": {
+              "type": "flat_object"
             }
           }
         }
