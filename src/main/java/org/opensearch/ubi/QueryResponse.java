@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package com.o19s.ubi.model;
+package org.opensearch.ubi;
 
 import java.util.List;
 
@@ -17,18 +17,18 @@ public class QueryResponse {
 
     private final String queryId;
     private final String queryResponseId;
-    private final List<String> queryResponseHitIds;
+    private final List<String> queryResponseObjectIds;
 
     /**
      * Creates a query response.
      * @param queryId The ID of the query.
      * @param queryResponseId The ID of the query response.
-     * @param queryResponseHitIds A list of IDs for the hits in the query.
+     * @param queryResponseObjectIds A list of IDs for the hits in the query.
      */
-    public QueryResponse(final String queryId, final String queryResponseId, final List<String> queryResponseHitIds) {
+    public QueryResponse(final String queryId, final String queryResponseId, final List<String> queryResponseObjectIds) {
         this.queryId = queryId;
         this.queryResponseId = queryResponseId;
-        this.queryResponseHitIds = queryResponseHitIds;
+        this.queryResponseObjectIds = queryResponseObjectIds;
     }
 
     /**
@@ -51,8 +51,8 @@ public class QueryResponse {
      * Gets the list of query response hit IDs.
      * @return A list of query response hit IDs.
      */
-    public List<String> getQueryResponseHitIds() {
-        return queryResponseHitIds;
+    public List<String> getQueryResponseObjectIds() {
+        return queryResponseObjectIds;
     }
 
 }

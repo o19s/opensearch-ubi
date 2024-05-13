@@ -7,12 +7,12 @@ apply plugin: 'maven-publish'
 opensearchplugin {
     name 'opensearch-ubi'
     description 'OpenSearch User Behavior Insights Plugin'
-    classname 'com.o19s.ubi.UserBehaviorInsightsPlugin'
+    classname 'org.opensearch.ubi.UserBehaviorInsightsPlugin'
     licenseFile rootProject.file('LICENSE.txt')
     noticeFile rootProject.file('NOTICE.txt')
 }
 
-group = 'com.o19s'
+group = 'org.opensearch'
 version = "${ubiVersion}-os${opensearchVersion}"
 
 // disabling some unnecessary validations for this plugin

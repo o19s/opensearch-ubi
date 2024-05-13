@@ -6,47 +6,32 @@
  * compatible open source license.
  */
 
-package com.o19s.ubi.model;
+package org.opensearch.ubi;
 
 /**
  * A query received by OpenSearch.
  */
 public class QueryRequest {
 
-    private final String storeName;
     private final long timestamp;
     private final String queryId;
-    private final String query;
     private final String userId;
-    private final String sessionId;
+    private final String userQuery;
     private final QueryResponse queryResponse;
 
     /**
      * Creates a query request.
-     * @param storeName The name of the UBI store to hold this query request.
      * @param queryId The ID of the query.
-     * @param query The query run by OpenSearch.
+     * @param userQuery The user-entered query.
      * @param userId The ID of the user that initiated the query.
-     * @param sessionId The ID of the session under which the query was run.
      * @param queryResponse The {@link QueryResponse} for this query request.
      */
-    public QueryRequest(final String storeName, final String queryId, final String query,
-                        final String userId, final String sessionId, final QueryResponse queryResponse) {
-        this.storeName = storeName;
+    public QueryRequest(final String queryId, final String userQuery, final String userId, final QueryResponse queryResponse) {
         this.timestamp = System.currentTimeMillis();
         this.queryId = queryId;
-        this.query = query;
         this.userId = userId;
-        this.sessionId = sessionId;
+        this.userQuery = userQuery;
         this.queryResponse = queryResponse;
-    }
-
-    /**
-     * Gets the name of the UBI store.
-     * @return The name of the UBI store.
-     */
-    public String getStoreName() {
-        return storeName;
     }
 
     /**
@@ -66,11 +51,11 @@ public class QueryRequest {
     }
 
     /**
-     * Gets the query.
-     * @return The query.
+     * Gets the user query.
+     * @return The user query.
      */
-    public String getQuery() {
-        return query;
+    public String getUserQuery() {
+        return userQuery;
     }
 
     /**
@@ -79,14 +64,6 @@ public class QueryRequest {
      */
     public String getUserId() {
         return userId;
-    }
-
-    /**
-     * Gets the session ID.
-     * @return The session ID.
-     */
-    public String getSessionId() {
-        return sessionId;
     }
 
     /**

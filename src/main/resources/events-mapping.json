@@ -104,7 +104,7 @@
               "type": "keyword"
             },
             "object_detail": {
-              "type": "flat_object"
+              "type": "text"
             }
           }
         }
