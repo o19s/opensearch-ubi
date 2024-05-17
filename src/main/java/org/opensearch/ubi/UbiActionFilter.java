@@ -18,6 +18,8 @@ import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.index.IndexResponse;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
+import org.opensearch.action.search.SearchResponseSections;
+import org.opensearch.action.search.ShardSearchFailure;
 import org.opensearch.action.support.ActionFilter;
 import org.opensearch.action.support.ActionFilterChain;
 import org.opensearch.client.Client;
@@ -122,6 +124,20 @@ public class UbiActionFilter implements ActionFilter {
                             final String queryResponseId = UUID.randomUUID().toString();
                             final QueryResponse queryResponse = new QueryResponse(queryId, queryResponseId, queryResponseHitIds);
                             final QueryRequest queryRequest = new QueryRequest(queryId, userQuery, userId, queryResponse);
+
+                            SearchResponse searchResponse = (SearchResponse) response;
+
+                            response = (Response) new UbiSearchResponse(
+                                    searchResponse.getInternalResponse(),
+                                    searchResponse.getScrollId(),
+                                    searchResponse.getTotalShards(),
+                                    searchResponse.getSuccessfulShards(),
+                                    searchResponse.getSkippedShards(),
+                                    searchResponse.getTook().millis(),
+                                    searchResponse.getShardFailures(),
+                                    searchResponse.getClusters(),
+                                    queryId
+                            );
 
                             indexQuery(queryRequest);
 
