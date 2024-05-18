@@ -16,13 +16,28 @@ import org.opensearch.ubi.ext.UbiParametersExtBuilder;
 
 import java.io.IOException;
 
-public class UbiSearchResponse  extends SearchResponse {
+/**
+ * A UBI search response.
+ */
+public class UbiSearchResponse extends SearchResponse {
 
     private static final String EXT_SECTION_NAME = "ext";
     private static final String UBI_QUERY_ID_FIELD_NAME = "query_id";
 
     private final String queryId;
 
+    /**
+     * Creates a new UBI search response.
+     * @param internalResponse The internal response.
+     * @param scrollId The scroll ID.
+     * @param totalShards The count total shards.
+     * @param successfulShards The count of successful shards.
+     * @param skippedShards The count of skipped shards.
+     * @param tookInMillis The time took in milliseconds.
+     * @param shardFailures An array of {@link ShardSearchFailure}.
+     * @param clusters The {@link Clusters}.
+     * @param queryId The query ID.
+     */
     public UbiSearchResponse(
             SearchResponseSections internalResponse,
             String scrollId,
