@@ -100,48 +100,43 @@ public class UbiActionFilter implements ActionFilter {
                     if (ubiParameters != null) {
 
                         final String queryId = ubiParameters.getQueryId();
+                        final String userQuery = ubiParameters.getUserQuery();
+                        final String userId = ubiParameters.getClientId();
+                        final String objectId = ubiParameters.getObjectId();
 
-                        if (queryId != null) {
+                        final List<String> queryResponseHitIds = new LinkedList<>();
 
-                            final String userQuery = ubiParameters.getUserQuery();
-                            final String userId = ubiParameters.getClientId();
-                            final String objectId = ubiParameters.getObjectId();
+                        for (final SearchHit hit : ((SearchResponse) response).getHits()) {
 
-                            final List<String> queryResponseHitIds = new LinkedList<>();
-
-                            for (final SearchHit hit : ((SearchResponse) response).getHits()) {
-
-                                if (objectId == null || objectId.isEmpty()) {
-                                    // Use the result's docId since no object_id was given for the search.
-                                    queryResponseHitIds.add(String.valueOf(hit.docId()));
-                                } else {
-                                    final Map<String, Object> source = hit.getSourceAsMap();
-                                    queryResponseHitIds.add((String) source.get(objectId));
-                                }
-
+                            if (objectId == null || objectId.isEmpty()) {
+                                // Use the result's docId since no object_id was given for the search.
+                                queryResponseHitIds.add(String.valueOf(hit.docId()));
+                            } else {
+                                final Map<String, Object> source = hit.getSourceAsMap();
+                                queryResponseHitIds.add((String) source.get(objectId));
                             }
 
-                            final String queryResponseId = UUID.randomUUID().toString();
-                            final QueryResponse queryResponse = new QueryResponse(queryId, queryResponseId, queryResponseHitIds);
-                            final QueryRequest queryRequest = new QueryRequest(queryId, userQuery, userId, queryResponse);
-
-                            SearchResponse searchResponse = (SearchResponse) response;
-
-                            response = (Response) new UbiSearchResponse(
-                                    searchResponse.getInternalResponse(),
-                                    searchResponse.getScrollId(),
-                                    searchResponse.getTotalShards(),
-                                    searchResponse.getSuccessfulShards(),
-                                    searchResponse.getSkippedShards(),
-                                    searchResponse.getTook().millis(),
-                                    searchResponse.getShardFailures(),
-                                    searchResponse.getClusters(),
-                                    queryId
-                            );
-
-                            indexQuery(queryRequest);
-
                         }
+
+                        final String queryResponseId = UUID.randomUUID().toString();
+                        final QueryResponse queryResponse = new QueryResponse(queryId, queryResponseId, queryResponseHitIds);
+                        final QueryRequest queryRequest = new QueryRequest(queryId, userQuery, userId, queryResponse);
+
+                        SearchResponse searchResponse = (SearchResponse) response;
+
+                        response = (Response) new UbiSearchResponse(
+                                searchResponse.getInternalResponse(),
+                                searchResponse.getScrollId(),
+                                searchResponse.getTotalShards(),
+                                searchResponse.getSuccessfulShards(),
+                                searchResponse.getSkippedShards(),
+                                searchResponse.getTook().millis(),
+                                searchResponse.getShardFailures(),
+                                searchResponse.getClusters(),
+                                queryId
+                        );
+
+                        indexQuery(queryRequest);
 
                     }
 
