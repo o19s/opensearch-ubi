@@ -17,6 +17,7 @@ public class QueryRequest {
     private final String queryId;
     private final String userId;
     private final String userQuery;
+    private final String query;
     private final QueryResponse queryResponse;
 
     /**
@@ -24,13 +25,15 @@ public class QueryRequest {
      * @param queryId The ID of the query.
      * @param userQuery The user-entered query.
      * @param userId The ID of the user that initiated the query.
+     * @param query The raw query.
      * @param queryResponse The {@link QueryResponse} for this query request.
      */
-    public QueryRequest(final String queryId, final String userQuery, final String userId, final QueryResponse queryResponse) {
+    public QueryRequest(final String queryId, final String userQuery, final String userId, final String query, final QueryResponse queryResponse) {
         this.timestamp = System.currentTimeMillis();
         this.queryId = queryId;
         this.userId = userId;
         this.userQuery = userQuery;
+        this.query = query;
         this.queryResponse = queryResponse;
     }
 
@@ -64,6 +67,14 @@ public class QueryRequest {
      */
     public String getUserId() {
         return userId;
+    }
+
+    /**
+     * Gets the raw query.
+     * @return The raw query.
+     */
+    public String getQuery() {
+        return query;
     }
 
     /**

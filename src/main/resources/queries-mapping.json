@@ -4,13 +4,28 @@
     "timestamp": {
       "type": "date"
     },
-    "query_id": { "type": "keyword" },
+    "query_id": {
+      "type": "keyword"
+    },
     "query": {
       "type": "text"
     },
-    "query_response_id": { "type": "keyword" },
-    "query_response_object_ids": { "type": "keyword" },
-    "user_id": { "type": "keyword" },
-    "user_query": { "type": "text" }
+    "query_response_id": {
+      "type": "keyword"
+    },
+    "query_response_object_ids": {
+      "type": "keyword"
+    },
+    "user_id": {
+      "type": "keyword"
+    },
+    "user_query": {
+      "type": "text",
+      "fields": {
+        "keyword": {
+          "type": "keyword"
+        }
+      }
+    }
   }
 }

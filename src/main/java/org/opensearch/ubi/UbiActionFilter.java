@@ -102,6 +102,8 @@ public class UbiActionFilter implements ActionFilter {
                         final String userId = ubiParameters.getClientId();
                         final String objectId = ubiParameters.getObjectId();
 
+                        final String query = searchRequest.source().toString();
+
                         final List<String> queryResponseHitIds = new LinkedList<>();
 
                         for (final SearchHit hit : ((SearchResponse) response).getHits()) {
@@ -118,7 +120,7 @@ public class UbiActionFilter implements ActionFilter {
 
                         final String queryResponseId = UUID.randomUUID().toString();
                         final QueryResponse queryResponse = new QueryResponse(queryId, queryResponseId, queryResponseHitIds);
-                        final QueryRequest queryRequest = new QueryRequest(queryId, userQuery, userId, queryResponse);
+                        final QueryRequest queryRequest = new QueryRequest(queryId, userQuery, userId, query, queryResponse);
 
                         SearchResponse searchResponse = (SearchResponse) response;
 
@@ -200,6 +202,11 @@ public class UbiActionFilter implements ActionFilter {
                 source.put("query_response_object_ids", queryRequest.getQueryResponse().getQueryResponseObjectIds());
                 source.put("user_id", queryRequest.getUserId());
                 source.put("user_query", queryRequest.getUserQuery());
+
+                // The query can be null for some types of queries.
+                if(queryRequest.getQuery() != null) {
+                    source.put("query", queryRequest.getQuery());
+                }
 
                 // Build the index request.
                 final IndexRequest indexRequest = new IndexRequest(UBI_QUERIES_INDEX).source(source, XContentType.JSON);
