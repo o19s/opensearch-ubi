@@ -188,7 +188,7 @@ public class UbiActionFilter implements ActionFilter {
 
                 }
 
-                LOGGER.info(
+                LOGGER.debug(
                     "Indexing query ID {} with response ID {}",
                     queryRequest.getQueryId(),
                     queryRequest.getQueryResponse().getQueryResponseId()

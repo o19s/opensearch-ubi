@@ -35,7 +35,7 @@ public class UbiParameters implements Writeable, ToXContentObject {
     private static final ParseField USER_QUERY = new ParseField("user_query");
     private static final ParseField CLIENT_ID = new ParseField("client_id");
     private static final ParseField OBJECT_ID = new ParseField("object_id");
-    private static final ParseField ATTRIBUTES = new ParseField("attributes");
+    //private static final ParseField ATTRIBUTES = new ParseField("attributes");
 
     static {
         PARSER = new ObjectParser<>(UbiParametersExtBuilder.UBI_PARAMETER_NAME, UbiParameters::new);
@@ -50,7 +50,7 @@ public class UbiParameters implements Writeable, ToXContentObject {
     private String userQuery;
     private String clientId;
     private String objectId;
-    private Map<String, Object> attributes;
+    //private Map<String, Object> attributes;
 
     /**
      * Get the {@link UbiParameters} from a {@link SearchRequest}.
@@ -95,7 +95,7 @@ public class UbiParameters implements Writeable, ToXContentObject {
         this.userQuery = input.readOptionalString();
         this.clientId = input.readOptionalString();
         this.objectId = input.readOptionalString();
-        this.attributes = input.readMap();
+        //this.attributes = input.readMap();
     }
 
     /**
@@ -104,14 +104,14 @@ public class UbiParameters implements Writeable, ToXContentObject {
      * @param userQuery The user-entered search query.
      * @param clientId The client ID.
      * @param objectId The object ID.
-     * @param attributes Optional attributes for UBI.
+  //   * @param attributes Optional attributes for UBI.
      */
-    public UbiParameters(String queryId, String userQuery, String clientId, String objectId, Map<String, Object> attributes) {
+    public UbiParameters(String queryId, String userQuery, String clientId, String objectId) {
         this.queryId = queryId;
         this.userQuery = userQuery;
         this.clientId = clientId;
         this.objectId = objectId;
-        this.attributes = attributes;
+        //this.attributes = attributes;
     }
 
     @Override
@@ -120,8 +120,8 @@ public class UbiParameters implements Writeable, ToXContentObject {
                 .field(QUERY_ID.getPreferredName(), this.queryId)
                 .field(USER_QUERY.getPreferredName(), this.userQuery)
                 .field(CLIENT_ID.getPreferredName(), this.clientId)
-                .field(OBJECT_ID.getPreferredName(), this.objectId)
-                .field(ATTRIBUTES.getPreferredName(), this.attributes);
+                .field(OBJECT_ID.getPreferredName(), this.objectId);
+                //.field(ATTRIBUTES.getPreferredName(), this.attributes);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class UbiParameters implements Writeable, ToXContentObject {
         out.writeOptionalString(userQuery);
         out.writeOptionalString(clientId);
         out.writeOptionalString(objectId);
-        out.writeMap(attributes);
+        //out.writeMap(attributes);
     }
 
     /**
@@ -156,8 +156,8 @@ public class UbiParameters implements Writeable, ToXContentObject {
         return Objects.equals(this.queryId, other.getQueryId())
                 && Objects.equals(this.userQuery, other.getUserQuery())
                 && Objects.equals(this.clientId, other.getClientId())
-                && Objects.equals(this.objectId, other.getObjectId())
-                && Objects.equals(this.attributes, other.getAttributes());
+                && Objects.equals(this.objectId, other.getObjectId());
+               // && Objects.equals(this.attributes, other.getAttributes());
     }
 
     @Override
@@ -236,16 +236,16 @@ public class UbiParameters implements Writeable, ToXContentObject {
      * Get the attributes.
      * @return A map of attributes.
      */
-    public Map<String, Object> getAttributes() {
-        return attributes;
-    }
+//    public Map<String, Object> getAttributes() {
+//        return attributes;
+//    }
 
     /**
      * Sets the attributes.
      * @param attributes A map of attributes.
      */
-    public void setAttributes(Map<String, Object> attributes) {
-        this.attributes = attributes;
-    }
+//    public void setAttributes(Map<String, Object> attributes) {
+//        this.attributes = attributes;
+//    }
 
 }
