@@ -27,6 +27,14 @@
       search:
         rest_total_hits_as_int: true
         index: ecommerce
+        body: "{\"query\": {\"match\": {\"category\": \"notebook\"}}, \"ext\": {\"ubi\": {\"query_id\": \"1234512345\", \"client_id\": \"abcabc\", \"user_query\": \"notebook\", \"query_attributes\": {\"experiment\": \"number_1\"}}}}"
+
+  - gte: { hits.total: 1 }
+
+  - do:
+      search:
+        rest_total_hits_as_int: true
+        index: ecommerce
         body: "{\"query\": {\"match\": {\"category\": \"notebook\"}}, \"ext\": {\"ubi\": {\"query_id\": \"1234512345\", \"client_id\": \"abcabc\", \"user_query\": \"notebook\"}}}"
 
   - gte: { hits.total: 1 }
