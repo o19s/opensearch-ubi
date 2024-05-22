@@ -1,31 +1,11 @@
 {
   "dynamic": false,
   "properties": {
-    "timestamp": {
-      "type": "date"
-    },
-    "query_id": {
-      "type": "keyword"
-    },
-    "query": {
-      "type": "text"
-    },
-    "query_response_id": {
-      "type": "keyword"
-    },
-    "query_response_object_ids": {
-      "type": "keyword"
-    },
-    "user_id": {
-      "type": "keyword"
-    },
-    "user_query": {
-      "type": "text",
-      "fields": {
-        "keyword": {
-          "type": "keyword"
-        }
-      }
-    }
+    "timestamp": { "type": "date" },
+    "query_id": { "type": "keyword", "ignore_above": 100 },
+    "query": { "type": "flat_object" },
+    "query_response_id": { "type": "keyword", "ignore_above": 100 },
+    "query_response_hit_ids": { "type": "keyword" },
+    "client_id": { "type": "keyword", "ignore_above": 100 }
   }
 }
