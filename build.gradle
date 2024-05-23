@@ -7,7 +7,7 @@ apply plugin: 'maven-publish'
 opensearchplugin {
     name 'opensearch-ubi'
     description 'OpenSearch User Behavior Insights Plugin'
-    classname 'org.opensearch.ubi.UserBehaviorInsightsPlugin'
+    classname 'org.opensearch.ubi.UbiPlugin'
     licenseFile rootProject.file('LICENSE.txt')
     noticeFile rootProject.file('NOTICE.txt')
 }
@@ -64,7 +64,7 @@ publishing {
             pom {
                 name = "opensearch-ubi"
                 description = "Provides User Behavior Insights for OpenSearch"
-                groupId = "com.o19s"
+                groupId = "org.opensearch"
                 licenses {
                     license {
                         name = "The Apache License, Version 2.0"
