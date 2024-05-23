@@ -1,4 +1,5 @@
 {
+  "dynamic": true,
   "properties": {
     "application": { "type": "keyword", "ignore_above": 256 },
     "action_name": { "type": "keyword", "ignore_above": 100 },
