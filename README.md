@@ -18,6 +18,11 @@ Please note that this repository is the implementation of the UBI plugin for Ope
 * For questions or help getting started, please find us in the [OpenSearch Slack](https://opensearch.org/slack.html) in the `#plugins` channel.
 * For bugs or feature requests, please create [a new issue](https://github.com/o19s/opensearch-ubi/issues/new/choose).
 
+## Useful Commands
+
+* Get the indexed queries: `curl http://localhost:9200/ubi_queries/_search | jq`
+* 
+
 ## User Quick Start
 
 ### Installing the Plugin
