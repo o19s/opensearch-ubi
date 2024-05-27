@@ -101,7 +101,7 @@ curl -s http://localhost:9200/your-index/_search -H "Content-Type: application/j
  }'
 ```
 
-Similar to a query response, query responses will also include a `ubi` section in the `ext` block.
+Similar to a query request, query responses will also include a `ubi` section in the `ext` block.
 
 ```
 {
