@@ -200,7 +200,7 @@ public class UbiActionFilter implements ActionFilter {
                 source.put("query_id", queryRequest.getQueryId());
                 source.put("query_response_id", queryRequest.getQueryResponse().getQueryResponseId());
                 source.put("query_response_object_ids", queryRequest.getQueryResponse().getQueryResponseObjectIds());
-                source.put("user_id", queryRequest.getUserId());
+                source.put("client_id", queryRequest.getUserId());
                 source.put("user_query", queryRequest.getUserQuery());
                 source.put("query_attributes", queryRequest.getQueryAttributes());
 

@@ -16,7 +16,7 @@
     "query_response_object_ids": {
       "type": "keyword"
     },
-    "user_id": {
+    "client_id": {
       "type": "keyword"
     },
     "user_query": {
