@@ -83,7 +83,7 @@ The `ubi` block can contain the following parameters. All parameters are optiona
 * `query_id` - A unique identifier for the query. If not provided, the plugin will generate a random UUID for the query and return the UUID in the query response. The `query_id` can be in any format but we use UUIDs in the examples.
 * `user_query` - The user-entered query. This is meant to be the actual text the user provided to initiate the search.
 * `client_id` - A unique identifier for the originator of the query. The client may be a user, an application, or any other originator of the query. The `client_id` can be in any format but we use UUIDs in the examples.
-* `object_id` - The name of a field in the index that contains a unique identifier for each result. If not provided, the `_id` field is used.
+* `object_id_field` - The name of a field in the index that contains a unique identifier for each result. If not provided, the `_id` field is used.
 
 Following is an example query that provides the parameters:
 
@@ -95,7 +95,7 @@ curl -s http://localhost:9200/your-index/_search -H "Content-Type: application/j
      "query_id": "12300d16cb-b6f1-4012-93ebcc49cac90426",
      "user_query": "small basketball",
      "client-id": "c4af7ca2-d6d2-4326-a41f-e616ebdd3d7b",
-     "object_id": "product_name"
+     "object_id_field": "product_name"
     }
    },
    "query": {
@@ -180,7 +180,7 @@ curl -s http://localhost:9200/ubi_queries/_search -H "Content-Type: application/
             "9"
           ],
           "client_id": null,
-          "query": "{\"query\":{\"match\":{\"name\":{\"query\":\"toner\",\"operator\":\"OR\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":true,\"lenient\":false,\"zero_terms_query\":\"NONE\",\"auto_generate_synonyms_phrase_query\":true,\"boost\":1.0}}},\"ext\":{\"query_id\":\"12300d16cb-b6f1-4012-93ebcc49cac90426\",\"user_query\":\"toner\",\"client_id\":null,\"object_id\":null,\"query_attributes\":{\"system\":\"my_system\",\"experiment\":\"exp_1\"}}}",
+          "query": "{\"query\":{\"match\":{\"name\":{\"query\":\"toner\",\"operator\":\"OR\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":true,\"lenient\":false,\"zero_terms_query\":\"NONE\",\"auto_generate_synonyms_phrase_query\":true,\"boost\":1.0}}},\"ext\":{\"query_id\":\"12300d16cb-b6f1-4012-93ebcc49cac90426\",\"user_query\":\"toner\",\"client_id\":null,\"object_id_field\":null,\"query_attributes\":{\"system\":\"my_system\",\"experiment\":\"exp_1\"}}}",
           "timestamp": 1716408298072
         }
       }
@@ -193,7 +193,7 @@ Each indexed query will have the following fields:
 * `query_response_id` - A unique identifier for the query response. 
 * `user_query`- Corresponds to the `user_query` in the query request.
 * `query_id` - Corresponds to the `query_id` in the query request, or a random UUID if a `query_id` was not provided in the query request.
-* `query_response_object_ids` - A list of the values of the `object_id` field in the document.
+* `query_response_object_ids` - A list of the values of the `object_id_field` field in the document.
 * `client_id` - Corresponds to the `client_id` in the query request.
 * `query` - The raw query that was provided to OpenSearch.
 * `timestamp` - The Unix timestamp when the query was indexed.
