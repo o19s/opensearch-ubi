@@ -35,7 +35,7 @@ public class UbiParameters implements Writeable, ToXContentObject {
     private static final ParseField QUERY_ID = new ParseField("query_id");
     private static final ParseField USER_QUERY = new ParseField("user_query");
     private static final ParseField CLIENT_ID = new ParseField("client_id");
-    private static final ParseField OBJECT_ID = new ParseField("object_id");
+    private static final ParseField OBJECT_ID_FIELD = new ParseField("object_id_field");
     private static final ParseField QUERY_ATTRIBUTES = new ParseField("query_attributes");
 
     static {
@@ -43,7 +43,7 @@ public class UbiParameters implements Writeable, ToXContentObject {
         PARSER.declareString(UbiParameters::setQueryId, QUERY_ID);
         PARSER.declareString(UbiParameters::setUserQuery, USER_QUERY);
         PARSER.declareString(UbiParameters::setClientId, CLIENT_ID);
-        PARSER.declareString(UbiParameters::setObjectId, OBJECT_ID);
+        PARSER.declareString(UbiParameters::setObjectIdField, OBJECT_ID_FIELD);
         PARSER.declareObject(UbiParameters::setQueryAttributes, (p, c) -> p.mapStrings(), QUERY_ATTRIBUTES);
     }
 
@@ -78,7 +78,7 @@ public class UbiParameters implements Writeable, ToXContentObject {
     private String queryId;
     private String userQuery;
     private String clientId;
-    private String objectId;
+    private String objectIdField;
     private Map<String, String> queryAttributes;
 
     /**
@@ -96,7 +96,7 @@ public class UbiParameters implements Writeable, ToXContentObject {
         this.queryId = input.readString();
         this.userQuery = input.readOptionalString();
         this.clientId = input.readOptionalString();
-        this.objectId = input.readOptionalString();
+        this.objectIdField = input.readOptionalString();
         this.queryAttributes = (Map<String, String>) input.readGenericValue();
     }
 
@@ -105,14 +105,14 @@ public class UbiParameters implements Writeable, ToXContentObject {
      * @param queryId The query ID.
      * @param userQuery The user-entered search query.
      * @param clientId The client ID.
-     * @param objectId The object ID.
+     * @param objectIdField The object ID field.
      * @param queryAttributes Optional attributes for UBI.
      */
-    public UbiParameters(String queryId, String userQuery, String clientId, String objectId, Map<String, String> queryAttributes) {
+    public UbiParameters(String queryId, String userQuery, String clientId, String objectIdField, Map<String, String> queryAttributes) {
         this.queryId = queryId;
         this.userQuery = userQuery;
         this.clientId = clientId;
-        this.objectId = objectId;
+        this.objectIdField = objectIdField;
         this.queryAttributes = queryAttributes;
     }
 
@@ -122,7 +122,7 @@ public class UbiParameters implements Writeable, ToXContentObject {
                 .field(QUERY_ID.getPreferredName(), this.queryId)
                 .field(USER_QUERY.getPreferredName(), this.userQuery)
                 .field(CLIENT_ID.getPreferredName(), this.clientId)
-                .field(OBJECT_ID.getPreferredName(), this.objectId)
+                .field(OBJECT_ID_FIELD.getPreferredName(), this.objectIdField)
                 .field(QUERY_ATTRIBUTES.getPreferredName(), this.queryAttributes);
     }
 
@@ -131,7 +131,7 @@ public class UbiParameters implements Writeable, ToXContentObject {
         out.writeString(getQueryId());
         out.writeOptionalString(userQuery);
         out.writeOptionalString(clientId);
-        out.writeOptionalString(objectId);
+        out.writeOptionalString(objectIdField);
         out.writeGenericValue(queryAttributes);
     }
 
@@ -158,7 +158,7 @@ public class UbiParameters implements Writeable, ToXContentObject {
         return Objects.equals(this.queryId, other.getQueryId())
                 && Objects.equals(this.userQuery, other.getUserQuery())
                 && Objects.equals(this.clientId, other.getClientId())
-                && Objects.equals(this.objectId, other.getObjectId())
+                && Objects.equals(this.objectIdField, other.getObjectIdField())
                 && Objects.equals(this.queryAttributes, other.getQueryAttributes());
     }
 
@@ -203,19 +203,19 @@ public class UbiParameters implements Writeable, ToXContentObject {
     }
 
     /**
-     * Get the object ID.
-     * @return The object ID.
+     * Get the object ID field.
+     * @return The object ID field.
      */
-    public String getObjectId() {
-        return objectId;
+    public String getObjectIdField() {
+        return objectIdField;
     }
 
     /**
-     * Set the object ID.
-     * @param objectId The object ID.
+     * Set the object ID field.
+     * @param objectIdField The object ID field.
      */
-    public void setObjectId(String objectId) {
-        this.objectId = objectId;
+    public void setObjectIdField(String objectIdField) {
+        this.objectIdField = objectIdField;
     }
 
     /**

@@ -100,7 +100,7 @@ public class UbiActionFilter implements ActionFilter {
                         final String queryId = ubiParameters.getQueryId();
                         final String userQuery = ubiParameters.getUserQuery();
                         final String userId = ubiParameters.getClientId();
-                        final String objectId = ubiParameters.getObjectId();
+                        final String objectIdField = ubiParameters.getObjectIdField();
                         final Map<String, String> queryAttributes = ubiParameters.getQueryAttributes();
                         final String query = searchRequest.source().toString();
 
@@ -108,12 +108,12 @@ public class UbiActionFilter implements ActionFilter {
 
                         for (final SearchHit hit : ((SearchResponse) response).getHits()) {
 
-                            if (objectId == null || objectId.isEmpty()) {
+                            if (objectIdField == null || objectIdField.isEmpty()) {
                                 // Use the result's docId since no object_id was given for the search.
                                 queryResponseHitIds.add(String.valueOf(hit.docId()));
                             } else {
                                 final Map<String, Object> source = hit.getSourceAsMap();
-                                queryResponseHitIds.add((String) source.get(objectId));
+                                queryResponseHitIds.add((String) source.get(objectIdField));
                             }
 
                         }
