@@ -1,5 +1,4 @@
 {
-  "dynamic": true,
   "properties": {
     "application": { "type": "keyword", "ignore_above": 256 },
     "action_name": { "type": "keyword", "ignore_above": 100 },
@@ -13,12 +12,8 @@
       "doc_values": true
     },
     "event_attributes": {
+      "dynamic": true,
       "properties": {
-        "dwell_time": { "type": "integer" },
-        "ip": { "type": "ip", "ignore_malformed": true },
-        "browser": { "type": "text",
-          "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } }
-        },
         "position": {
           "properties": {
             "ordinal": { "type": "integer" },
@@ -36,7 +31,7 @@
           "properties": {
             "internal_id": { "type": "keyword" },
             "object_id": { "type": "keyword", "ignore_above": 256 },
-            "object_type": { "type": "keyword", "ignore_above": 100 },
+            "object_id_field": { "type": "keyword", "ignore_above": 100 },
             "name": { "type": "keyword", "ignore_above": 256 },
             "description": { "type": "text",
               "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } }
