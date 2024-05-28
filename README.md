@@ -8,7 +8,11 @@ UBI and this plugin project was originally proposed in the [OpenSearch UBI RFC](
 
 ## UBI Schemas
 
-Please note that this repository is the implementation of the UBI plugin for OpenSearch. For details on the JSON Schema used by UBI to send and receive queries and events please see the [UBI](https://github.com/o19s/ubi) repository and the links below.
+Please note that this repository is the implementation of the UBI plugin for OpenSearch.
+
+[!IMPORTANT] This release targets to the 1.0 version of the UBI Specification, which will be released when this plugin is released and the below links will be updated.
+
+For details on the JSON Schema used by UBI to send and receive queries and events please see the [UBI](https://github.com/o19s/ubi) repository and the links below.
 * [Query Request Schema](https://o19s.github.io/ubi/docs/html/query.request.schema.html)
 * [Query Response Schema](https://o19s.github.io/ubi/docs/html/query.response.schema.html)
 * [Event Schema](https://o19s.github.io/ubi/docs/html/event.schema.html)
@@ -21,7 +25,7 @@ Please note that this repository is the implementation of the UBI plugin for Ope
 ## Useful Commands
 
 * Get the indexed queries: `curl http://localhost:9200/ubi_queries/_search | jq`
-* 
+*
 
 ## User Quick Start
 
@@ -33,7 +37,7 @@ To get started, download the plugin zip file from the [releases](https://github.
 bin/opensearch-plugin install file:/opensearch-ubi-1.0.0-os2.14.0.zip
 ```
 
-To create the UBI indexes called `ubi_queries` and `ubi_events`, send a query to an OpenSearch index:
+To create the UBI indexes called `ubi_queries` and `ubi_events`, send a query to an OpenSearch index with the `ubi` query block added:
 
 ```
 curl -s http://localhost:9200/your-index/_search -H "Content-Type: application/json" -d'
@@ -93,8 +97,8 @@ curl -s http://localhost:9200/your-index/_search -H "Content-Type: application/j
   "ext": {
    "ubi": {
      "query_id": "12300d16cb-b6f1-4012-93ebcc49cac90426",
-     "user_query": "small basketball",
-     "client-id": "c4af7ca2-d6d2-4326-a41f-e616ebdd3d7b",
+     "user_query": "Toner",
+     "client_id": "c4af7ca2-d6d2-4326-a41f-e616ebdd3d7b",
      "object_id_field": "product_name"
     }
    },
@@ -190,7 +194,7 @@ curl -s http://localhost:9200/ubi_queries/_search -H "Content-Type: application/
 
 Each indexed query will have the following fields:
 
-* `query_response_id` - A unique identifier for the query response. 
+* `query_response_id` - A unique identifier for the query response.
 * `user_query`- Corresponds to the `user_query` in the query request.
 * `query_id` - Corresponds to the `query_id` in the query request, or a random UUID if a `query_id` was not provided in the query request.
 * `query_response_object_ids` - A list of the values of the `object_id_field` field in the document.
@@ -250,7 +254,7 @@ where query_response_object_ids is null
 ```
 
 ```sql
-select 
+select
 	count(0)
 from ubi_events
 where action_name='on_search' and event_attributes.data.data_detail.query_data.query_response_object_ids is null
@@ -262,7 +266,7 @@ order by timestamp
 Find the most common client-side events:
 
 ```sql
-select 
+select
 	action_name, count(0) Total  
 from ubi_events
 group by action_name
@@ -286,7 +290,7 @@ new_user_entry|208
 All client-side events that are associated with a query should have the same `query_id`.
 
 ```sql
-select 
+select
 	action_name, count(0) Total  
 from ubi_events
 where query_id is not null
@@ -338,4 +342,3 @@ This code is licensed under the Apache 2.0 License. See [LICENSE.txt](LICENSE.tx
 
 ## Copyright
 Copyright OpenSearch Contributors. See [NOTICE.txt](NOTICE.txt) for details.
-
