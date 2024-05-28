@@ -34,20 +34,20 @@ services:
     networks:
       - ubi-dev-os-net
 
-  ubi-dev-os-dashboards:
-    image: opensearchproject/opensearch-dashboards:2.12.0
-    container_name: ubi-dev-os-dashboards
-    ports:
-      - 5601:5601
-    expose:
-      - 5601
-    environment:
-      OPENSEARCH_HOSTS: '["http://ubi-dev-os:9200"]'
-      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
-    depends_on:
-      - ubi-dev-os
-    networks:
-      - ubi-dev-os-net      
+#  ubi-dev-os-dashboards:
+#    image: opensearchproject/opensearch-dashboards:2.12.0
+#    container_name: ubi-dev-os-dashboards
+#    ports:
+#      - 5601:5601
+#    expose:
+#      - 5601
+#    environment:
+#      OPENSEARCH_HOSTS: '["http://ubi-dev-os:9200"]'
+#      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+#    depends_on:
+#      - ubi-dev-os
+#    networks:
+#      - ubi-dev-os-net
 
 networks:
   ubi-dev-os-net:

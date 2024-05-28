@@ -26,6 +26,9 @@
           "type": "keyword"
         }
       }
+    },
+    "query_attributes": {
+      "type": "flat_object"
     }
   }
 }

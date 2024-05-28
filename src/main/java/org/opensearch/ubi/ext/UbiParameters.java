@@ -13,6 +13,7 @@ import org.opensearch.core.ParseField;
 import org.opensearch.core.common.io.stream.StreamInput;
 import org.opensearch.core.common.io.stream.StreamOutput;
 import org.opensearch.core.common.io.stream.Writeable;
+import org.opensearch.core.xcontent.ConstructingObjectParser;
 import org.opensearch.core.xcontent.ObjectParser;
 import org.opensearch.core.xcontent.ToXContentObject;
 import org.opensearch.core.xcontent.XContentBuilder;
@@ -35,7 +36,7 @@ public class UbiParameters implements Writeable, ToXContentObject {
     private static final ParseField USER_QUERY = new ParseField("user_query");
     private static final ParseField CLIENT_ID = new ParseField("client_id");
     private static final ParseField OBJECT_ID = new ParseField("object_id");
-    //private static final ParseField ATTRIBUTES = new ParseField("attributes");
+    private static final ParseField QUERY_ATTRIBUTES = new ParseField("query_attributes");
 
     static {
         PARSER = new ObjectParser<>(UbiParametersExtBuilder.UBI_PARAMETER_NAME, UbiParameters::new);
@@ -43,14 +44,8 @@ public class UbiParameters implements Writeable, ToXContentObject {
         PARSER.declareString(UbiParameters::setUserQuery, USER_QUERY);
         PARSER.declareString(UbiParameters::setClientId, CLIENT_ID);
         PARSER.declareString(UbiParameters::setObjectId, OBJECT_ID);
-        //PARSER.declareNamedObject(UbiParameters::setAttributes, (p, c, n) -> p.namedObject(Map.class, n, c), ATTRIBUTES);
+        PARSER.declareObject(UbiParameters::setQueryAttributes, (p, c) -> p.mapStrings(), QUERY_ATTRIBUTES);
     }
-
-    private String queryId;
-    private String userQuery;
-    private String clientId;
-    private String objectId;
-    //private Map<String, Object> attributes;
 
     /**
      * Get the {@link UbiParameters} from a {@link SearchRequest}.
@@ -63,10 +58,10 @@ public class UbiParameters implements Writeable, ToXContentObject {
 
         if (request.source() != null && request.source().ext() != null && !request.source().ext().isEmpty()) {
             final Optional<SearchExtBuilder> b = request.source()
-                .ext()
-                .stream()
-                .filter(bldr -> UbiParametersExtBuilder.UBI_PARAMETER_NAME.equals(bldr.getWriteableName()))
-                .findFirst();
+                    .ext()
+                    .stream()
+                    .filter(bldr -> UbiParametersExtBuilder.UBI_PARAMETER_NAME.equals(bldr.getWriteableName()))
+                    .findFirst();
             if (b.isPresent()) {
                 builder = (UbiParametersExtBuilder) b.get();
             }
@@ -80,6 +75,12 @@ public class UbiParameters implements Writeable, ToXContentObject {
 
     }
 
+    private String queryId;
+    private String userQuery;
+    private String clientId;
+    private String objectId;
+    private Map<String, String> queryAttributes;
+
     /**
      * Creates a new instance.
      */
@@ -90,12 +91,13 @@ public class UbiParameters implements Writeable, ToXContentObject {
      * @param input The {@link StreamInput} to read parameters from.
      * @throws IOException Thrown if the parameters cannot be read.
      */
+    @SuppressWarnings("unchecked")
     public UbiParameters(StreamInput input) throws IOException {
         this.queryId = input.readString();
         this.userQuery = input.readOptionalString();
         this.clientId = input.readOptionalString();
         this.objectId = input.readOptionalString();
-        //this.attributes = input.readMap();
+        this.queryAttributes = (Map<String, String>) input.readGenericValue();
     }
 
     /**
@@ -104,14 +106,14 @@ public class UbiParameters implements Writeable, ToXContentObject {
      * @param userQuery The user-entered search query.
      * @param clientId The client ID.
      * @param objectId The object ID.
-  //   * @param attributes Optional attributes for UBI.
+     * @param queryAttributes Optional attributes for UBI.
      */
-    public UbiParameters(String queryId, String userQuery, String clientId, String objectId) {
+    public UbiParameters(String queryId, String userQuery, String clientId, String objectId, Map<String, String> queryAttributes) {
         this.queryId = queryId;
         this.userQuery = userQuery;
         this.clientId = clientId;
         this.objectId = objectId;
-        //this.attributes = attributes;
+        this.queryAttributes = queryAttributes;
     }
 
     @Override
@@ -120,8 +122,8 @@ public class UbiParameters implements Writeable, ToXContentObject {
                 .field(QUERY_ID.getPreferredName(), this.queryId)
                 .field(USER_QUERY.getPreferredName(), this.userQuery)
                 .field(CLIENT_ID.getPreferredName(), this.clientId)
-                .field(OBJECT_ID.getPreferredName(), this.objectId);
-                //.field(ATTRIBUTES.getPreferredName(), this.attributes);
+                .field(OBJECT_ID.getPreferredName(), this.objectId)
+                .field(QUERY_ATTRIBUTES.getPreferredName(), this.queryAttributes);
     }
 
     @Override
@@ -130,7 +132,7 @@ public class UbiParameters implements Writeable, ToXContentObject {
         out.writeOptionalString(userQuery);
         out.writeOptionalString(clientId);
         out.writeOptionalString(objectId);
-        //out.writeMap(attributes);
+        out.writeGenericValue(queryAttributes);
     }
 
     /**
@@ -152,12 +154,12 @@ public class UbiParameters implements Writeable, ToXContentObject {
             return false;
         }
 
-        UbiParameters other = (UbiParameters) o;
+        final UbiParameters other = (UbiParameters) o;
         return Objects.equals(this.queryId, other.getQueryId())
                 && Objects.equals(this.userQuery, other.getUserQuery())
                 && Objects.equals(this.clientId, other.getClientId())
-                && Objects.equals(this.objectId, other.getObjectId());
-               // && Objects.equals(this.attributes, other.getAttributes());
+                && Objects.equals(this.objectId, other.getObjectId())
+                && Objects.equals(this.queryAttributes, other.getQueryAttributes());
     }
 
     @Override
@@ -236,16 +238,16 @@ public class UbiParameters implements Writeable, ToXContentObject {
      * Get the attributes.
      * @return A map of attributes.
      */
-//    public Map<String, Object> getAttributes() {
-//        return attributes;
-//    }
+    public Map<String, String> getQueryAttributes() {
+        return queryAttributes;
+    }
 
     /**
      * Sets the attributes.
-     * @param attributes A map of attributes.
+     * @param queryAttributes A map of attributes.
      */
-//    public void setAttributes(Map<String, Object> attributes) {
-//        this.attributes = attributes;
-//    }
+    public void setQueryAttributes(Map<String, String> queryAttributes) {
+        this.queryAttributes = queryAttributes;
+    }
 
 }
