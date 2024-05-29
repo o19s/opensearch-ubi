@@ -40,7 +40,7 @@ bin/opensearch-plugin install file:/opensearch-ubi-1.0.0-os2.14.0.zip
 To create the UBI indexes called `ubi_queries` and `ubi_events`, send a query to an OpenSearch index with the `ubi` query block added:
 
 ```
-curl -s http://localhost:9200/your-index/_search -H "Content-Type: application/json" -d'
+curl -s http://localhost:9200/ecommerce/_search -H "Content-Type: application/json" -d'
  {
   "ext": {
    "ubi": {

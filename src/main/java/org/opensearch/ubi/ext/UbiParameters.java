@@ -21,6 +21,7 @@ import org.opensearch.core.xcontent.XContentParser;
 import org.opensearch.search.SearchExtBuilder;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -239,6 +240,9 @@ public class UbiParameters implements Writeable, ToXContentObject {
      * @return A map of attributes.
      */
     public Map<String, String> getQueryAttributes() {
+        if(queryAttributes == null) {
+            queryAttributes = new HashMap<>();
+        }
         return queryAttributes;
     }
 

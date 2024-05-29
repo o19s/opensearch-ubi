@@ -59,4 +59,4 @@
         index: ubi_queries
         body: {}
 
-  - match: {count : 1}
+  - match: {count : 2}
