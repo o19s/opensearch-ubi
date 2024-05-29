@@ -40,6 +40,30 @@
   - gte: { hits.total: 1 }
 
   - do:
+      search:
+        rest_total_hits_as_int: true
+        index: ecommerce
+        body: "{\"query\": {\"match\": {\"category\": \"notebook\"}}, \"ext\": {\"ubi\": {\"query_id\": \"abcdef\", \"client_id\": \"abcabc\", \"user_query\": \"notebook\"}}}"
+
+  - gte: { hits.total: 1 }
+
+  - do:
+      search:
+        rest_total_hits_as_int: true
+        index: ecommerce
+        body: "{\"query\": {\"match\": {\"category\": \"notebook\"}}, \"ext\": {\"ubi\": {}}}"
+
+  - gte: { hits.total: 1 }
+
+  - do:
+      search:
+        rest_total_hits_as_int: true
+        index: ecommerce
+        body: "{\"query\": {\"match\": {\"category\": \"notebook\"}}}"
+
+  - gte: { hits.total: 1 }
+
+  - do:
       cluster.health:
         index: [ubi_queries]
         wait_for_no_initializing_shards: true
@@ -59,4 +83,4 @@
         index: ubi_queries
         body: {}
 
-  - match: {count : 2}
+  - match: {count : 4}
