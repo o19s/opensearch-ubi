@@ -3,7 +3,7 @@
   "properties": {
     "timestamp": { "type": "date" },
     "query_id": { "type": "keyword", "ignore_above": 100 },
-    "query": { "type": "flat_object" },
+    "query": { "type": "text" },
     "query_response_id": { "type": "keyword", "ignore_above": 100 },
     "query_response_hit_ids": { "type": "keyword" },
     "user_query": { "type": "text",

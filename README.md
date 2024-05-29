@@ -88,6 +88,7 @@ The `ubi` block can contain the following parameters. All parameters are optiona
 * `user_query` - The user-entered query. This is meant to be the actual text the user provided to initiate the search.
 * `client_id` - A unique identifier for the originator of the query. The client may be a user, an application, or any other originator of the query. The `client_id` can be in any format but we use UUIDs in the examples.
 * `object_id_field` - The name of a field in the index that contains a unique identifier for each result. If not provided, the `_id` field is used.
+* `query_attributes` - A map of arbitrary key/value pairs that will be indexed along with the query. This can be used to capture additional information about the query, such as an experiment ID or other details.
 
 Following is an example query that provides the parameters:
 
@@ -99,7 +100,10 @@ curl -s http://localhost:9200/your-index/_search -H "Content-Type: application/j
      "query_id": "12300d16cb-b6f1-4012-93ebcc49cac90426",
      "user_query": "Toner",
      "client_id": "c4af7ca2-d6d2-4326-a41f-e616ebdd3d7b",
-     "object_id_field": "product_name"
+     "object_id_field": "product_name",
+     "query_attributes": {
+       "experiment_id": "12345"
+     }
     }
    },
    "query": {
