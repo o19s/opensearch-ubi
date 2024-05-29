@@ -100,27 +100,27 @@ public class UbiActionFilter implements ActionFilter {
                         final String queryId = ubiParameters.getQueryId();
                         final String userQuery = ubiParameters.getUserQuery();
                         final String userId = ubiParameters.getClientId();
-                        final String objectId = ubiParameters.getObjectId();
-
+                        final String objectIdField = ubiParameters.getObjectIdField();
+                        final Map<String, String> queryAttributes = ubiParameters.getQueryAttributes();
                         final String query = searchRequest.source().toString();
 
                         final List<String> queryResponseHitIds = new LinkedList<>();
 
                         for (final SearchHit hit : ((SearchResponse) response).getHits()) {
 
-                            if (objectId == null || objectId.isEmpty()) {
+                            if (objectIdField == null || objectIdField.isEmpty()) {
                                 // Use the result's docId since no object_id was given for the search.
                                 queryResponseHitIds.add(String.valueOf(hit.docId()));
                             } else {
                                 final Map<String, Object> source = hit.getSourceAsMap();
-                                queryResponseHitIds.add((String) source.get(objectId));
+                                queryResponseHitIds.add((String) source.get(objectIdField));
                             }
 
                         }
 
                         final String queryResponseId = UUID.randomUUID().toString();
                         final QueryResponse queryResponse = new QueryResponse(queryId, queryResponseId, queryResponseHitIds);
-                        final QueryRequest queryRequest = new QueryRequest(queryId, userQuery, userId, query, queryResponse);
+                        final QueryRequest queryRequest = new QueryRequest(queryId, userQuery, userId, query, queryAttributes, queryResponse);
 
                         SearchResponse searchResponse = (SearchResponse) response;
 
@@ -200,8 +200,9 @@ public class UbiActionFilter implements ActionFilter {
                 source.put("query_id", queryRequest.getQueryId());
                 source.put("query_response_id", queryRequest.getQueryResponse().getQueryResponseId());
                 source.put("query_response_object_ids", queryRequest.getQueryResponse().getQueryResponseObjectIds());
-                source.put("user_id", queryRequest.getUserId());
+                source.put("client_id", queryRequest.getUserId());
                 source.put("user_query", queryRequest.getUserQuery());
+                source.put("query_attributes", queryRequest.getQueryAttributes());
 
                 // The query can be null for some types of queries.
                 if(queryRequest.getQuery() != null) {

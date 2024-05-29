@@ -36,18 +36,18 @@ import static java.util.Collections.singletonList;
 /**
  * OpenSearch User Behavior Insights
  */
-public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin, SearchPlugin {
+public class UbiPlugin extends Plugin implements ActionPlugin, SearchPlugin {
 
-    private ActionFilter userBehaviorLoggingFilter;
+    private ActionFilter ubiActionFilter;
 
     /**
-     * Creates a new instance of {@link UserBehaviorInsightsPlugin}.
+     * Creates a new instance of {@link UbiPlugin}.
      */
-    public UserBehaviorInsightsPlugin() {}
+    public UbiPlugin() {}
 
     @Override
     public List<ActionFilter> getActionFilters() {
-        return singletonList(userBehaviorLoggingFilter);
+        return singletonList(ubiActionFilter);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class UserBehaviorInsightsPlugin extends Plugin implements ActionPlugin, 
         Supplier<RepositoriesService> repositoriesServiceSupplier
     ) {
 
-        this.userBehaviorLoggingFilter = new UbiActionFilter(client);
+        this.ubiActionFilter = new UbiActionFilter(client);
 
         return Collections.emptyList();
 
