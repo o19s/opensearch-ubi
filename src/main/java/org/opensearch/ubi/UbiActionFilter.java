@@ -10,8 +10,10 @@ package org.opensearch.ubi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -137,15 +139,8 @@ public class UbiActionFilter implements ActionFilter {
 
                         final String dataPrepperUrl = environment.settings().get(UbiSettings.DATA_PREPPER_URL);
                         if(dataPrepperUrl != null) {
-
-                            try {
-                                sendToDataPrepper(dataPrepperUrl, queryRequest);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-
+                            sendToDataPrepper(dataPrepperUrl, queryRequest);
                         } else {
-                            LOGGER.info("Dataprepper url is NOT set");
                             indexQuery(queryRequest);
                         }
 
@@ -180,36 +175,33 @@ public class UbiActionFilter implements ActionFilter {
 
     }
 
-    private void sendToDataPrepper(final String dataPrepperUrl, final QueryRequest queryRequest) throws IOException {
+    private void sendToDataPrepper(final String dataPrepperUrl, final QueryRequest queryRequest) {
 
         LOGGER.debug("Sending query to DataPrepper at " + dataPrepperUrl);
 
-        final ObjectMapper objMapper = new ObjectMapper();
-        final String json = objMapper.writeValueAsString(queryRequest);
+        try {
 
-        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            final ObjectMapper objMapper = new ObjectMapper();
+            final String json = objMapper.writeValueAsString(queryRequest);
 
-            HttpPost httpPost = new HttpPost(dataPrepperUrl);
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
-            final StringEntity entity = new StringEntity(json);
-            httpPost.setEntity(entity);
-            httpPost.setHeader("Content-type", "application/json");
+                final HttpPost httpPost = new HttpPost(dataPrepperUrl);
 
-            final ResponseHandler<String> responseHandler = response -> {
+                httpPost.setEntity(new StringEntity(json));
+                httpPost.setHeader("Content-type", "application/json");
 
-                int status = response.getStatusLine().getStatusCode();
-                if (status >= 200 && status < 300) {
-                    HttpEntity entity1 = response.getEntity();
-                    return entity1 != null ? EntityUtils.toString(entity1) : null;
-                } else {
-                    throw new ClientProtocolException("Unexpected response status: " + status);
+                try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                    final int status = response.getStatusLine().getStatusCode();
+                    if (status != 200) {
+                        LOGGER.error("Unexpected response status from Data Prepper: " + status);
+                    }
                 }
 
-            };
+            }
 
-            final String responseBody = httpclient.execute(httpPost, responseHandler);
-            LOGGER.info(responseBody);
-
+        } catch (IOException ex) {
+            LOGGER.error("Failed to send query to Data Prepper", ex);
         }
 
     }
