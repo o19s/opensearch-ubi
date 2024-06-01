@@ -40,12 +40,16 @@ repositories {
     maven { url "https://plugins.gradle.org/m2/" }
 }
 
+thirdPartyAudit.enabled = false
+
 dependencies {
     // required for the yaml test to run
     yamlRestTestImplementation "org.apache.logging.log4j:log4j-core:${versions.log4j}"
     runtimeOnly "org.apache.logging.log4j:log4j-core:${versions.log4j}"
     implementation "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}"
     implementation "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}"
+    implementation "org.apache.httpcomponents:httpcore:${versions.httpcore}"
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
 }
 
 publishing {

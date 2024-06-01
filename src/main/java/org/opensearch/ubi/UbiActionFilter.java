@@ -8,6 +8,15 @@
 
 package org.opensearch.ubi;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionRequest;
@@ -27,6 +36,7 @@ import org.opensearch.common.util.io.Streams;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
+import org.opensearch.env.Environment;
 import org.opensearch.search.SearchHit;
 import org.opensearch.tasks.Task;
 import org.opensearch.ubi.ext.UbiParameters;
@@ -56,13 +66,16 @@ public class UbiActionFilter implements ActionFilter {
     private static final String QUERIES_MAPPING_FILE = "/queries-mapping.json";
 
     private final Client client;
+    private final Environment environment;
 
     /**
      * Creates a new filter.
      * @param client An OpenSearch {@link Client}.
+     * @param environment The OpenSearch {@link Environment}.
      */
-    public UbiActionFilter(Client client) {
+    public UbiActionFilter(Client client, Environment environment) {
         this.client = client;
+        this.environment = environment;
     }
 
     @Override
@@ -122,6 +135,20 @@ public class UbiActionFilter implements ActionFilter {
                         final QueryResponse queryResponse = new QueryResponse(queryId, queryResponseId, queryResponseHitIds);
                         final QueryRequest queryRequest = new QueryRequest(queryId, userQuery, userId, query, queryAttributes, queryResponse);
 
+                        final String dataPrepperUrl = environment.settings().get(UbiSettings.DATA_PREPPER_URL);
+                        if(dataPrepperUrl != null) {
+
+                            try {
+                                sendToDataPrepper(dataPrepperUrl, queryRequest);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+
+                        } else {
+                            LOGGER.info("Dataprepper url is NOT set");
+                            indexQuery(queryRequest);
+                        }
+
                         SearchResponse searchResponse = (SearchResponse) response;
 
                         response = (Response) new UbiSearchResponse(
@@ -135,8 +162,6 @@ public class UbiActionFilter implements ActionFilter {
                                 searchResponse.getClusters(),
                                 queryId
                         );
-
-                        indexQuery(queryRequest);
 
                     }
 
@@ -152,6 +177,40 @@ public class UbiActionFilter implements ActionFilter {
             }
 
         });
+
+    }
+
+    private void sendToDataPrepper(final String dataPrepperUrl, final QueryRequest queryRequest) throws IOException {
+
+        LOGGER.debug("Sending query to DataPrepper at " + dataPrepperUrl);
+
+        final ObjectMapper objMapper = new ObjectMapper();
+        final String json = objMapper.writeValueAsString(queryRequest);
+
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+
+            HttpPost httpPost = new HttpPost(dataPrepperUrl);
+
+            final StringEntity entity = new StringEntity(json);
+            httpPost.setEntity(entity);
+            httpPost.setHeader("Content-type", "application/json");
+
+            final ResponseHandler<String> responseHandler = response -> {
+
+                int status = response.getStatusLine().getStatusCode();
+                if (status >= 200 && status < 300) {
+                    HttpEntity entity1 = response.getEntity();
+                    return entity1 != null ? EntityUtils.toString(entity1) : null;
+                } else {
+                    throw new ClientProtocolException("Unexpected response status: " + status);
+                }
+
+            };
+
+            final String responseBody = httpclient.execute(httpPost, responseHandler);
+            LOGGER.info(responseBody);
+
+        }
 
     }
 

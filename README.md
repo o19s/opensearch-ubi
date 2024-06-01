@@ -24,8 +24,7 @@ For details on the JSON Schema used by UBI to send and receive queries and event
 
 ## Useful Commands
 
-* Get the indexed queries: `curl http://localhost:9200/ubi_queries/_search | jq`
-*
+The `scripts/` directory contains example UBI requests for common use cases.
 
 ## User Quick Start
 
@@ -40,7 +39,7 @@ bin/opensearch-plugin install file:/opensearch-ubi-1.0.0-os2.14.0.zip
 To create the UBI indexes called `ubi_queries` and `ubi_events`, send a query to an OpenSearch index with the `ubi` query block added:
 
 ```
-curl -s http://localhost:9200/your-index/_search -H "Content-Type: application/json" -d'
+curl -s http://localhost:9200/ecommerce/_search -H "Content-Type: application/json" -d'
  {
   "ext": {
    "ubi": {
@@ -154,9 +153,11 @@ Similar to a query request, query responses will also include a `ubi` section in
 
 The only field present in the query response will be the `query_id`. The value of the `query_id` is the same as the `query_id` provided in the query, or, if not provided, a random UUID.
 
-### Indexed Queries
+### Indexing Queries
 
-To see how the query is indexed, you can search the `ubi_queries` index:
+Queries can be either indexed in the local OpenSearch in the `ubi_queries` index, or queries can be sent to a Data Prepper `http_source` endpoint.
+
+By default, queries are written to the local OpenSearch `ubi_queries` index as they are received. To see how the query is indexed, you can search the `ubi_queries` index:
 
 ```
 curl -s http://localhost:9200/ubi_queries/_search -H "Content-Type: application/json" | jq
@@ -205,6 +206,16 @@ Each indexed query will have the following fields:
 * `client_id` - Corresponds to the `client_id` in the query request.
 * `query` - The raw query that was provided to OpenSearch.
 * `timestamp` - The Unix timestamp when the query was indexed.
+
+#### Sending Queries to Data Prepper
+
+To send queries to Data Prepper, configure the following properties in OpenSearch:
+
+| Property            | Description                           | Example Value                 |
+|---------------------|---------------------------------------|-------------------------------|
+| ubi.dataprepper.url | Data Prepper's `http_source` endpoint | `http://localhost:2021/log/ingest` |
+
+With these properties set, queries will no longer be indexed into the local OpenSearch. The `ubi_queries` index can be deleted. Queries will be sent to Data Prepper as they are received by OpenSearch.
 
 ### Capturing Events
 

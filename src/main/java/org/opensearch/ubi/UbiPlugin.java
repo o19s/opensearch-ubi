@@ -12,6 +12,8 @@ import org.opensearch.action.support.ActionFilter;
 import org.opensearch.client.Client;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.cluster.service.ClusterService;
+import org.opensearch.common.settings.Setting;
+import org.opensearch.common.settings.Settings;
 import org.opensearch.core.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.env.Environment;
@@ -46,6 +48,11 @@ public class UbiPlugin extends Plugin implements ActionPlugin, SearchPlugin {
     public UbiPlugin() {}
 
     @Override
+    public List<Setting<?>> getSettings() {
+        return UbiSettings.getSettings();
+    }
+
+    @Override
     public List<ActionFilter> getActionFilters() {
         return singletonList(ubiActionFilter);
     }
@@ -65,8 +72,7 @@ public class UbiPlugin extends Plugin implements ActionPlugin, SearchPlugin {
         Supplier<RepositoriesService> repositoriesServiceSupplier
     ) {
 
-        this.ubiActionFilter = new UbiActionFilter(client);
-
+        this.ubiActionFilter = new UbiActionFilter(client, environment);
         return Collections.emptyList();
 
     }
