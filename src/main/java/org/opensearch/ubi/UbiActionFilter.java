@@ -9,16 +9,11 @@
 package org.opensearch.ubi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpEntity;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionRequest;
@@ -179,6 +174,7 @@ public class UbiActionFilter implements ActionFilter {
 
         LOGGER.debug("Sending query to DataPrepper at " + dataPrepperUrl);
 
+        // TODO: Do this in a background thread?
         try {
 
             final ObjectMapper objMapper = new ObjectMapper();
