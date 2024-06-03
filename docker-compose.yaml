@@ -23,7 +23,7 @@ services:
       plugins.security.disabled: "true"
       logger.level: info
       OPENSEARCH_INITIAL_ADMIN_PASSWORD: SuperSecretPassword_123
-      ubi.dataprepper.url: "http://dataprepper-dev-os:2021/log/ingest"
+      #ubi.dataprepper.url: "http://dataprepper-dev-os:2021/log/ingest"
     ulimits:
       memlock:
         soft: -1
