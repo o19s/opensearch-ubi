@@ -8,6 +8,11 @@
 
 package org.opensearch.ubi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Map;
 
 /**
@@ -34,6 +39,7 @@ public class QueryRequest {
      */
     public QueryRequest(final String queryId, final String userQuery, final String clientId, final String query,
                         final Map<String, String> queryAttributes, final QueryResponse queryResponse) {
+
         this.timestamp = System.currentTimeMillis();
         this.queryId = queryId;
         this.clientId = clientId;
@@ -41,39 +47,23 @@ public class QueryRequest {
         this.query = query;
         this.queryAttributes = queryAttributes;
         this.queryResponse = queryResponse;
+
     }
 
     @Override
     public String toString() {
 
-        final StringBuilder sb = new StringBuilder();
+        final ObjectMapper objectMapper = new ObjectMapper();
 
-        // Query Request
-        sb.append("{");
-        sb.append("\"query_id\": \"").append(queryId).append("\", ");
-        sb.append("\"user_query\": \"").append(userQuery).append("\", ");
-        sb.append("\"user_id\": \"").append(clientId).append("\", ");
+        final String json = AccessController.doPrivileged((PrivilegedAction<String>) () -> {
+            try {
+                return objectMapper.writeValueAsString(this);
+            } catch (JsonProcessingException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
-        sb.append("query_attributes: {");
-        for(final String key : queryAttributes.keySet()) {
-            sb.append("\"").append(key).append("\": ").append("\"").append(queryAttributes.get(key)).append("\", ");
-        }
-        sb.append("},");
-
-        // Query Response
-        sb.append("\"query_response\": {");
-        sb.append("\"query_id\": ").append(queryResponse.getQueryId()).append("\", ");
-        sb.append("\"query_response_id\": ").append(queryResponse.getQueryResponseId()).append("\", ");
-        sb.append("\"query_response_object_ids\": [");
-        for(final String objectId : queryResponse.getQueryResponseObjectIds()) {
-            sb.append("\"").append(objectId).append("\", ");
-        }
-        sb.append("],");
-        sb.append("}");
-
-        sb.append("}");
-
-        return sb.toString();
+        return "[" + json + "]";
 
     }
 
@@ -106,6 +96,9 @@ public class QueryRequest {
      * @return The user query.
      */
     public String getUserQuery() {
+        if(userQuery == null) {
+            return "";
+        }
         return userQuery;
     }
 
@@ -114,6 +107,9 @@ public class QueryRequest {
      * @return The client ID.
      */
     public String getClientId() {
+        if(clientId == null) {
+            return "";
+        }
         return clientId;
     }
 
@@ -122,6 +118,9 @@ public class QueryRequest {
      * @return The raw query.
      */
     public String getQuery() {
+        if(query == null) {
+            return "";
+        }
         return query;
     }
 

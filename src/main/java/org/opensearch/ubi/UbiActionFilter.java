@@ -8,6 +8,10 @@
 
 package org.opensearch.ubi;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -41,6 +45,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -111,6 +117,8 @@ public class UbiActionFilter implements ActionFilter {
                         final String userId = ubiParameters.getClientId();
                         final String objectIdField = ubiParameters.getObjectIdField();
                         final Map<String, String> queryAttributes = ubiParameters.getQueryAttributes();
+
+                        // TODO: Ignore the UBI in ext.
                         final String query = searchRequest.source().toString();
 
                         final List<String> queryResponseHitIds = new LinkedList<>();
@@ -183,12 +191,19 @@ public class UbiActionFilter implements ActionFilter {
                 httpPost.setEntity(new StringEntity(queryRequest.toString()));
                 httpPost.setHeader("Content-type", "application/json");
 
-                try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
-                    final int status = response.getStatusLine().getStatusCode();
-                    if (status != 200) {
-                        LOGGER.error("Unexpected response status from Data Prepper: " + status);
+                AccessController.doPrivileged((PrivilegedAction<Boolean>) () -> {
+                    try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                        final int status = response.getStatusLine().getStatusCode();
+                        if (status != 200) {
+                            LOGGER.error("Unexpected response status from Data Prepper: {}", status);
+                            return false;
+                        }
+                    } catch (Exception ex) {
+                        LOGGER.error("Unable to send query to Data Prepper", ex);
+                        return false;
                     }
-                }
+                    return true;
+                });
 
             }
 
