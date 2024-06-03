@@ -2,7 +2,23 @@ version: '3.7'
 
 services:
 
-  os01:
+  dataprepper-dev-os:
+    depends_on:
+      - ubi-dev-os
+      - ubi-dev-os-2
+      - ubi-dev-os-3
+    container_name: dataprepper
+    image: opensearchproject/data-prepper:2.8.0
+    ports:
+      - 4900:4900
+      - 2021:2021
+    volumes:
+      - ./dataprepper/pipelines.yaml:/usr/share/data-prepper/pipelines/pipelines.yaml
+      - ./dataprepper/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml 
+    networks:
+      - ubi-dev-os-net
+
+  ubi-dev-os:
     build: ./
     environment:
       node.name: os01
@@ -24,8 +40,10 @@ services:
     ports:
       - 9200:9200
       - 9600:9600
-  
-  os02:
+    networks:
+      - ubi-dev-os-net
+
+  ubi-dev-os-2:
     build: ./
     environment:
       node.name: os02
@@ -44,8 +62,10 @@ services:
       nofile:
         soft: 65536
         hard: 65536
+    networks:
+      - ubi-dev-os-net
 
-  os03:
+  ubi-dev-os-3:
     build: ./
     environment:
       node.name: os03
@@ -64,9 +84,11 @@ services:
       nofile:
         soft: 65536
         hard: 65536
+    networks:
+      - ubi-dev-os-net
 
   os-dashboards:
-    image: opensearchproject/opensearch-dashboards:2.12.0
+    image: opensearchproject/opensearch-dashboards:2.14.0
     container_name: opensearch-dashboards
     ports:
       - 5601:5601
@@ -77,3 +99,5 @@ services:
       DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
     depends_on:
       - os01
+    networks:
+      - ubi-dev-os-net
