@@ -18,7 +18,10 @@ import org.opensearch.client.AdminClient;
 import org.opensearch.client.Client;
 import org.opensearch.client.IndicesAdminClient;
 import org.opensearch.common.action.ActionFuture;
+import org.opensearch.common.settings.Settings;
+import org.opensearch.common.unit.TimeValue;
 import org.opensearch.core.action.ActionListener;
+import org.opensearch.env.Environment;
 import org.opensearch.search.SearchExtBuilder;
 import org.opensearch.search.SearchHit;
 import org.opensearch.search.SearchHits;
@@ -52,10 +55,13 @@ public class UbiActionFilterTests extends OpenSearchTestCase {
         when(client.admin()).thenReturn(adminClient);
         when(adminClient.indices()).thenReturn(indicesAdminClient);
 
+        final Environment environment = mock(Environment.class);
+        when(environment.settings()).thenReturn(Settings.EMPTY);
+
         final ActionFuture<IndicesExistsResponse> actionFuture = mock(ActionFuture.class);
         when(indicesAdminClient.exists(any(IndicesExistsRequest.class))).thenReturn(actionFuture);
 
-        final UbiActionFilter ubiActionFilter = new UbiActionFilter(client);
+        final UbiActionFilter ubiActionFilter = new UbiActionFilter(client, environment);
         final ActionListener<SearchResponse> listener = mock(ActionListener.class);
 
         final SearchRequest request = mock(SearchRequest.class);
@@ -64,6 +70,9 @@ public class UbiActionFilterTests extends OpenSearchTestCase {
 
         final SearchResponse response = mock(SearchResponse.class);
         when(response.getHits()).thenReturn(searchHits);
+
+        final TimeValue timeValue = new TimeValue(System.currentTimeMillis());
+        when(response.getTook()).thenReturn(timeValue);
 
         final Task task = mock(Task.class);
 
@@ -103,10 +112,13 @@ public class UbiActionFilterTests extends OpenSearchTestCase {
         when(client.admin()).thenReturn(adminClient);
         when(adminClient.indices()).thenReturn(indicesAdminClient);
 
+        final Environment environment = mock(Environment.class);
+        when(environment.settings()).thenReturn(Settings.EMPTY);
+
         final ActionFuture<IndicesExistsResponse> actionFuture = mock(ActionFuture.class);
         when(indicesAdminClient.exists(any(IndicesExistsRequest.class))).thenReturn(actionFuture);
 
-        final UbiActionFilter ubiActionFilter = new UbiActionFilter(client);
+        final UbiActionFilter ubiActionFilter = new UbiActionFilter(client, environment);
         final ActionListener<SearchResponse> listener = mock(ActionListener.class);
 
         final SearchRequest request = mock(SearchRequest.class);
@@ -115,6 +127,9 @@ public class UbiActionFilterTests extends OpenSearchTestCase {
 
         final SearchResponse response = mock(SearchResponse.class);
         when(response.getHits()).thenReturn(searchHits);
+
+        final TimeValue timeValue = new TimeValue(System.currentTimeMillis());
+        when(response.getTook()).thenReturn(timeValue);
 
         final Task task = mock(Task.class);
 

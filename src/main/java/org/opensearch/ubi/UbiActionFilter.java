@@ -8,7 +8,6 @@
 
 package org.opensearch.ubi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -177,14 +176,11 @@ public class UbiActionFilter implements ActionFilter {
         // TODO: Do this in a background thread?
         try {
 
-            final ObjectMapper objMapper = new ObjectMapper();
-            final String json = objMapper.writeValueAsString(queryRequest);
-
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
                 final HttpPost httpPost = new HttpPost(dataPrepperUrl);
 
-                httpPost.setEntity(new StringEntity(json));
+                httpPost.setEntity(new StringEntity(queryRequest.toString()));
                 httpPost.setHeader("Content-type", "application/json");
 
                 try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
@@ -247,7 +243,7 @@ public class UbiActionFilter implements ActionFilter {
                 source.put("query_id", queryRequest.getQueryId());
                 source.put("query_response_id", queryRequest.getQueryResponse().getQueryResponseId());
                 source.put("query_response_object_ids", queryRequest.getQueryResponse().getQueryResponseObjectIds());
-                source.put("client_id", queryRequest.getUserId());
+                source.put("client_id", queryRequest.getClientId());
                 source.put("user_query", queryRequest.getUserQuery());
                 source.put("query_attributes", queryRequest.getQueryAttributes());
 

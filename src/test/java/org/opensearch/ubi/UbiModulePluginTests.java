@@ -20,13 +20,13 @@ import static org.mockito.Mockito.mock;
 
 public class UbiModulePluginTests extends OpenSearchTestCase {
 
-    private UbiModulePlugin ubiModulePlugin;
+    private UbiPlugin ubiModulePlugin;
 
     private final Client client = mock(Client.class);
 
     @Before
     public void setup() {
-        ubiModulePlugin = new UbiModulePlugin();
+        ubiModulePlugin = new UbiPlugin();
     }
 
     public void testCreateComponent() {
