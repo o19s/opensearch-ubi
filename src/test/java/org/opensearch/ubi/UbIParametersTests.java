@@ -15,10 +15,13 @@ import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.core.xcontent.XContentGenerator;
 import org.opensearch.search.builder.SearchSourceBuilder;
 import org.opensearch.test.OpenSearchTestCase;
+import org.opensearch.ubi.ext.UbiParameters;
+import org.opensearch.ubi.ext.UbiParametersExtBuilder;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -77,7 +80,7 @@ public class UbIParametersTests extends OpenSearchTestCase {
     }
 
     public void testUbiParameters() {
-        final UbiParameters params = new UbiParameters("query_id", "user_query", "client_id", "object_id");
+        final UbiParameters params = new UbiParameters("query_id", "user_query", "client_id", "object_id", Collections.emptyMap());
         UbiParametersExtBuilder extBuilder = new UbiParametersExtBuilder();
         extBuilder.setParams(params);
         SearchSourceBuilder srcBulder = SearchSourceBuilder.searchSource().ext(List.of(extBuilder));
@@ -87,7 +90,7 @@ public class UbIParametersTests extends OpenSearchTestCase {
     }
 
     public void testWriteTo() throws IOException {
-        final UbiParameters params = new UbiParameters("query_id", "user_query", "client_id", "object_id");
+        final UbiParameters params = new UbiParameters("query_id", "user_query", "client_id", "object_id", Collections.emptyMap());
         StreamOutput output = new DummyStreamOutput();
         params.writeTo(output);
         List<String> actual = ((DummyStreamOutput) output).getList();
@@ -98,7 +101,7 @@ public class UbIParametersTests extends OpenSearchTestCase {
     }
 
     public void testToXContent() throws IOException {
-        final UbiParameters params = new UbiParameters("query_id", "user_query", "client_id", "object_id");
+        final UbiParameters params = new UbiParameters("query_id", "user_query", "client_id", "object_id", Collections.emptyMap());
         XContent xc = mock(XContent.class);
         OutputStream os = mock(OutputStream.class);
         XContentGenerator generator = mock(XContentGenerator.class);
@@ -108,7 +111,7 @@ public class UbIParametersTests extends OpenSearchTestCase {
     }
 
     public void testToXContentAllOptionalParameters() throws IOException {
-        final UbiParameters params = new UbiParameters("query_id", "user_query", "client_id", "object_id");
+        final UbiParameters params = new UbiParameters("query_id", "user_query", "client_id", "object_id", Collections.emptyMap());
         XContent xc = mock(XContent.class);
         OutputStream os = mock(OutputStream.class);
         XContentGenerator generator = mock(XContentGenerator.class);

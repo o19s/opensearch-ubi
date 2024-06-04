@@ -8,6 +8,15 @@
 
 package org.opensearch.ubi;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionRequest;
@@ -27,6 +36,7 @@ import org.opensearch.common.util.io.Streams;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.action.ActionResponse;
+import org.opensearch.env.Environment;
 import org.opensearch.search.SearchHit;
 import org.opensearch.tasks.Task;
 import org.opensearch.ubi.ext.UbiParameters;
@@ -35,6 +45,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,13 +68,16 @@ public class UbiActionFilter implements ActionFilter {
     private static final String QUERIES_MAPPING_FILE = "/queries-mapping.json";
 
     private final Client client;
+    private final Environment environment;
 
     /**
      * Creates a new filter.
      * @param client An OpenSearch {@link Client}.
+     * @param environment The OpenSearch {@link Environment}.
      */
-    public UbiActionFilter(Client client) {
+    public UbiActionFilter(Client client, Environment environment) {
         this.client = client;
+        this.environment = environment;
     }
 
     @Override
@@ -102,6 +117,8 @@ public class UbiActionFilter implements ActionFilter {
                         final String userId = ubiParameters.getClientId();
                         final String objectIdField = ubiParameters.getObjectIdField();
                         final Map<String, String> queryAttributes = ubiParameters.getQueryAttributes();
+
+                        // TODO: Ignore the UBI in ext.
                         final String query = searchRequest.source().toString();
 
                         final List<String> queryResponseHitIds = new LinkedList<>();
@@ -122,6 +139,13 @@ public class UbiActionFilter implements ActionFilter {
                         final QueryResponse queryResponse = new QueryResponse(queryId, queryResponseId, queryResponseHitIds);
                         final QueryRequest queryRequest = new QueryRequest(queryId, userQuery, userId, query, queryAttributes, queryResponse);
 
+                        final String dataPrepperUrl = environment.settings().get(UbiSettings.DATA_PREPPER_URL);
+                        if(dataPrepperUrl != null) {
+                            sendToDataPrepper(dataPrepperUrl, queryRequest);
+                        } else {
+                            indexQuery(queryRequest);
+                        }
+
                         SearchResponse searchResponse = (SearchResponse) response;
 
                         response = (Response) new UbiSearchResponse(
@@ -135,8 +159,6 @@ public class UbiActionFilter implements ActionFilter {
                                 searchResponse.getClusters(),
                                 queryId
                         );
-
-                        indexQuery(queryRequest);
 
                     }
 
@@ -152,6 +174,42 @@ public class UbiActionFilter implements ActionFilter {
             }
 
         });
+
+    }
+
+    private void sendToDataPrepper(final String dataPrepperUrl, final QueryRequest queryRequest) {
+
+        LOGGER.debug("Sending query to DataPrepper at " + dataPrepperUrl);
+
+        // TODO: Do this in a background thread?
+        try {
+
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+
+                final HttpPost httpPost = new HttpPost(dataPrepperUrl);
+
+                httpPost.setEntity(new StringEntity(queryRequest.toString()));
+                httpPost.setHeader("Content-type", "application/json");
+
+                AccessController.doPrivileged((PrivilegedAction<Boolean>) () -> {
+                    try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                        final int status = response.getStatusLine().getStatusCode();
+                        if (status != 200) {
+                            LOGGER.error("Unexpected response status from Data Prepper: {}", status);
+                            return false;
+                        }
+                    } catch (Exception ex) {
+                        LOGGER.error("Unable to send query to Data Prepper", ex);
+                        return false;
+                    }
+                    return true;
+                });
+
+            }
+
+        } catch (IOException ex) {
+            LOGGER.error("Failed to send query to Data Prepper", ex);
+        }
 
     }
 
@@ -200,7 +258,7 @@ public class UbiActionFilter implements ActionFilter {
                 source.put("query_id", queryRequest.getQueryId());
                 source.put("query_response_id", queryRequest.getQueryResponse().getQueryResponseId());
                 source.put("query_response_object_ids", queryRequest.getQueryResponse().getQueryResponseObjectIds());
-                source.put("client_id", queryRequest.getUserId());
+                source.put("client_id", queryRequest.getClientId());
                 source.put("user_query", queryRequest.getUserQuery());
                 source.put("query_attributes", queryRequest.getQueryAttributes());
 

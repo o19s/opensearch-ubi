@@ -15,55 +15,28 @@ import org.opensearch.core.common.io.stream.StreamInput;
 import org.opensearch.core.xcontent.XContentHelper;
 import org.opensearch.core.xcontent.XContentParser;
 import org.opensearch.test.OpenSearchTestCase;
+import org.opensearch.ubi.ext.UbiParameters;
+import org.opensearch.ubi.ext.UbiParametersExtBuilder;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class UbiParametersExtBuilderTests extends OpenSearchTestCase {
 
-    public void testCtor() throws IOException {
+    public void testCtor() {
+
+        final Map<String, String> queryAttributes = new HashMap<>();
 
         final UbiParametersExtBuilder builder = new UbiParametersExtBuilder();
-        final UbiParameters parameters = new UbiParameters("query_id", "user_query", "client_id", "object_id");
+        final UbiParameters parameters = new UbiParameters("query_id", "user_query", "client_id", "object_id_field", queryAttributes);
         builder.setParams(parameters);
         assertEquals(parameters, builder.getParams());
-
-        final UbiParametersExtBuilder builder1 = new UbiParametersExtBuilder(new StreamInput() {
-            @Override
-            public byte readByte() throws IOException {
-                return 0;
-            }
-
-            @Override
-            public void readBytes(byte[] b, int offset, int len) throws IOException {
-
-            }
-
-            @Override
-            public void close() throws IOException {
-
-            }
-
-            @Override
-            public int available() throws IOException {
-                return 0;
-            }
-
-            @Override
-            protected void ensureCanReadBytes(int length) throws EOFException {
-
-            }
-
-            @Override
-            public int read() throws IOException {
-                return 0;
-            }
-        });
-
-        assertNotNull(builder1);
 
     }
 
@@ -76,7 +49,7 @@ public class UbiParametersExtBuilderTests extends OpenSearchTestCase {
     }
 
     public void testXContentRoundTrip() throws IOException {
-        UbiParameters param1 = new UbiParameters("query_id", "user_query", "client_id", "object_id");
+        UbiParameters param1 = new UbiParameters("query_id", "user_query", "client_id", "object_id_field", Collections.emptyMap());
         UbiParametersExtBuilder extBuilder = new UbiParametersExtBuilder();
         extBuilder.setParams(param1);
         XContentType xContentType = randomFrom(XContentType.values());
@@ -88,11 +61,11 @@ public class UbiParametersExtBuilderTests extends OpenSearchTestCase {
         assertEquals("query_id", parameters.getQueryId());
         assertEquals("user_query", parameters.getUserQuery());
         assertEquals("client_id", parameters.getClientId());
-        assertEquals("object_id", parameters.getObjectId());
+        assertEquals("object_id_field", parameters.getObjectIdField());
     }
 
     public void testXContentRoundTripAllValues() throws IOException {
-        UbiParameters param1 = new UbiParameters("query_id", "user_query", "client_id", "object_id");
+        UbiParameters param1 = new UbiParameters("query_id", "user_query", "client_id", "object_id_field", Collections.emptyMap());
         UbiParametersExtBuilder extBuilder = new UbiParametersExtBuilder();
         extBuilder.setParams(param1);
         XContentType xContentType = randomFrom(XContentType.values());
@@ -103,7 +76,7 @@ public class UbiParametersExtBuilderTests extends OpenSearchTestCase {
     }
 
     public void testStreamRoundTrip() throws IOException {
-        UbiParameters param1 = new UbiParameters("query_id", "user_query", "client_id", "object_id");
+        UbiParameters param1 = new UbiParameters("query_id", "user_query", "client_id", "object_id_field", Collections.emptyMap());
         UbiParametersExtBuilder extBuilder = new UbiParametersExtBuilder();
         extBuilder.setParams(param1);
         BytesStreamOutput bso = new BytesStreamOutput();
@@ -114,11 +87,11 @@ public class UbiParametersExtBuilderTests extends OpenSearchTestCase {
         assertEquals("query_id", parameters.getQueryId());
         assertEquals("user_query", parameters.getUserQuery());
         assertEquals("client_id", parameters.getClientId());
-        assertEquals("object_id", parameters.getObjectId());
+        assertEquals("object_id_field", parameters.getObjectIdField());
     }
 
     public void testStreamRoundTripAllValues() throws IOException {
-        UbiParameters param1 = new UbiParameters("query_id", "user_query", "client_id", "object_id");
+        UbiParameters param1 = new UbiParameters("query_id", "user_query", "client_id", "object_id_field", Collections.emptyMap());
         UbiParametersExtBuilder extBuilder = new UbiParametersExtBuilder();
         extBuilder.setParams(param1);
         BytesStreamOutput bso = new BytesStreamOutput();
