@@ -213,11 +213,15 @@ Each indexed query will have the following fields:
 
 To send queries to Data Prepper, configure the following properties in OpenSearch:
 
-| Property            | Description                           | Example Value                 |
-|---------------------|---------------------------------------|-------------------------------|
-| ubi.dataprepper.url | Data Prepper's `http_source` endpoint | `http://localhost:2021/log/ingest` |
+| Property                      | Description                                                        | Example Value                      |
+|-------------------------------|--------------------------------------------------------------------|------------------------------------|
+| ubi.dataprepper.url           | Data Prepper's `http_source` endpoint                              | `http://localhost:2021/log/ingest` |
+| ubi.dataprepper.auth.username | Data Prepper's `http_source` authentication username, if required. | Any string value                   |
+| ubi.dataprepper.auth.password | Data Prepper's `http_source` authentication password, if required. | Any string value                                   |
 
-With these properties set, queries will no longer be indexed into the local OpenSearch. The `ubi_queries` index can be deleted. Queries will be sent to Data Prepper as they are received by OpenSearch.
+With these properties set, queries will no longer be indexed into the local OpenSearch. The `ubi_queries` index can be deleted if they have been created. Queries will be sent to Data Prepper as they are received by OpenSearch.
+
+When Data Prepper is enabled, it is important to verify queries are successfully making it into the Data Prepper sink. If the sink does not contain the expected queries, check the Data Prepper log for errors.
 
 ### Capturing Events
 
@@ -338,7 +342,7 @@ The plugin can be built using Gradle:
 ./gradlew build
 ```
 
-To test and debug, build the OpenSearch docker image that contains the built plugin and then start the containers:
+The `docker-compose-*.yml` files in this repository are only for development and test. Its configuration can be used for reference, but it is not intended for production use. To test and debug, build the OpenSearch docker image that contains the built plugin and then start the containers:
 
 ```
 docker compose build && docker compose up
