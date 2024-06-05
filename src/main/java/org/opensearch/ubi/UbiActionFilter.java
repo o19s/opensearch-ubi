@@ -185,12 +185,12 @@ public class UbiActionFilter implements ActionFilter {
 
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
-                final String dataPrepperUserName = environment.settings().get(UbiSettings.DATA_PREPPER_AUTH_USERNAME);
-
                 final HttpPost httpPost = new HttpPost(dataPrepperUrl);
 
                 httpPost.setEntity(new StringEntity(queryRequest.toString()));
                 httpPost.setHeader("Content-type", "application/json");
+
+                final String dataPrepperUserName = environment.settings().get(UbiSettings.DATA_PREPPER_AUTH_USERNAME);
 
                 if(dataPrepperUserName != null) {
                     final String dataPrepperPassword = environment.settings().get(UbiSettings.DATA_PREPPER_AUTH_PASSWORD);
