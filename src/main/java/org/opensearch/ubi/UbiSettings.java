@@ -10,7 +10,6 @@ package org.opensearch.ubi;
 
 import org.opensearch.common.settings.Setting;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,8 +22,28 @@ public class UbiSettings {
      */
     public static final String DATA_PREPPER_URL = "ubi.dataprepper.url";
 
+    /**
+     * The optional username for Data Prepper's http_source.
+     */
+    public static final String DATA_PREPPER_AUTH_USERNAME = "ubi.dataprepper.auth.username";
+
+    /**
+     * The optional password for Data Prepper's http_source.
+     */
+    public static final String DATA_PREPPER_AUTH_PASSWORD = "ubi.dataprepper.auth.password";
+
     private static final Setting<String> DATA_PREPPER_URL_SETTING = Setting.simpleString(
             DATA_PREPPER_URL,
+            Setting.Property.Dynamic,
+            Setting.Property.NodeScope);
+
+    private static final Setting<String> DATA_PREPPER_AUTH_USERNAME_SETTING = Setting.simpleString(
+            DATA_PREPPER_AUTH_USERNAME,
+            Setting.Property.Dynamic,
+            Setting.Property.NodeScope);
+
+    private static final Setting<String> DATA_PREPPER_AUTH_PASSWORD_PASSWORD = Setting.simpleString(
+            DATA_PREPPER_AUTH_PASSWORD,
             Setting.Property.Dynamic,
             Setting.Property.NodeScope);
 
@@ -33,8 +52,10 @@ public class UbiSettings {
      * @return A list of the UBI plugin settings.
      */
     public static List<Setting<?>> getSettings() {
-        return Collections.singletonList(
-                DATA_PREPPER_URL_SETTING
+        return List.of(
+                DATA_PREPPER_URL_SETTING,
+                DATA_PREPPER_AUTH_USERNAME_SETTING,
+                DATA_PREPPER_AUTH_PASSWORD_PASSWORD
         );
     }
 

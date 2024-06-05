@@ -24,6 +24,8 @@ services:
       logger.level: info
       OPENSEARCH_INITIAL_ADMIN_PASSWORD: SuperSecretPassword_123
       #ubi.dataprepper.url: "http://dataprepper-dev-os:2021/log/ingest"
+      #ubi.dataprepper.auth.username: "ubi"
+      #ubi.dataprepper.auth.password: "ubi"
     ulimits:
       memlock:
         soft: -1

@@ -8,10 +8,7 @@
 
 package org.opensearch.ubi;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -44,9 +41,11 @@ import org.opensearch.ubi.ext.UbiParameters;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -186,10 +185,20 @@ public class UbiActionFilter implements ActionFilter {
 
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
+                final String dataPrepperUserName = environment.settings().get(UbiSettings.DATA_PREPPER_AUTH_USERNAME);
+
                 final HttpPost httpPost = new HttpPost(dataPrepperUrl);
 
                 httpPost.setEntity(new StringEntity(queryRequest.toString()));
                 httpPost.setHeader("Content-type", "application/json");
+
+                if(dataPrepperUserName != null) {
+                    final String dataPrepperPassword = environment.settings().get(UbiSettings.DATA_PREPPER_AUTH_PASSWORD);
+                    final String auth = dataPrepperUserName + ":" + dataPrepperPassword;
+                    final byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.ISO_8859_1));
+                    final String authHeader = "Basic " + new String(encodedAuth, StandardCharsets.ISO_8859_1);
+                    httpPost.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+                }
 
                 AccessController.doPrivileged((PrivilegedAction<Boolean>) () -> {
                     try (CloseableHttpResponse response = httpClient.execute(httpPost)) {

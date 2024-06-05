@@ -3,6 +3,10 @@ chorus-ubi-pipeline:
     http:
       port: 2021
       ssl: false
+#      authentication:
+#        http_basic:
+#          username: ubi
+#          password: ubi
   sink:
     - opensearch:
         hosts: [ "http://ubi-dev-os:9200" ]
