@@ -221,6 +221,8 @@ To send queries to Data Prepper, configure the following properties in OpenSearc
 
 With these properties set, queries will no longer be indexed into the local OpenSearch. The `ubi_queries` index can be deleted if they have been created. Queries will be sent to Data Prepper as they are received by OpenSearch.
 
+For information on configuring Data Prepper's `http_source` see Data Prepper's [http_source](https://opensearch.org/docs/latest/data-prepper/pipelines/configuration/sources/http-source/) documentation.
+
 When Data Prepper is enabled, it is important to verify queries are successfully making it into the Data Prepper sink. If the sink does not contain the expected queries, check the Data Prepper log for errors.
 
 ### Capturing Events
