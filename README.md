@@ -1,3 +1,5 @@
+# This repo has moved to [https://github.com/opensearch-project/user-behavior-insights](https://github.com/opensearch-project/user-behavior-insights) and this project is now archived.
+
 # OpenSearch User Behavior Insights
 
 This repository contains the OpenSearch plugin for the User Behavior Insights (UBI) capability. This plugin
